@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Bucket List</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <div class="city-glow" aria-hidden="true"></div>
+
+    <div class="page-shell">
+      <header class="topbar">
+        <div class="brand-wrap">
+          <div class="brand-mark">LA</div>
+          <div class="brand-copy">
+            <span class="eyebrow">Life archive</span>
+            <h1>Bucket List</h1>
+          </div>
+        </div>
+
+        <button id="addBucketBtn" type="button" class="glass-button">+ New memory</button>
+      </header>
+
+      <main class="main-layout">
+        <section class="panel overview-panel">
+          <div class="panel-label">Archive overview</div>
+
+          <div class="stats-row">
+            <div>
+              <span class="stat-label">Completed</span>
+              <strong>12</strong>
+            </div>
+            <div>
+              <span class="stat-label">In motion</span>
+              <strong>05</strong>
+            </div>
+            <div>
+              <span class="stat-label">Dreams</span>
+              <strong>18</strong>
+            </div>
+          </div>
+
+          <div class="progress-block">
+            <div class="ring" aria-label="64 percent complete">
+              <span>64%</span>
+            </div>
+
+            <div class="progress-copy">
+              <p class="muted-label">Life progress</p>
+              <p id="progressText">12 / 18 completed</p>
+            </div>
+          </div>
+        </section>
+
+        <section class="panel hero-panel">
+          <p class="eyebrow">This season</p>
+          <h2>Build a life that feels cinematic.</h2>
+          <p>
+            Some chapters are written in motion. Others are kept in the quiet, waiting for the right light.
+          </p>
+
+          <div class="chip-row">
+            <span>Travel</span>
+            <span>Creativity</span>
+            <span>Home</span>
+          </div>
+        </section>
+
+        <section class="panel calendar-panel">
+          <div class="calendar-header">
+            <button id="prevMonth" type="button" class="nav-button" aria-label="Previous month">←</button>
+            <h2 id="monthLabel">August 2026</h2>
+            <button id="nextMonth" type="button" class="nav-button" aria-label="Next month">→</button>
+          </div>
+
+          <div class="day-names" aria-label="Weekdays">
+            <span>Sun</span>
+            <span>Mon</span>
+            <span>Tue</span>
+            <span>Wed</span>
+            <span>Thu</span>
+            <span>Fri</span>
+            <span>Sat</span>
+          </div>
+
+          <div id="calendarGrid" class="calendar-grid" aria-live="polite"></div>
+          <div id="calendarDetails" class="calendar-details" aria-live="polite"></div>
+        </section>
+
+        <section class="panel bucket-panel">
+          <div class="section-header">
+            <h2>My Buckets</h2>
+          </div>
+
+          <div id="bucketFilters" class="filter-row" aria-label="Filter bucket categories"></div>
+          <div id="bucketList" class="bucket-list" aria-live="polite"></div>
+        </section>
+      </main>
+    </div>
+
+    <div id="bucketModal" class="modal-backdrop hidden" aria-hidden="true">
+      <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+        <div class="modal-header">
+          <h3 id="modalTitle">Add a new memory</h3>
+        </div>
+
+        <form id="bucketForm">
+          <label>
+            Title
+            <input id="bucketGoal" name="goal" type="text" placeholder="See the Northern Lights" required />
+          </label>
+
+          <label>
+            Category
+            <select id="bucketCategory" name="category">
+              <option value="Travel">Travel</option>
+              <option value="Career">Career</option>
+              <option value="Learning">Learning</option>
+              <option value="Experience">Experience</option>
+              <option value="Personal">Personal</option>
+            </select>
+          </label>
+
+          <label>
+            Description
+            <textarea id="bucketDescription" name="description" rows="3" placeholder="Experience the Northern Lights in Iceland."></textarea>
+          </label>
+
+          <label>
+            Date type
+            <select id="bucketDateType" name="dateType">
+              <option value="someday">SOMEDAY</option>
+              <option value="exact">EXACT DATE</option>
+            </select>
+          </label>
+
+          <label id="exactDateField" style="display: none;">
+            Exact date
+            <input id="bucketDate" name="targetDate" type="date" />
+          </label>
+
+          <div class="modal-actions">
+            <button type="button" id="cancelBucketBtn" class="secondary-button">Cancel</button>
+            <button type="submit" class="primary-button">Save memory</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <div id="bucketDetailsModal" class="modal-backdrop hidden" aria-hidden="true">
+      <div class="modal detail-modal" role="dialog" aria-modal="true" aria-labelledby="detailTitle">
+        <div class="modal-header detail-header">
+          <h3 id="detailTitle">Bucket details</h3>
+          <button type="button" id="closeDetailBtn" class="icon-button" aria-label="Close details">×</button>
+        </div>
+
+        <div id="detailContent"></div>
+      </div>
+    </div>
+
+    <script src="script.js"></script>
+  </body>
+</html>
