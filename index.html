@@ -159,6 +159,17 @@
       </div>
     </div>
 
+    <div id="calendarDetailExpanded" class="calendar-detail-expanded hidden" aria-hidden="true">
+      <div class="calendar-detail-overlay" id="calendarDetailOverlay"></div>
+      <div class="calendar-detail-container">
+        <button type="button" id="closeCalendarDetailBtn" class="calendar-detail-close" aria-label="Close expanded calendar detail">←</button>
+        <div class="calendar-detail-expanded-header">
+          <h2 id="expandedDateLabel"></h2>
+        </div>
+        <div id="expandedCalendarDetails" class="expanded-calendar-details" aria-live="polite"></div>
+      </div>
+    </div>
+
     <script src="script.js"></script>
   </body>
 </html>

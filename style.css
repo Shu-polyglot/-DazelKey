@@ -634,6 +634,214 @@ img {
   font-size: 0.94rem;
 }
 
+.calendar-details .day-link {
+  background: none;
+  border: none;
+  color: var(--accent);
+  cursor: pointer;
+  text-decoration: none;
+  padding: 0;
+  font-size: inherit;
+  font-family: inherit;
+  transition: color 0.2s ease;
+}
+
+.calendar-details .day-link:hover {
+  color: var(--accent-strong);
+}
+
+.calendar-day {
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.calendar-day:hover:not(.is-muted) {
+  border-color: rgba(142, 227, 255, 0.24);
+  background: rgba(18, 28, 37, 0.65);
+  transform: translateY(-2px);
+}
+
+.calendar-day.is-selected {
+  border-color: var(--accent);
+  background: rgba(142, 227, 255, 0.12);
+  box-shadow: 0 0 0 2px rgba(142, 227, 255, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.04);
+}
+
+.calendar-detail-expanded {
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+  display: flex;
+  flex-direction: column;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease-out;
+}
+
+.calendar-detail-expanded.visible {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.calendar-detail-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(2, 7, 12, 0.6);
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
+  animation: fadeInOverlay 0.4s ease-out;
+}
+
+@keyframes fadeInOverlay {
+  from {
+    background: rgba(2, 7, 12, 0);
+    backdrop-filter: blur(0px);
+    -webkit-backdrop-filter: blur(0px);
+  }
+  to {
+    background: rgba(2, 7, 12, 0.6);
+    backdrop-filter: blur(2px);
+    -webkit-backdrop-filter: blur(2px);
+  }
+}
+
+.calendar-detail-container {
+  position: relative;
+  z-index: 2001;
+  margin-top: auto;
+  margin-left: auto;
+  margin-right: auto;
+  width: 90%;
+  max-width: 600px;
+  max-height: 80vh;
+  padding: 28px 24px;
+  background: linear-gradient(180deg, rgba(17, 26, 35, 0.95), rgba(11, 17, 24, 0.9));
+  border: 1px solid var(--line);
+  border-radius: 28px 28px 0 0;
+  box-shadow: var(--shadow);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  animation: slideUpDetail 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+  overflow-y: auto;
+}
+
+@keyframes slideUpDetail {
+  from {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.calendar-detail-expanded.closing .calendar-detail-container {
+  animation: slideDownDetail 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+@keyframes slideDownDetail {
+  from {
+    transform: translateY(0);
+    opacity: 1;
+  }
+  to {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+}
+
+.calendar-detail-close {
+  position: absolute;
+  top: 24px;
+  left: 24px;
+  width: 36px;
+  height: 36px;
+  border: 1px solid var(--line);
+  border-radius: 50%;
+  background: rgba(152, 169, 192, 0.04);
+  color: var(--text);
+  font-size: 1.2rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  z-index: 2002;
+}
+
+.calendar-detail-close:hover {
+  background: rgba(142, 227, 255, 0.12);
+  border-color: rgba(142, 227, 255, 0.28);
+}
+
+.calendar-detail-expanded-header {
+  margin-left: 48px;
+  margin-bottom: 20px;
+}
+
+.calendar-detail-expanded-header h2 {
+  margin: 0;
+  font-size: 1.8rem;
+  font-weight: 600;
+  letter-spacing: -0.04em;
+  color: var(--text);
+}
+
+.expanded-calendar-details {
+  margin-left: 0;
+}
+
+.expanded-calendar-details h3 {
+  margin: 0 0 12px;
+  font-size: 0.75rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--soft);
+  font-weight: 500;
+}
+
+.expanded-calendar-details ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  gap: 12px;
+}
+
+.expanded-calendar-details li {
+  padding: 12px 14px;
+  border-radius: var(--radius-sm);
+  background: rgba(142, 227, 255, 0.04);
+  border: 1px solid rgba(142, 227, 255, 0.12);
+  color: var(--text);
+  font-size: 0.95rem;
+  transition: all 0.2s ease;
+}
+
+.expanded-calendar-details li:hover {
+  background: rgba(142, 227, 255, 0.08);
+  border-color: rgba(142, 227, 255, 0.24);
+  transform: translateX(4px);
+}
+
+.expanded-calendar-details .day-link {
+  background: none;
+  border: none;
+  color: var(--accent);
+  cursor: pointer;
+  text-decoration: none;
+  padding: 0;
+  font-size: inherit;
+  font-family: inherit;
+  font-weight: 500;
+  transition: color 0.2s ease;
+}
+
+.expanded-calendar-details .day-link:hover {
+  color: var(--accent-strong);
+}
+
 .detail-modal {
   max-width: 540px;
 }

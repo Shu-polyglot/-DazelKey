@@ -162,12 +162,19 @@ const bucketForm = document.getElementById('bucketForm');
 const detailsModal = document.getElementById('bucketDetailsModal');
 const detailContent = document.getElementById('detailContent');
 const closeDetailBtn = document.getElementById('closeDetailBtn');
+const calendarDetailExpanded = document.getElementById('calendarDetailExpanded');
+const calendarDetailOverlay = document.getElementById('calendarDetailOverlay');
+const closeCalendarDetailBtn = document.getElementById('closeCalendarDetailBtn');
+const expandedDateLabel = document.getElementById('expandedDateLabel');
+const expandedCalendarDetails = document.getElementById('expandedCalendarDetails');
 
 let bucketState = loadData();
 let currentMonth = new Date(2026, 7, 1);
 let activeFilter = 'All';
 let selectedDate = null;
 let detailsEditMode = false;
+let selectedBucketId = null;
+let expandedCalendarDate = null;
 let detailsBucketId = null;
 
 function normalizeBucket(bucket, index) {
@@ -399,6 +406,42 @@ function renderCalendarDetails() {
   });
 }
 
+function openExpandedCalendarDetail(isoDate) {
+  const matches = getBucketMatchesForDate(isoDate);
+  
+  expandedDateLabel.textContent = formatDate(isoDate);
+  
+  if (!matches.length) {
+    expandedCalendarDetails.innerHTML = '<h3>No activities planned</h3><ul><li>Nothing scheduled for this day.</li></ul>';
+  } else {
+    const entries = matches
+      .map((bucket) => `<li><button type="button" data-bucket-id="${bucket.id}" class="day-link">${bucket.title}</button><br><span style="font-size: 0.85rem; color: var(--soft);">${getStatusLabel(bucket)}</span></li>`)
+      .join('');
+    expandedCalendarDetails.innerHTML = `<h3>Planned activities</h3><ul>${entries}</ul>`;
+    
+    expandedCalendarDetails.querySelectorAll('[data-bucket-id]').forEach((button) => {
+      button.addEventListener('click', () => {
+        closeExpandedCalendarDetail();
+        openBucketDetails(Number(button.dataset.bucketId));
+      });
+    });
+  }
+  
+  calendarDetailExpanded.classList.remove('hidden');
+  calendarDetailExpanded.setAttribute('aria-hidden', 'false');
+  calendarDetailExpanded.classList.add('visible');
+}
+
+function closeExpandedCalendarDetail() {
+  calendarDetailExpanded.classList.add('closing');
+  setTimeout(() => {
+    calendarDetailExpanded.classList.remove('visible', 'closing');
+    calendarDetailExpanded.classList.add('hidden');
+    calendarDetailExpanded.setAttribute('aria-hidden', 'true');
+    expandedCalendarDate = null;
+  }, 400);
+}
+
 function renderCalendar() {
   const monthStart = new Date(currentMonth.getFullYear(), currentMonth.getMonth(), 1);
   const monthEnd = new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1, 0);
@@ -457,10 +500,15 @@ function renderCalendar() {
     dateNumber.textContent = String(dayValue);
     dayEl.appendChild(dateNumber);
 
+    if (selectedDate === isoDate) {
+      dayEl.classList.add('is-selected');
+    }
+
     dayEl.addEventListener('click', () => {
       selectedDate = isoDate;
+      expandedCalendarDate = isoDate;
       renderCalendar();
-      renderCalendarDetails();
+      openExpandedCalendarDetail(isoDate);
     });
 
     calendarGrid.appendChild(dayEl);
@@ -955,6 +1003,8 @@ nextMonthBtn.addEventListener('click', () => {
 addBucketBtn.addEventListener('click', openModal);
 cancelBucketBtn.addEventListener('click', closeModal);
 closeDetailBtn.addEventListener('click', closeDetailsModal);
+closeCalendarDetailBtn.addEventListener('click', closeExpandedCalendarDetail);
+calendarDetailOverlay.addEventListener('click', closeExpandedCalendarDetail);
 
 const dateTypeField = document.getElementById('bucketDateType');
 if (dateTypeField) {
