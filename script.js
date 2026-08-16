@@ -167,6 +167,9 @@ const calendarDetailOverlay = document.getElementById('calendarDetailOverlay');
 const closeCalendarDetailBtn = document.getElementById('closeCalendarDetailBtn');
 const expandedDateLabel = document.getElementById('expandedDateLabel');
 const expandedCalendarDetails = document.getElementById('expandedCalendarDetails');
+const lifeMapSvg = document.getElementById('lifeMapSvg');
+const lifeMapContainer = document.getElementById('lifeMapContainer');
+const resetMapViewBtn = document.getElementById('resetMapView');
 
 let bucketState = loadData();
 let currentMonth = new Date(2026, 7, 1);
@@ -176,6 +179,235 @@ let detailsEditMode = false;
 let selectedBucketId = null;
 let expandedCalendarDate = null;
 let detailsBucketId = null;
+let lifeMap = null;
+
+// ============================================================================
+// LIFE MAP IMPLEMENTATION
+// ============================================================================
+
+class MapNode {
+  constructor(bucket, x, y) {
+    this.bucket = bucket;
+    this.x = x;
+    this.y = y;
+    this.radius = 24;
+    this.isDragging = false;
+  }
+
+  getColor() {
+    const colors = {
+      Travel: 'rgba(142, 227, 255, 0.25)',
+      Career: 'rgba(181, 157, 255, 0.25)',
+      Learning: 'rgba(151, 215, 181, 0.25)',
+      Experience: 'rgba(255, 200, 100, 0.25)',
+      Personal: 'rgba(255, 170, 170, 0.25)',
+    };
+    return colors[this.bucket.category] || 'rgba(142, 227, 255, 0.25)';
+  }
+
+  getStrokeColor() {
+    const colors = {
+      Travel: 'rgba(142, 227, 255, 0.6)',
+      Career: 'rgba(181, 157, 255, 0.6)',
+      Learning: 'rgba(151, 215, 181, 0.6)',
+      Experience: 'rgba(255, 200, 100, 0.6)',
+      Personal: 'rgba(255, 170, 170, 0.6)',
+    };
+    return colors[this.bucket.category] || 'rgba(142, 227, 255, 0.6)';
+  }
+}
+
+class LifeMap {
+  constructor(svgElement, container, bucketData) {
+    this.svg = svgElement;
+    this.container = container;
+    this.buckets = bucketData;
+    this.nodes = [];
+    this.zoomLevel = 1;
+    this.panX = 0;
+    this.panY = 0;
+    this.isDraggingMap = false;
+    this.dragStartX = 0;
+    this.dragStartY = 0;
+    this.selectedNode = null;
+
+    this.init();
+  }
+
+  init() {
+    this.setupSVG();
+    this.createNodes();
+    this.setupEventListeners();
+    this.render();
+  }
+
+  setupSVG() {
+    this.svg.setAttribute('viewBox', '0 0 800 600');
+    this.svg.innerHTML = '';
+    
+    // Background group
+    this.bgGroup = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+    this.svg.appendChild(this.bgGroup);
+    
+    // Nodes group
+    this.nodesGroup = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+    this.svg.appendChild(this.nodesGroup);
+  }
+
+  createNodes() {
+    this.nodes = [];
+    const categoryGroups = {};
+
+    this.buckets.forEach((bucket) => {
+      if (!categoryGroups[bucket.category]) {
+        categoryGroups[bucket.category] = [];
+      }
+      categoryGroups[bucket.category].push(bucket);
+    });
+
+    const categories = Object.keys(categoryGroups);
+    const centerX = 400;
+    const centerY = 300;
+    const baseRadius = 120;
+
+    categories.forEach((category, idx) => {
+      const angle = (idx / categories.length) * Math.PI * 2;
+      const categoryRadius = baseRadius + Math.random() * 40;
+      const categoryX = centerX + Math.cos(angle) * categoryRadius;
+      const categoryY = centerY + Math.sin(angle) * categoryRadius;
+
+      categoryGroups[category].forEach((bucket, bucketIdx) => {
+        const subAngle = (bucketIdx / categoryGroups[category].length) * Math.PI * 2 - Math.PI / 2;
+        const radius = 35 + Math.random() * 20;
+        const x = categoryX + Math.cos(subAngle) * radius;
+        const y = categoryY + Math.sin(subAngle) * radius;
+
+        const node = new MapNode(bucket, x, y);
+        this.nodes.push(node);
+      });
+    });
+  }
+
+  render() {
+    this.nodesGroup.innerHTML = '';
+
+    this.nodes.forEach((node) => {
+      const group = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+      group.setAttribute('class', `map-node ${node.bucket.category.toLowerCase()} ${node.bucket.status}`);
+      group.setAttribute('data-bucket-id', node.bucket.id);
+
+      const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+      circle.setAttribute('cx', node.x);
+      circle.setAttribute('cy', node.y);
+      circle.setAttribute('r', node.radius);
+      circle.setAttribute('fill', node.getColor());
+      circle.setAttribute('stroke', node.getStrokeColor());
+      circle.setAttribute('stroke-width', '1.5');
+
+      const label = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+      label.setAttribute('x', node.x);
+      label.setAttribute('y', node.y - 2);
+      label.setAttribute('class', 'map-node-label');
+      label.textContent = node.bucket.title.substring(0, 12);
+
+      const category = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+      category.setAttribute('x', node.x);
+      category.setAttribute('y', node.y + 8);
+      category.setAttribute('class', 'map-node-category');
+      category.textContent = node.bucket.category.substring(0, 3).toUpperCase();
+
+      group.appendChild(circle);
+      group.appendChild(label);
+      group.appendChild(category);
+
+      group.addEventListener('mouseenter', () => this.onNodeHover(group, node));
+      group.addEventListener('mouseleave', () => this.onNodeLeave(group, node));
+      group.addEventListener('mousedown', (e) => this.onNodeMouseDown(e, node));
+      group.addEventListener('click', () => this.onNodeClick(node));
+
+      this.nodesGroup.appendChild(group);
+    });
+  }
+
+  onNodeHover(group, node) {
+    group.setAttribute('filter', 'brightness(1.2)');
+  }
+
+  onNodeLeave(group, node) {
+    group.removeAttribute('filter');
+  }
+
+  onNodeMouseDown(e, node) {
+    e.preventDefault();
+    node.isDragging = true;
+    this.selectedNode = node;
+    this.dragStartX = e.clientX;
+    this.dragStartY = e.clientY;
+  }
+
+  onNodeClick(node) {
+    openBucketDetails(node.bucket.id);
+  }
+
+  setupEventListeners() {
+    this.svg.addEventListener('mousemove', (e) => this.onMapMouseMove(e));
+    this.svg.addEventListener('mouseup', (e) => this.onMapMouseUp(e));
+    this.svg.addEventListener('mouseleave', (e) => this.onMapMouseUp(e));
+    this.svg.addEventListener('wheel', (e) => this.onMapWheel(e), { passive: false });
+
+    resetMapViewBtn.addEventListener('click', () => this.resetView());
+  }
+
+  onMapMouseMove(e) {
+    if (this.selectedNode && this.selectedNode.isDragging) {
+      const deltaX = e.clientX - this.dragStartX;
+      const deltaY = e.clientY - this.dragStartY;
+
+      const rect = this.svg.getBoundingClientRect();
+      const scaleX = 800 / rect.width;
+      const scaleY = 600 / rect.height;
+
+      this.selectedNode.x += deltaX * scaleX;
+      this.selectedNode.y += deltaY * scaleY;
+
+      this.dragStartX = e.clientX;
+      this.dragStartY = e.clientY;
+
+      this.render();
+    }
+  }
+
+  onMapMouseUp(e) {
+    if (this.selectedNode) {
+      this.selectedNode.isDragging = false;
+      this.selectedNode = null;
+    }
+  }
+
+  onMapWheel(e) {
+    e.preventDefault();
+    const zoomFactor = e.deltaY > 0 ? 0.9 : 1.1;
+    const newZoom = Math.max(0.5, Math.min(3, this.zoomLevel * zoomFactor));
+
+    if (newZoom !== this.zoomLevel) {
+      this.zoomLevel = newZoom;
+      this.svg.setAttribute('style', `transform: scale(${this.zoomLevel}); transform-origin: center;`);
+    }
+  }
+
+  resetView() {
+    this.zoomLevel = 1;
+    this.panX = 0;
+    this.panY = 0;
+    this.svg.setAttribute('style', 'transform: scale(1); transform-origin: center;');
+  }
+
+  updateBuckets(newBuckets) {
+    this.buckets = newBuckets;
+    this.createNodes();
+    this.render();
+  }
+}
 
 function normalizeBucket(bucket, index) {
   const safeStatus = ['planned', 'in-progress', 'completed'].includes(bucket.status) ? bucket.status : 'planned';
@@ -891,6 +1123,9 @@ function saveBucketEdit(bucketId, form) {
   renderCalendar();
   detailsEditMode = false;
   renderBucketDetailsView(bucketId);
+  if (lifeMap) {
+    lifeMap.updateBuckets(bucketState);
+  }
 }
 
 function deleteBucket(bucketId) {
@@ -904,6 +1139,9 @@ function deleteBucket(bucketId) {
   updateProgress();
   renderBuckets();
   renderCalendar();
+  if (lifeMap) {
+    lifeMap.updateBuckets(bucketState);
+  }
   closeDetailsModal();
 }
 
@@ -935,6 +1173,9 @@ function completeBucket(bucketId, chosenDate) {
   updateProgress();
   renderBuckets();
   renderCalendar();
+  if (lifeMap) {
+    lifeMap.updateBuckets(bucketState);
+  }
   openBucketDetails(bucket.id);
 }
 
@@ -976,6 +1217,9 @@ function addBucket(event) {
   renderFilters();
   renderBuckets();
   renderCalendar();
+  if (lifeMap) {
+    lifeMap.updateBuckets(bucketState);
+  }
   closeModal();
 }
 
@@ -1035,3 +1279,4 @@ renderFilters();
 renderBuckets();
 updateProgress();
 renderCalendar();
+lifeMap = new LifeMap(lifeMapSvg, lifeMapContainer, bucketState);
