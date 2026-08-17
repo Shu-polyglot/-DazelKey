@@ -5,7 +5,7 @@
   align-items: center;
   justify-content: center;
   padding: var(--space-md);
-  background: rgba(4, 3, 2, 0.6);
+  background: rgba(var(--color-void-1-rgb), 0.6);
   backdrop-filter: blur(10px);
   z-index: 30;
 }
@@ -13,7 +13,7 @@
 .modal {
   width: min(100%, 440px);
   padding: var(--space-lg) var(--space-md);
-  background: rgba(19, 15, 12, 0.94);
+  background: rgba(var(--color-void-2-rgb), 0.94);
   border: 1px solid var(--color-border);
   border-radius: 26px;
   box-shadow: var(--shadow-strong);
@@ -52,7 +52,7 @@
   height: 36px;
   border-radius: 50%;
   border: 1px solid var(--color-border);
-  background: rgba(214, 201, 184, 0.04);
+  background: rgba(var(--color-mist-rgb), 0.04);
   color: var(--color-text-primary);
   font-size: 1.5rem;
   cursor: pointer;
@@ -61,7 +61,7 @@
 
 .icon-button:hover {
   border-color: var(--color-border-strong);
-  background: rgba(214, 201, 184, 0.1);
+  background: rgba(var(--color-mist-rgb), 0.1);
 }
 
 .bucket-form {
@@ -83,7 +83,7 @@
   padding: var(--space-sm) var(--space-sm);
   border: 1px solid var(--color-border-strong);
   border-radius: var(--radius-sm);
-  background: rgba(9, 7, 5, 0.6);
+  background: rgba(var(--color-void-1-rgb), 0.6);
   color: var(--color-text-primary);
   resize: vertical;
 }
@@ -95,7 +95,7 @@
 .detail-form select:focus,
 .detail-form textarea:focus {
   outline: none;
-  border-color: rgba(216, 162, 74, 0.4);
+  border-color: rgba(var(--color-glow-rgb), 0.4);
   box-shadow: 0 0 0 3px var(--color-accent-subtle);
 }
 
@@ -121,20 +121,20 @@
 
 /* Neutral action — save, edit. Not the achievement moment. */
 .primary-button {
-  background: rgba(214, 201, 184, 0.1);
+  background: rgba(var(--color-mist-rgb), 0.1);
   border-color: var(--color-border-strong);
   color: var(--color-text-primary);
 }
 
 .secondary-button {
-  background: rgba(214, 201, 184, 0.05);
+  background: rgba(var(--color-mist-rgb), 0.05);
   color: var(--color-text-secondary);
 }
 
 /* The one amber action in the product — marking something achieved. */
 .achieve-button {
-  background: linear-gradient(180deg, rgba(216, 162, 74, 0.28), rgba(216, 162, 74, 0.14));
-  border-color: rgba(216, 162, 74, 0.4);
+  background: linear-gradient(180deg, rgba(var(--color-glow-rgb), 0.28), rgba(var(--color-glow-rgb), 0.14));
+  border-color: rgba(var(--color-glow-rgb), 0.4);
   color: var(--color-text-primary);
 }
 
@@ -145,7 +145,7 @@
 }
 
 .achieve-button:hover {
-  border-color: rgba(216, 162, 74, 0.55);
+  border-color: rgba(var(--color-glow-rgb), 0.55);
   box-shadow: 0 0 0 6px var(--color-accent-subtle);
 }
 
@@ -168,7 +168,7 @@
 .detail-item {
   padding: var(--space-sm) var(--space-sm);
   border-radius: var(--radius-sm);
-  background: rgba(214, 201, 184, 0.04);
+  background: rgba(var(--color-mist-rgb), 0.04);
   border: 1px solid var(--color-border);
 }
 
@@ -256,7 +256,7 @@
   width: 100%;
   border: 1px solid var(--color-border-strong);
   border-radius: var(--radius-sm);
-  background: rgba(9, 7, 5, 0.6);
+  background: rgba(var(--color-void-1-rgb), 0.6);
   color: var(--color-text-primary);
   padding: var(--space-sm) var(--space-sm);
   resize: vertical;

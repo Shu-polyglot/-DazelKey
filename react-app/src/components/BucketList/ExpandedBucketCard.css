@@ -6,7 +6,7 @@
   align-items: center;
   justify-content: center;
   padding: var(--space-lg);
-  background: rgba(5, 4, 3, 0.72);
+  background: rgba(var(--color-void-1-rgb), 0.72);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
 }
@@ -22,7 +22,7 @@
   border: 1px solid var(--color-border);
   border-radius: var(--radius-lg);
   background:
-    radial-gradient(circle at 50% -10%, rgba(216, 162, 74, 0.08), transparent 55%),
+    radial-gradient(circle at 50% -10%, rgba(var(--color-glow-rgb), 0.08), transparent 55%),
     var(--color-surface-elevated);
   box-shadow: var(--shadow-strong);
   cursor: default;

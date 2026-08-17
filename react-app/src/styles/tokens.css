@@ -1,39 +1,57 @@
 /*
-  Design tokens for Life OS — "Field Journal" identity.
-  Warm ink-dark ground, one accent reserved for achievement, a serif
-  voice for editorial moments (headlines, achievement cards, numerals)
+  Design tokens for Life OS — "Cinematic Dark Blue" identity.
+  Near-black navy ground deepening into midnight-blue surfaces, a
+  restrained cinematic blue accent used throughout (no color reserved
+  and withheld elsewhere), warm ivory reserved for primary text and
+  literal "starlight" moments in the Opening Experience. Serif voice
+  for editorial moments (headlines, achievement cards, numerals)
   paired with the existing sans for UI chrome and body copy.
+
+  --color-mist-rgb / --color-glow-rgb / --color-glow-bright-rgb /
+  --color-void-*-rgb are R,G,B triples (no rgba() wrapper) meant to be
+  composed as rgba(var(--color-x-rgb), alpha) by components that need
+  a one-off wash or shadow at a custom opacity — they exist so every
+  component draws from the same few hues instead of inventing new
+  ones.
 */
 
 :root {
   /* ---------------------------------------------------------------- */
   /* Color                                                             */
   /* ---------------------------------------------------------------- */
-  --color-bg: #0e0c0a;
-  --color-bg-elevated: #17130f;
+  --color-bg: #05070d;
+  --color-bg-elevated: #0a0f1c;
 
-  --color-surface: rgba(24, 20, 17, 0.6);
-  --color-surface-elevated: rgba(28, 24, 20, 0.85);
+  --color-surface: rgba(18, 27, 42, 0.6);
+  --color-surface-elevated: rgba(23, 33, 51, 0.85);
 
-  --color-border: rgba(214, 201, 184, 0.1);
-  --color-border-strong: rgba(214, 201, 184, 0.2);
+  --color-border: rgba(190, 206, 226, 0.1);
+  --color-border-strong: rgba(190, 206, 226, 0.2);
 
   --color-text-primary: #f3ede2;
-  --color-text-secondary: rgba(232, 222, 206, 0.68);
-  --color-text-muted: rgba(232, 222, 206, 0.42);
+  --color-text-secondary: rgba(200, 212, 230, 0.68);
+  --color-text-muted: rgba(200, 212, 230, 0.42);
 
-  /* Achievement accent — reserved for completion/achieved states only */
-  --color-accent: #d8a24a;
-  --color-accent-strong: #e8b768;
-  --color-accent-subtle: rgba(216, 162, 74, 0.14);
+  /* Cinematic blue — the product's one accent, used throughout */
+  --color-accent: #6f9bc7;
+  --color-accent-strong: #9dc7ec;
+  --color-accent-subtle: rgba(111, 155, 199, 0.16);
 
-  /* Minor "in motion" signal — used sparingly, never for achievement */
+  /* Minor "in motion" signal — used sparingly, distinct from accent */
   --color-inprogress: #8fa98f;
   --color-inprogress-subtle: rgba(143, 169, 143, 0.14);
 
   --color-success: #97d789;
   --color-warning: #e0b06a;
   --color-danger: #e08a72;
+
+  /* Composable washes/shadows — see file header */
+  --color-mist-rgb: 190, 206, 226;
+  --color-glow-rgb: 111, 155, 199;
+  --color-glow-bright-rgb: 157, 199, 236;
+  --color-void-1-rgb: 2, 5, 11;
+  --color-void-2-rgb: 9, 14, 25;
+  --color-void-3-rgb: 16, 24, 40;
 
   /* ---------------------------------------------------------------- */
   /* Typography                                                        */
@@ -93,9 +111,9 @@
   /* ---------------------------------------------------------------- */
   /* Elevation                                                         */
   /* ---------------------------------------------------------------- */
-  --shadow-subtle: 0 8px 24px rgba(6, 4, 2, 0.35);
-  --shadow-medium: 0 16px 40px rgba(6, 4, 2, 0.48);
-  --shadow-strong: 0 20px 60px rgba(6, 4, 2, 0.58);
+  --shadow-subtle: 0 8px 24px rgba(2, 4, 10, 0.4);
+  --shadow-medium: 0 16px 40px rgba(2, 4, 10, 0.52);
+  --shadow-strong: 0 20px 60px rgba(2, 4, 10, 0.62);
 
   --blur-sm: 8px;
   --blur-md: 14px;

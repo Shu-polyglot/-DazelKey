@@ -1,7 +1,7 @@
 .modal.composer-modal {
   background:
-    radial-gradient(circle at 50% -10%, rgba(216, 162, 74, 0.09), transparent 55%),
-    rgba(19, 15, 12, 0.94);
+    radial-gradient(circle at 50% -10%, rgba(var(--color-glow-rgb), 0.09), transparent 55%),
+    rgba(var(--color-void-2-rgb), 0.94);
 }
 
 .composer {
@@ -111,7 +111,7 @@
   padding: var(--space-2xs) var(--space-sm);
   border-radius: var(--radius-pill);
   border: 1px solid var(--color-border);
-  background: rgba(214, 201, 184, 0.04);
+  background: rgba(var(--color-mist-rgb), 0.04);
   color: var(--color-text-secondary);
   cursor: pointer;
   font-size: var(--font-size-body-sm);
@@ -119,7 +119,7 @@
 }
 
 .composer-chip.is-active {
-  background: rgba(214, 201, 184, 0.1);
+  background: rgba(var(--color-mist-rgb), 0.1);
   border-color: var(--color-border-strong);
   color: var(--color-text-primary);
 }
@@ -131,9 +131,9 @@
   margin-top: var(--space-2xs);
 }
 
-/* Deliberately neutral, not amber — accent stays reserved for achievement. */
+/* Deliberately neutral — the accent glow is reserved for the achieve moment. */
 .composer-submit:hover {
-  box-shadow: 0 0 0 6px rgba(214, 201, 184, 0.08);
+  box-shadow: 0 0 0 6px rgba(var(--color-mist-rgb), 0.08);
 }
 
 @media (max-width: 640px) {

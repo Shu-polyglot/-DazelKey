@@ -7,7 +7,7 @@
   font-family: var(--font-family-display);
   font-style: italic;
   font-size: 1.1rem;
-  background: radial-gradient(circle at 50% 0%, rgba(216, 162, 74, 0.06), transparent 65%), rgba(216, 162, 74, 0.02);
+  background: radial-gradient(circle at 50% 0%, rgba(var(--color-glow-rgb), 0.06), transparent 65%), rgba(var(--color-glow-rgb), 0.02);
 }
 
 .achievements-shelf {
@@ -43,21 +43,21 @@
   padding: var(--space-lg) var(--space-md);
   border-radius: var(--radius-lg);
   border: 1px solid var(--color-border);
-  background: radial-gradient(circle at 50% 0%, rgba(216, 162, 74, 0.07), transparent 60%), var(--color-bg-elevated);
+  background: radial-gradient(circle at 50% 0%, rgba(var(--color-glow-rgb), 0.07), transparent 60%), var(--color-bg-elevated);
   box-shadow: var(--shadow-medium);
   overflow: hidden;
   transition: border-color 0.2s ease;
 }
 
 .achievement-card:hover .achievement-card-frame {
-  border-color: rgba(216, 162, 74, 0.3);
+  border-color: rgba(var(--color-glow-rgb), 0.3);
 }
 
 .achievement-card-frame::after {
   content: '';
   position: absolute;
   inset: 0;
-  box-shadow: inset 0 0 60px rgba(6, 4, 2, 0.55);
+  box-shadow: inset 0 0 60px rgba(var(--color-void-1-rgb), 0.55);
   pointer-events: none;
 }
 
