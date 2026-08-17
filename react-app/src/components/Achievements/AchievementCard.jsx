@@ -1,6 +1,6 @@
 import { motion } from 'motion/react';
 import { formatDate } from '../../lib/dates';
-import { transitions, spring } from '../../styles/motion';
+import { spring, dashboardEntrance, entranceTransition, staggerDelay } from '../../styles/motion';
 import './Achievements.css';
 
 function AchievementCard({ bucket, index, onOpen }) {
@@ -10,7 +10,7 @@ function AchievementCard({ bucket, index, onOpen }) {
       onClick={() => onOpen(bucket.id)}
       initial={{ opacity: 0, y: 14, filter: 'blur(6px)' }}
       animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
-      transition={{ ...transitions.emphasis, delay: Math.min(index * 0.05, 0.3) }}
+      transition={entranceTransition(staggerDelay(dashboardEntrance.achievements, index))}
       whileHover={{ y: -6, scale: 1.015, transition: spring.hover }}
       whileTap={{ y: -1, scale: 0.97, transition: spring.press }}
     >

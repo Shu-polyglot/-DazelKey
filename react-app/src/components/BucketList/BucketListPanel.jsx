@@ -1,8 +1,9 @@
 import { useMemo, useState } from 'react';
-import { AnimatePresence } from 'motion/react';
+import { AnimatePresence, motion } from 'motion/react';
 import CategoryFilters from './CategoryFilters';
 import BucketCard from './BucketCard';
 import ExpandedBucketCard from './ExpandedBucketCard';
+import { dashboardEntrance, entranceTransition } from '../../styles/motion';
 import './BucketList.css';
 
 function BucketListPanel({ buckets, onUpdate, onDelete, onComplete }) {
@@ -27,21 +28,35 @@ function BucketListPanel({ buckets, onUpdate, onDelete, onComplete }) {
 
   return (
     <section className="app-section bucket-section">
-      <div className="section-heading">
-        <span className="section-label">Intentions</span>
-        <h2>What’s ahead</h2>
-      </div>
+      <motion.div
+        initial={{ opacity: 0, y: 14, filter: 'blur(6px)' }}
+        animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
+        transition={entranceTransition(dashboardEntrance.bucketList)}
+      >
+        <div className="section-heading">
+          <span className="section-label">Intentions</span>
+          <h2>What’s ahead</h2>
+        </div>
 
-      <CategoryFilters activeFilter={activeFilter} onChange={setActiveFilter} />
+        <CategoryFilters activeFilter={activeFilter} onChange={setActiveFilter} />
+      </motion.div>
 
       <div className="bucket-list">
         <AnimatePresence mode="popLayout">
           {filteredBuckets.length === 0 ? (
-            <div className="empty-state" key="empty">
+            <motion.div
+              className="empty-state"
+              key="empty"
+              initial={{ opacity: 0, y: 14, filter: 'blur(6px)' }}
+              animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
+              transition={entranceTransition(dashboardEntrance.bucketList + 0.06)}
+            >
               Your next adventure starts here.
-            </div>
+            </motion.div>
           ) : (
-            gridBuckets.map((bucket) => <BucketCard key={bucket.id} bucket={bucket} onOpen={setExpandedId} />)
+            gridBuckets.map((bucket, index) => (
+              <BucketCard key={bucket.id} bucket={bucket} index={index} onOpen={setExpandedId} />
+            ))
           )}
         </AnimatePresence>
       </div>

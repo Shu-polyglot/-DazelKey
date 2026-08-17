@@ -37,3 +37,32 @@ export const transitions = {
   exit: { duration: duration.standard, ease: easing.exit },
   press: spring.press,
 };
+
+/*
+  Dashboard entrance choreography — the one place that owns "when does
+  each section wake up" so the sequence reads as a single environment
+  coming to life, not each component picking its own timing. Sections
+  read a delay from here; list items (achievements, bucket cards) add
+  a small per-index stagger on top, capped so a long list doesn't drag
+  the sequence out.
+*/
+export const dashboardEntrance = {
+  header: 0.12,
+  overview: 0.24,
+  progress: 0.4,
+  nextUp: 0.48,
+  achievements: 0.56,
+  bucketList: 0.62,
+  calendar: 0.74,
+};
+
+export const entranceStagger = 0.05;
+export const entranceStaggerCap = 0.25;
+
+export function staggerDelay(baseDelay, index) {
+  return baseDelay + Math.min(index * entranceStagger, entranceStaggerCap);
+}
+
+export function entranceTransition(delay = 0, overrides = {}) {
+  return { duration: 0.55, delay, ease: easing.emphasized, ...overrides };
+}

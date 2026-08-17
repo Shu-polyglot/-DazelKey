@@ -1,14 +1,19 @@
 import { motion } from 'motion/react';
 import { getNextUpcoming } from '../lib/buckets';
 import { formatDate } from '../lib/dates';
-import { transitions } from '../styles/motion';
+import { transitions, dashboardEntrance, entranceTransition } from '../styles/motion';
 import './NextUpPanel.css';
 
 function NextUpPanel({ buckets, onOpenBucket }) {
   const next = getNextUpcoming(buckets);
 
   return (
-    <section className="panel next-up-panel">
+    <motion.section
+      className="panel next-up-panel"
+      initial={{ opacity: 0, y: 14, filter: 'blur(6px)' }}
+      animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
+      transition={entranceTransition(dashboardEntrance.nextUp)}
+    >
       <p className="eyebrow">What’s ahead</p>
 
       {next ? (
@@ -31,7 +36,7 @@ function NextUpPanel({ buckets, onOpenBucket }) {
           <p className="next-up-meta">Give one of your intentions a date to see it here.</p>
         </div>
       )}
-    </section>
+    </motion.section>
   );
 }
 

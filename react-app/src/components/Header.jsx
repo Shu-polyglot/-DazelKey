@@ -1,5 +1,5 @@
 import { motion } from 'motion/react';
-import { spring } from '../styles/motion';
+import { spring, dashboardEntrance, entranceTransition } from '../styles/motion';
 import './Header.css';
 
 function getInitials(name) {
@@ -17,7 +17,12 @@ function getInitials(name) {
 
 function Header({ title, profile, onAddBucket, onOpenProfile }) {
   return (
-    <header className="topbar">
+    <motion.header
+      className="topbar"
+      initial={{ opacity: 0, y: 14, filter: 'blur(6px)' }}
+      animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
+      transition={entranceTransition(dashboardEntrance.header)}
+    >
       <div className="brand-wrap">
         <motion.button
           type="button"
@@ -45,7 +50,7 @@ function Header({ title, profile, onAddBucket, onOpenProfile }) {
       >
         + Add to What’s ahead
       </motion.button>
-    </header>
+    </motion.header>
   );
 }
 

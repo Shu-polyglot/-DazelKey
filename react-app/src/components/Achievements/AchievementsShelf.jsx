@@ -1,4 +1,6 @@
+import { motion } from 'motion/react';
 import AchievementCard from './AchievementCard';
+import { dashboardEntrance, entranceTransition } from '../../styles/motion';
 import './Achievements.css';
 
 function AchievementsShelf({ buckets, onOpenBucket }) {
@@ -6,13 +8,25 @@ function AchievementsShelf({ buckets, onOpenBucket }) {
 
   return (
     <section className="app-section">
-      <div className="section-heading">
+      <motion.div
+        className="section-heading"
+        initial={{ opacity: 0, y: 14, filter: 'blur(6px)' }}
+        animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
+        transition={entranceTransition(dashboardEntrance.achievements)}
+      >
         <span className="section-label">The Archive</span>
         <h2>What you’ve lived</h2>
-      </div>
+      </motion.div>
 
       {achievements.length === 0 ? (
-        <div className="achievements-empty">Nothing archived yet — your first achievement will appear here.</div>
+        <motion.div
+          className="achievements-empty"
+          initial={{ opacity: 0, y: 14, filter: 'blur(6px)' }}
+          animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
+          transition={entranceTransition(dashboardEntrance.achievements + 0.06)}
+        >
+          Nothing archived yet — your first achievement will appear here.
+        </motion.div>
       ) : (
         <div className="achievements-shelf">
           {achievements.map((bucket, index) => (

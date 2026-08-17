@@ -5,7 +5,7 @@ import CalendarDayDetails from './CalendarDayDetails';
 import CalendarExpandedOverlay from './CalendarExpandedOverlay';
 import { buildMonthGrid } from '../../lib/calendar';
 import { formatMonth } from '../../lib/dates';
-import { spring } from '../../styles/motion';
+import { spring, dashboardEntrance, entranceTransition } from '../../styles/motion';
 import './Calendar.css';
 
 const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
@@ -31,7 +31,12 @@ function CalendarPanel({ buckets, onOpenBucket }) {
   }
 
   return (
-    <section className="app-section calendar-section">
+    <motion.section
+      className="app-section calendar-section"
+      initial={{ opacity: 0, y: 14, filter: 'blur(6px)' }}
+      animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
+      transition={entranceTransition(dashboardEntrance.calendar)}
+    >
       <span className="section-label">Your timeline</span>
 
       <div className="calendar-header">
@@ -81,7 +86,7 @@ function CalendarPanel({ buckets, onOpenBucket }) {
           />
         )}
       </AnimatePresence>
-    </section>
+    </motion.section>
   );
 }
 
