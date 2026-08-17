@@ -1,0 +1,143 @@
+.modal.composer-modal {
+  background:
+    radial-gradient(circle at 50% -10%, rgba(216, 162, 74, 0.09), transparent 55%),
+    rgba(19, 15, 12, 0.94);
+}
+
+.composer {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg);
+}
+
+.composer-prompt {
+  font-family: var(--font-family-display);
+  font-style: italic;
+  font-weight: var(--font-weight-regular);
+  font-size: 1.05rem;
+  letter-spacing: var(--tracking-normal);
+  text-transform: none;
+  color: var(--color-text-secondary);
+}
+
+.composer-input {
+  width: 100%;
+  border: none;
+  border-bottom: 1px solid var(--color-border-strong);
+  background: transparent;
+  padding: var(--space-xs) 0 var(--space-md);
+  font-family: var(--font-family-display);
+  font-size: clamp(1.4rem, 3vw, 1.9rem);
+  font-weight: var(--font-weight-regular);
+  color: var(--color-text-primary);
+  transition: border-color 0.25s ease, box-shadow 0.25s ease;
+}
+
+.composer-input::placeholder {
+  color: var(--color-text-muted);
+  font-style: italic;
+}
+
+.composer-input:focus {
+  outline: none;
+  border-bottom-color: var(--color-accent);
+  box-shadow: 0 4px 16px -6px var(--color-accent-subtle);
+}
+
+.composer-toggles {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-md);
+  margin-top: calc(-1 * var(--space-sm));
+}
+
+.composer-toggle {
+  appearance: none;
+  border: none;
+  background: none;
+  padding: 0;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-body-sm);
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.composer-toggle:hover {
+  color: var(--color-text-secondary);
+}
+
+.composer-field {
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2xs);
+}
+
+.composer-field-label {
+  font-size: var(--font-size-caption);
+  letter-spacing: var(--tracking-wide);
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+}
+
+.composer-field input,
+.composer-field textarea {
+  width: 100%;
+  border: none;
+  border-bottom: 1px solid var(--color-border);
+  background: transparent;
+  padding: var(--space-xs) 0;
+  color: var(--color-text-primary);
+  font-size: var(--font-size-body);
+  font-family: inherit;
+  resize: none;
+}
+
+.composer-field input:focus,
+.composer-field textarea:focus {
+  outline: none;
+  border-bottom-color: var(--color-accent);
+}
+
+.composer-chip-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-xs);
+  padding-top: var(--space-2xs);
+}
+
+.composer-chip {
+  appearance: none;
+  padding: var(--space-2xs) var(--space-sm);
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--color-border);
+  background: rgba(214, 201, 184, 0.04);
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  font-size: var(--font-size-body-sm);
+  transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+}
+
+.composer-chip.is-active {
+  background: rgba(214, 201, 184, 0.1);
+  border-color: var(--color-border-strong);
+  color: var(--color-text-primary);
+}
+
+.composer-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-xs);
+  margin-top: var(--space-2xs);
+}
+
+/* Deliberately neutral, not amber — accent stays reserved for achievement. */
+.composer-submit:hover {
+  box-shadow: 0 0 0 6px rgba(214, 201, 184, 0.08);
+}
+
+@media (max-width: 640px) {
+  .composer-actions {
+    flex-direction: column;
+  }
+}

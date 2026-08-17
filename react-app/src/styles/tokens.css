@@ -1,40 +1,48 @@
 /*
-  Design tokens for Life OS.
-  Source of truth for color, type, spacing, radius, and elevation.
-  Ported and reorganized from the root app's style.css, which already
-  established a dark, cool, editorial visual language worth keeping.
+  Design tokens for Life OS — "Field Journal" identity.
+  Warm ink-dark ground, one accent reserved for achievement, a serif
+  voice for editorial moments (headlines, achievement cards, numerals)
+  paired with the existing sans for UI chrome and body copy.
 */
 
 :root {
   /* ---------------------------------------------------------------- */
   /* Color                                                             */
   /* ---------------------------------------------------------------- */
-  --color-bg: #07141a;
-  --color-bg-elevated: #0b1d2a;
+  --color-bg: #0e0c0a;
+  --color-bg-elevated: #17130f;
 
-  --color-surface: rgba(18, 28, 37, 0.6);
-  --color-surface-elevated: rgba(22, 31, 41, 0.82);
+  --color-surface: rgba(24, 20, 17, 0.6);
+  --color-surface-elevated: rgba(28, 24, 20, 0.85);
 
-  --color-border: rgba(176, 201, 220, 0.12);
-  --color-border-strong: rgba(176, 201, 220, 0.2);
+  --color-border: rgba(214, 201, 184, 0.1);
+  --color-border-strong: rgba(214, 201, 184, 0.2);
 
-  --color-text-primary: #edf5ff;
-  --color-text-secondary: rgba(214, 225, 236, 0.72);
-  --color-text-muted: rgba(214, 225, 236, 0.45);
+  --color-text-primary: #f3ede2;
+  --color-text-secondary: rgba(232, 222, 206, 0.68);
+  --color-text-muted: rgba(232, 222, 206, 0.42);
 
-  --color-accent: #8ee3ff;
-  --color-accent-strong: #7db7ff;
-  --color-accent-subtle: rgba(142, 227, 255, 0.14);
+  /* Achievement accent — reserved for completion/achieved states only */
+  --color-accent: #d8a24a;
+  --color-accent-strong: #e8b768;
+  --color-accent-subtle: rgba(216, 162, 74, 0.14);
 
-  --color-success: #97d7b5;
-  --color-warning: #f0bd77;
-  --color-danger: #ff8f8f;
+  /* Minor "in motion" signal — used sparingly, never for achievement */
+  --color-inprogress: #8fa98f;
+  --color-inprogress-subtle: rgba(143, 169, 143, 0.14);
+
+  --color-success: #97d789;
+  --color-warning: #e0b06a;
+  --color-danger: #e08a72;
 
   /* ---------------------------------------------------------------- */
   /* Typography                                                        */
   /* ---------------------------------------------------------------- */
   --font-family-base: "SF Pro Display", "SF Pro Text", -apple-system,
     BlinkMacSystemFont, "Segoe UI", sans-serif;
+
+  --font-family-display: Georgia, "Iowan Old Style", "Palatino Linotype",
+    "Times New Roman", serif;
 
   --font-size-display: clamp(2.75rem, 5vw, 4.5rem);
   --font-size-h1: clamp(2.25rem, 4vw, 3.25rem);
@@ -85,9 +93,9 @@
   /* ---------------------------------------------------------------- */
   /* Elevation                                                         */
   /* ---------------------------------------------------------------- */
-  --shadow-subtle: 0 8px 24px rgba(1, 7, 12, 0.35);
-  --shadow-medium: 0 16px 40px rgba(1, 7, 12, 0.48);
-  --shadow-strong: 0 20px 60px rgba(1, 7, 12, 0.58);
+  --shadow-subtle: 0 8px 24px rgba(6, 4, 2, 0.35);
+  --shadow-medium: 0 16px 40px rgba(6, 4, 2, 0.48);
+  --shadow-strong: 0 20px 60px rgba(6, 4, 2, 0.58);
 
   --blur-sm: 8px;
   --blur-md: 14px;

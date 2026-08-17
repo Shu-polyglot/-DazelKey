@@ -26,6 +26,8 @@ export const easing = {
 export const spring = {
   press: { type: 'spring', stiffness: 500, damping: 30, mass: 0.8 },
   soft: { type: 'spring', stiffness: 260, damping: 28, mass: 1 },
+  hover: { type: 'spring', stiffness: 380, damping: 22, mass: 0.6 }, // quick, light lift toward the cursor
+  commit: { type: 'spring', stiffness: 420, damping: 20, mass: 0.9 }, // slightly looser — for the one "I did this" action
 };
 
 export const transitions = {

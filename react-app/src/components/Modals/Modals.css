@@ -1,0 +1,287 @@
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-md);
+  background: rgba(4, 3, 2, 0.6);
+  backdrop-filter: blur(10px);
+  z-index: 30;
+}
+
+.modal {
+  width: min(100%, 440px);
+  padding: var(--space-lg) var(--space-md);
+  background: rgba(19, 15, 12, 0.94);
+  border: 1px solid var(--color-border);
+  border-radius: 26px;
+  box-shadow: var(--shadow-strong);
+  max-height: 85vh;
+  overflow-y: auto;
+}
+
+.modal.detail-modal {
+  max-width: 540px;
+}
+
+.modal-header h3 {
+  margin: 0 0 var(--space-md);
+  font-family: var(--font-family-display);
+  font-weight: var(--font-weight-regular);
+  font-size: 1.8rem;
+  letter-spacing: var(--tracking-tight);
+}
+
+.detail-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.archived-tag {
+  font-size: var(--font-size-label);
+  letter-spacing: var(--tracking-wider);
+  text-transform: uppercase;
+  color: var(--color-accent);
+  margin-bottom: var(--space-2xs);
+}
+
+.icon-button {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 1px solid var(--color-border);
+  background: rgba(214, 201, 184, 0.04);
+  color: var(--color-text-primary);
+  font-size: 1.5rem;
+  cursor: pointer;
+  transition: border-color 0.2s ease, background 0.2s ease;
+}
+
+.icon-button:hover {
+  border-color: var(--color-border-strong);
+  background: rgba(214, 201, 184, 0.1);
+}
+
+.bucket-form {
+  display: grid;
+  gap: var(--space-md);
+}
+
+.bucket-form label {
+  display: grid;
+  gap: var(--space-xs);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-secondary);
+}
+
+.bucket-form input,
+.bucket-form select,
+.bucket-form textarea {
+  width: 100%;
+  padding: var(--space-sm) var(--space-sm);
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-sm);
+  background: rgba(9, 7, 5, 0.6);
+  color: var(--color-text-primary);
+  resize: vertical;
+}
+
+.bucket-form input:focus,
+.bucket-form select:focus,
+.bucket-form textarea:focus,
+.detail-form input:focus,
+.detail-form select:focus,
+.detail-form textarea:focus {
+  outline: none;
+  border-color: rgba(216, 162, 74, 0.4);
+  box-shadow: 0 0 0 3px var(--color-accent-subtle);
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-xs);
+  margin-top: var(--space-2xs);
+}
+
+.primary-button,
+.secondary-button,
+.achieve-button {
+  appearance: none;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-pill);
+  cursor: pointer;
+  transition: border-color 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
+  padding: var(--space-sm) var(--space-md);
+  font-weight: var(--font-weight-semibold);
+  font-size: var(--font-size-body-sm);
+}
+
+/* Neutral action — save, edit. Not the achievement moment. */
+.primary-button {
+  background: rgba(214, 201, 184, 0.1);
+  border-color: var(--color-border-strong);
+  color: var(--color-text-primary);
+}
+
+.secondary-button {
+  background: rgba(214, 201, 184, 0.05);
+  color: var(--color-text-secondary);
+}
+
+/* The one amber action in the product — marking something achieved. */
+.achieve-button {
+  background: linear-gradient(180deg, rgba(216, 162, 74, 0.28), rgba(216, 162, 74, 0.14));
+  border-color: rgba(216, 162, 74, 0.4);
+  color: var(--color-text-primary);
+}
+
+.primary-button:hover,
+.secondary-button:hover,
+.achieve-button:hover {
+  border-color: var(--color-border-strong);
+}
+
+.achieve-button:hover {
+  border-color: rgba(216, 162, 74, 0.55);
+  box-shadow: 0 0 0 6px var(--color-accent-subtle);
+}
+
+.detail-content {
+  display: grid;
+  gap: var(--space-md);
+}
+
+.detail-section {
+  display: grid;
+  gap: var(--space-sm);
+}
+
+.detail-meta {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-sm);
+}
+
+.detail-item {
+  padding: var(--space-sm) var(--space-sm);
+  border-radius: var(--radius-sm);
+  background: rgba(214, 201, 184, 0.04);
+  border: 1px solid var(--color-border);
+}
+
+.detail-item .label {
+  display: block;
+  font-size: 0.68rem;
+  letter-spacing: var(--tracking-wide);
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+  margin-bottom: var(--space-3xs);
+}
+
+.detail-item .value {
+  color: var(--color-text-primary);
+  font-size: 0.95rem;
+}
+
+.achieve-prompt {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: var(--space-md);
+  padding: var(--space-md) 0;
+  margin: var(--space-xs) 0;
+  border-top: 1px solid var(--color-border);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.achieve-prompt-label {
+  flex: 1 1 100%;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-body-sm);
+}
+
+.achieve-date-field {
+  display: grid;
+  gap: var(--space-2xs);
+  color: var(--color-text-muted);
+  font-size: var(--font-size-caption);
+  letter-spacing: var(--tracking-wide);
+  text-transform: uppercase;
+}
+
+.achieve-date-field input {
+  border: none;
+  border-bottom: 1px solid var(--color-border-strong);
+  background: transparent;
+  padding: var(--space-2xs) 0;
+  color: var(--color-text-primary);
+  font-size: var(--font-size-body-sm);
+  text-transform: none;
+  letter-spacing: normal;
+}
+
+.achieve-date-field input:focus {
+  outline: none;
+  border-bottom-color: var(--color-accent);
+}
+
+.detail-form {
+  display: grid;
+  gap: var(--space-sm);
+}
+
+.detail-form label,
+.detail-form-label {
+  display: grid;
+  gap: var(--space-xs);
+  color: var(--color-text-secondary);
+  font-size: 0.9rem;
+}
+
+.detail-form-label span {
+  display: block;
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-primary);
+  font-size: 0.85rem;
+  letter-spacing: var(--tracking-wide);
+  text-transform: uppercase;
+}
+
+.detail-form input,
+.detail-form textarea,
+.detail-form select {
+  width: 100%;
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-sm);
+  background: rgba(9, 7, 5, 0.6);
+  color: var(--color-text-primary);
+  padding: var(--space-sm) var(--space-sm);
+  resize: vertical;
+}
+
+.detail-form textarea {
+  min-height: 90px;
+}
+
+.detail-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: var(--space-xs);
+  margin-top: var(--space-sm);
+}
+
+@media (max-width: 640px) {
+  .modal-actions {
+    flex-direction: column;
+  }
+
+  .primary-button,
+  .secondary-button,
+  .achieve-button {
+    width: 100%;
+  }
+}

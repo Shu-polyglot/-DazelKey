@@ -1,0 +1,138 @@
+.filter-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-xs);
+  margin-bottom: var(--space-lg);
+}
+
+.filter-button {
+  appearance: none;
+  padding: var(--space-2xs) var(--space-sm);
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--color-border);
+  background: rgba(214, 201, 184, 0.04);
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+}
+
+.filter-button.is-active {
+  background: rgba(214, 201, 184, 0.1);
+  border-color: var(--color-border-strong);
+  color: var(--color-text-primary);
+}
+
+.bucket-list {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--space-md);
+}
+
+.bucket-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+  padding: var(--space-md) var(--space-md) var(--space-sm);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface);
+  cursor: pointer;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.bucket-card:hover {
+  border-color: var(--color-border-strong);
+  box-shadow: var(--shadow-subtle);
+}
+
+.bucket-card-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.bucket-category {
+  margin: 0;
+  color: var(--color-text-muted);
+  letter-spacing: var(--tracking-wide);
+  text-transform: uppercase;
+  font-size: 0.68rem;
+}
+
+.bucket-status {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-3xs) var(--space-xs);
+  border-radius: var(--radius-pill);
+  font-size: 0.66rem;
+  letter-spacing: var(--tracking-wide);
+  text-transform: uppercase;
+  border: 1px solid var(--color-border);
+}
+
+.bucket-card h3 {
+  margin: 0;
+  font-family: var(--font-family-display);
+  font-weight: var(--font-weight-regular);
+  font-size: clamp(1.3rem, 2vw, 1.6rem);
+  letter-spacing: var(--tracking-tight);
+  line-height: 1.15;
+}
+
+.bucket-meta {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-body-sm);
+}
+
+.bucket-card[data-status='Someday'] .bucket-status {
+  background: rgba(214, 201, 184, 0.06);
+  color: var(--color-text-secondary);
+}
+
+.bucket-card[data-status='Planned'] .bucket-status {
+  background: var(--color-inprogress-subtle);
+  color: var(--color-inprogress);
+}
+
+.bucket-card-actions {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.bucket-status-button {
+  appearance: none;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-pill);
+  cursor: pointer;
+  transition: border-color 0.2s ease, background 0.2s ease;
+  padding: var(--space-xs) var(--space-sm);
+  background: rgba(214, 201, 184, 0.05);
+  color: var(--color-text-primary);
+  font-size: 0.76rem;
+}
+
+.bucket-status-button:hover {
+  border-color: var(--color-border-strong);
+  background: rgba(214, 201, 184, 0.1);
+}
+
+.empty-state {
+  grid-column: 1 / -1;
+  padding: var(--space-2xl) var(--space-md);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  text-align: center;
+  color: var(--color-text-secondary);
+  font-family: var(--font-family-display);
+  font-style: italic;
+  font-size: 1.1rem;
+  background: radial-gradient(circle at 50% 0%, rgba(216, 162, 74, 0.05), transparent 65%), rgba(214, 201, 184, 0.02);
+}
+
+@media (max-width: 840px) {
+  .bucket-list {
+    grid-template-columns: 1fr;
+  }
+}
