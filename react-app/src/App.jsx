@@ -84,15 +84,11 @@ function App() {
           />
 
           <main className="main-layout">
-            <OverviewPanel buckets={buckets} />
+            <OverviewPanel buckets={buckets} onOpenArchive={() => setIsArchiveOpen(true)} />
             <NextUpPanel buckets={buckets} onOpenBucket={setDetailsBucketId} />
           </main>
 
-          <AchievementsShelf
-            buckets={buckets}
-            onOpenBucket={setDetailsBucketId}
-            onOpenArchive={() => setIsArchiveOpen(true)}
-          />
+          <AchievementsShelf buckets={buckets} onOpenBucket={setDetailsBucketId} />
           <CalendarPanel buckets={buckets} onOpenBucket={setDetailsBucketId} />
           <BucketListPanel
             buckets={buckets}

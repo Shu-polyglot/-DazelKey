@@ -1,9 +1,9 @@
 import { useEffect, useMemo, useRef } from 'react';
 import { motion, animate, useMotionValue, useTransform, useReducedMotion } from 'motion/react';
-import { dashboardEntrance, entranceTransition, easing } from '../styles/motion';
+import { dashboardEntrance, entranceTransition, easing, spring } from '../styles/motion';
 import './OverviewPanel.css';
 
-function OverviewPanel({ buckets }) {
+function OverviewPanel({ buckets, onOpenArchive }) {
   const stats = useMemo(() => {
     const completed = buckets.filter((bucket) => bucket.status === 'completed').length;
     const inProgress = buckets.filter((bucket) => bucket.status === 'in-progress').length;
@@ -54,27 +54,41 @@ function OverviewPanel({ buckets }) {
   return (
     <motion.section
       className="panel overview-panel"
+      id="archive-section"
       initial={{ opacity: 0, y: 14, filter: 'blur(6px)' }}
       animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
       transition={entranceTransition(dashboardEntrance.overview)}
     >
       <p className="panel-label">Archive overview</p>
 
-      <div className="overview-body">
-        <div className="overview-count">
-          <motion.span className="overview-number">{roundedCount}</motion.span>
-          <span className="overview-caption">experiences archived</span>
-          {stats.inProgress > 0 && <span className="overview-secondary">{stats.inProgress} in motion</span>}
+      <motion.button
+        type="button"
+        className="overview-target"
+        onClick={onOpenArchive}
+        whileHover={{ y: -2, transition: spring.hover }}
+        whileTap={{ y: 1, scale: 0.98, transition: spring.press }}
+      >
+        <div className="overview-body">
+          <div className="overview-count">
+            <motion.span className="overview-number">{roundedCount}</motion.span>
+            <span className="overview-caption">experiences archived</span>
+            {stats.inProgress > 0 && <span className="overview-secondary">{stats.inProgress} in motion</span>}
+          </div>
+
+          <motion.div
+            className="ring"
+            style={{ background: ringBackground }}
+            aria-label={`${stats.percentage} percent of the archive complete`}
+          >
+            <motion.span>{percentageLabel}</motion.span>
+          </motion.div>
         </div>
 
-        <motion.div
-          className="ring"
-          style={{ background: ringBackground }}
-          aria-label={`${stats.percentage} percent of the archive complete`}
-        >
-          <motion.span>{percentageLabel}</motion.span>
-        </motion.div>
-      </div>
+        <div className="overview-invite">
+          <span className="overview-invite-label">What you’ve lived</span>
+          <span className="overview-invite-cta">Learn more →</span>
+        </div>
+      </motion.button>
     </motion.section>
   );
 }
