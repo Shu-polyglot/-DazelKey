@@ -1,0 +1,27 @@
+.profile-photo-button {
+  appearance: none;
+  justify-self: center;
+  width: 92px;
+  height: 92px;
+  margin-bottom: var(--space-xs);
+  border-radius: 50%;
+  border: 1.5px dashed var(--color-border-strong);
+  background-color: rgba(214, 201, 184, 0.04);
+  background-size: cover;
+  background-position: center;
+  display: grid;
+  place-items: center;
+  color: var(--color-text-muted);
+  font-size: 1.5rem;
+  cursor: pointer;
+  transition: border-color 0.2s ease, background-color 0.2s ease;
+}
+
+.profile-photo-button:hover {
+  border-color: var(--color-border-strong);
+  background-color: rgba(214, 201, 184, 0.08);
+}
+
+.photo-input {
+  display: none;
+}

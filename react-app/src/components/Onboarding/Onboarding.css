@@ -140,10 +140,10 @@
 }
 
 /* ------------------------------------------------------------------ */
-/* Age step                                                            */
+/* Name / Age / Photo steps                                            */
 /* ------------------------------------------------------------------ */
 
-.age-question {
+.opening-question {
   font-family: var(--font-family-display);
   font-weight: var(--font-weight-regular);
   font-size: clamp(1.75rem, 3.5vw, 2.75rem);
@@ -152,30 +152,41 @@
   margin-bottom: var(--space-lg);
 }
 
-.age-input-wrap {
+.opening-input-row {
   display: flex;
   align-items: center;
   justify-content: center;
   gap: var(--space-md);
 }
 
-.age-input {
+.age-input,
+.name-input {
   appearance: none;
-  width: clamp(140px, 30vw, 240px);
   padding-bottom: var(--space-sm);
   border: none;
   border-bottom: 2px solid var(--color-border-strong);
   background: transparent;
   color: var(--color-text-primary);
   font-family: var(--font-family-display);
-  font-size: clamp(4rem, 12vw, 7rem);
-  font-variant-numeric: tabular-nums;
-  line-height: 1;
   text-align: center;
   transition: border-color 0.2s ease;
 }
 
-.age-input::placeholder {
+.age-input {
+  width: clamp(140px, 30vw, 240px);
+  font-size: clamp(4rem, 12vw, 7rem);
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
+
+.name-input {
+  width: min(420px, 80vw);
+  font-size: clamp(2rem, 6vw, 3rem);
+  line-height: 1.15;
+}
+
+.age-input::placeholder,
+.name-input::placeholder {
   color: var(--color-text-muted);
 }
 
@@ -189,20 +200,23 @@
   -moz-appearance: textfield;
 }
 
-.age-input:focus {
+.age-input:focus,
+.name-input:focus {
   outline: none;
   border-bottom-color: var(--color-accent-strong);
 }
 
-.has-error .age-input {
+.has-error .age-input,
+.has-error .name-input {
   border-bottom-color: var(--color-danger);
 }
 
-.age-continue {
+.opening-continue {
   display: grid;
   place-items: center;
   width: 52px;
   height: 52px;
+  flex: none;
   border-radius: 50%;
   border: 1px solid var(--color-border);
   background: rgba(243, 237, 226, 0.04);
@@ -212,14 +226,44 @@
   transition: border-color 0.2s ease, background 0.2s ease;
 }
 
-.age-continue:hover {
+.opening-continue:hover {
   border-color: var(--color-border-strong);
   background: rgba(243, 237, 226, 0.08);
 }
 
-.age-error {
+.opening-error {
   color: var(--color-danger);
   font-size: var(--font-size-caption);
+}
+
+.photo-dropzone {
+  appearance: none;
+  width: 160px;
+  height: 160px;
+  border-radius: 50%;
+  border: 1.5px dashed var(--color-border-strong);
+  background-color: rgba(243, 237, 226, 0.03);
+  background-size: cover;
+  background-position: center;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  color: var(--color-text-muted);
+  transition: border-color 0.2s ease, background-color 0.2s ease, transform 0.2s ease;
+}
+
+.photo-dropzone:hover {
+  border-color: var(--color-border-strong);
+  transform: translateY(-2px);
+}
+
+.photo-dropzone-label {
+  font-size: 2rem;
+  font-weight: var(--font-weight-regular);
+}
+
+.photo-input {
+  display: none;
 }
 
 @media (max-width: 640px) {
@@ -228,7 +272,12 @@
     padding: var(--space-lg) var(--space-md);
   }
 
-  .age-input-wrap {
+  .opening-input-row {
     gap: var(--space-sm);
+  }
+
+  .photo-dropzone {
+    width: 132px;
+    height: 132px;
   }
 }

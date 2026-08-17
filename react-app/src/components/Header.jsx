@@ -2,11 +2,34 @@ import { motion } from 'motion/react';
 import { spring } from '../styles/motion';
 import './Header.css';
 
-function Header({ title, onAddBucket }) {
+function getInitials(name) {
+  if (!name) {
+    return 'LA';
+  }
+  const initials = name
+    .trim()
+    .split(/\s+/)
+    .slice(0, 2)
+    .map((part) => part[0]?.toUpperCase())
+    .join('');
+  return initials || 'LA';
+}
+
+function Header({ title, profile, onAddBucket, onOpenProfile }) {
   return (
     <header className="topbar">
       <div className="brand-wrap">
-        <div className="brand-mark">LA</div>
+        <motion.button
+          type="button"
+          className="brand-mark"
+          onClick={onOpenProfile}
+          aria-label={profile?.name ? `Edit profile — ${profile.name}` : 'Edit profile'}
+          style={profile?.photo ? { backgroundImage: `url(${profile.photo})` } : undefined}
+          whileHover={{ y: -2, transition: spring.hover }}
+          whileTap={{ scale: 0.94, transition: spring.press }}
+        >
+          {!profile?.photo && getInitials(profile?.name)}
+        </motion.button>
         <div className="brand-copy">
           <span className="eyebrow">Life archive</span>
           <h1>{title}</h1>
