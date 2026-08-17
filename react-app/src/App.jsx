@@ -61,7 +61,12 @@ function App() {
 
           <AchievementsShelf buckets={buckets} onOpenBucket={setDetailsBucketId} />
           <CalendarPanel buckets={buckets} onOpenBucket={setDetailsBucketId} />
-          <BucketListPanel buckets={buckets} onOpenBucket={setDetailsBucketId} />
+          <BucketListPanel
+            buckets={buckets}
+            onUpdate={updateBucket}
+            onDelete={deleteBucket}
+            onComplete={completeBucket}
+          />
 
           <AnimatePresence>
             {isAddModalOpen && (

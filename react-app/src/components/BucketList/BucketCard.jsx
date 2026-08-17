@@ -1,7 +1,7 @@
 import { motion } from 'motion/react';
 import { getStatusLabel } from '../../lib/buckets';
 import { formatDate } from '../../lib/dates';
-import { spring } from '../../styles/motion';
+import { spring, easing } from '../../styles/motion';
 
 function BucketCard({ bucket, onOpen }) {
   const meta =
@@ -20,13 +20,14 @@ function BucketCard({ bucket, onOpen }) {
       className="bucket-card"
       data-status={getStatusLabel(bucket)}
       onClick={() => onOpen(bucket.id)}
+      layoutId={`bucket-card-${bucket.id}`}
       layout
       initial={{ opacity: 0, y: 10, scale: 0.97 }}
       animate={{ opacity: 1, y: 0, scale: 1 }}
       exit={{ opacity: 0, scale: 0.96, transition: { duration: 0.16 } }}
       whileHover={{ y: -3, transition: spring.hover }}
       whileTap={{ y: 0, scale: 0.98, transition: spring.press }}
-      transition={{ layout: { duration: 0.28, ease: [0.16, 1, 0.3, 1] }, default: { duration: 0.28, ease: [0.16, 1, 0.3, 1] } }}
+      transition={{ layout: { duration: 0.6, ease: easing.emphasized }, default: { duration: 0.28, ease: [0.16, 1, 0.3, 1] } }}
     >
       <div className="bucket-card-top">
         <p className="bucket-category">{bucket.category}</p>
