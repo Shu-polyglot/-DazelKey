@@ -1,5 +1,5 @@
 import { motion } from 'motion/react';
-import { getStatusLabel } from '../../lib/buckets';
+import { getStatusLabel, whenLabels, modeLabels } from '../../lib/buckets';
 import { formatDate } from '../../lib/dates';
 import { spring, easing, dashboardEntrance, staggerDelay } from '../../styles/motion';
 
@@ -9,11 +9,7 @@ function BucketCard({ bucket, index = 0, onOpen }) {
       ? bucket.completedDate
         ? formatDate(bucket.completedDate)
         : 'Completed'
-      : bucket.dateType === 'someday'
-        ? 'Someday'
-        : bucket.targetDate
-          ? formatDate(bucket.targetDate)
-          : 'Date to be chosen';
+      : [modeLabels[bucket.mode], bucket.place].filter(Boolean).join(' · ');
 
   return (
     <motion.article
@@ -33,7 +29,7 @@ function BucketCard({ bucket, index = 0, onOpen }) {
       }}
     >
       <div className="bucket-card-top">
-        <p className="bucket-category">{bucket.category}</p>
+        <p className="bucket-category">{bucket.status === 'completed' ? 'Completed' : whenLabels[bucket.when]}</p>
         <span className="bucket-status">{getStatusLabel(bucket)}</span>
       </div>
 

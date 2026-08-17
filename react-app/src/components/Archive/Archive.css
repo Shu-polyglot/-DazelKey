@@ -1,0 +1,127 @@
+.archive-experience {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  overflow: hidden;
+  background: var(--color-bg);
+}
+
+.archive-close {
+  position: absolute;
+  top: var(--space-lg);
+  right: var(--space-lg);
+  z-index: 5;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  border: 1px solid var(--color-border);
+  background: rgba(var(--color-void-1-rgb), 0.4);
+  color: var(--color-text-primary);
+  font-size: 1.3rem;
+  line-height: 1;
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+  transition: border-color 0.2s ease, background 0.2s ease;
+}
+
+.archive-close:hover,
+.archive-close:focus-visible {
+  border-color: var(--color-border-strong);
+  background: rgba(var(--color-void-1-rgb), 0.65);
+}
+
+.archive-close:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+/* ------------------------------------------------------------------ */
+/* Progress                                                             */
+/* ------------------------------------------------------------------ */
+
+.story-progress {
+  position: absolute;
+  top: var(--space-lg);
+  left: var(--space-lg);
+  right: calc(var(--space-lg) * 2 + 38px);
+  z-index: 5;
+  display: flex;
+  gap: 5px;
+}
+
+.story-progress-segment {
+  flex: 1;
+  height: 2px;
+  border-radius: var(--radius-pill);
+  background: rgba(var(--color-mist-rgb), 0.22);
+  overflow: hidden;
+  display: block;
+}
+
+.story-progress-fill {
+  display: block;
+  width: 100%;
+  height: 100%;
+  background: var(--color-text-primary);
+  transform-origin: left;
+}
+
+.story-progress-fill:not(.is-done) {
+  transform: scaleX(0);
+}
+
+.story-progress-fill.is-done {
+  transform: scaleX(1);
+}
+
+/* ------------------------------------------------------------------ */
+/* Stage + tap zones                                                    */
+/* ------------------------------------------------------------------ */
+
+.archive-stage {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  height: 100%;
+}
+
+.story-frame {
+  position: absolute;
+  inset: 0;
+}
+
+.archive-tap-zone {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  appearance: none;
+  border: none;
+  background: none;
+  padding: 0;
+  cursor: pointer;
+}
+
+.archive-tap-zone.left {
+  right: auto;
+  width: 35%;
+}
+
+.archive-tap-zone.right {
+  left: 35%;
+}
+
+@media (max-width: 640px) {
+  .story-progress {
+    top: calc(var(--space-md) + env(safe-area-inset-top));
+    left: var(--space-md);
+    right: calc(var(--space-md) * 2 + 34px);
+  }
+
+  .archive-close {
+    top: calc(var(--space-md) + env(safe-area-inset-top));
+    right: var(--space-md);
+    width: 34px;
+    height: 34px;
+  }
+}

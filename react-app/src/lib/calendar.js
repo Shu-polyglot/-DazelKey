@@ -24,16 +24,8 @@ export function buildMonthGrid(monthDate) {
   return cells;
 }
 
+// The Calendar shows lived history, not plans -- only completed Buckets,
+// matched by the one real date in the model.
 export function getBucketMatchesForDate(buckets, dateString) {
-  return buckets.filter((bucket) => {
-    if (bucket.dateType === 'exact' && bucket.targetDate === dateString) {
-      return true;
-    }
-
-    if (bucket.completedDate === dateString) {
-      return true;
-    }
-
-    return false;
-  });
+  return buckets.filter((bucket) => bucket.completedDate === dateString);
 }

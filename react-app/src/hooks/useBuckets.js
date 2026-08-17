@@ -1,11 +1,13 @@
 import { useMemo } from 'react';
 import { useLocalStorage } from './useLocalStorage';
 import { STORAGE_KEY, defaultBuckets, normalizeBucket } from '../lib/buckets';
+import { loadMigratedBuckets } from '../lib/migrateBuckets';
 
 export function useBuckets() {
-  const [storedBuckets, setStoredBuckets] = useLocalStorage(STORAGE_KEY, () =>
-    defaultBuckets.map(normalizeBucket),
-  );
+  const [storedBuckets, setStoredBuckets] = useLocalStorage(STORAGE_KEY, () => {
+    const migrated = loadMigratedBuckets();
+    return migrated && migrated.length ? migrated : defaultBuckets.map(normalizeBucket);
+  });
 
   const buckets = useMemo(
     () => (Array.isArray(storedBuckets) ? storedBuckets.map(normalizeBucket) : []),
@@ -33,18 +35,7 @@ export function useBuckets() {
     }
 
     setStoredBuckets((prev) =>
-      prev.map((bucket) => {
-        if (bucket.id !== id) {
-          return bucket;
-        }
-
-        return {
-          ...bucket,
-          status: 'completed',
-          completedDate: chosenDate,
-          targetDate: bucket.dateType === 'exact' ? bucket.targetDate || chosenDate : bucket.targetDate,
-        };
-      }),
+      prev.map((bucket) => (bucket.id === id ? { ...bucket, status: 'completed', completedDate: chosenDate } : bucket)),
     );
   }
 

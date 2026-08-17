@@ -10,7 +10,7 @@ function CalendarDayDetails({ selectedDate, buckets, onOpenBucket }) {
       <h3>{selectedDate ? formatDate(selectedDate) : 'Life moments'}</h3>
       <ul>
         {matches.length === 0 ? (
-          <li>Nothing planned for this day.</li>
+          <li>Nothing happened this day.</li>
         ) : (
           matches.map((bucket) => (
             <li key={bucket.id} data-status={getStatusLabel(bucket)}>

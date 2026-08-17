@@ -1,6 +1,5 @@
 import { motion } from 'motion/react';
-import { getNextUpcoming } from '../lib/buckets';
-import { formatDate } from '../lib/dates';
+import { getNextUpcoming, whenLabels } from '../lib/buckets';
 import { transitions, dashboardEntrance, entranceTransition } from '../styles/motion';
 import './NextUpPanel.css';
 
@@ -27,13 +26,14 @@ function NextUpPanel({ buckets, onOpenBucket }) {
         >
           <h2>{next.title}</h2>
           <p className="next-up-meta">
-            {next.category} · {formatDate(next.targetDate)}
+            {whenLabels[next.when]}
+            {next.place ? ` · ${next.place}` : ''}
           </p>
         </motion.button>
       ) : (
         <div className="next-up-target">
           <h2>Nothing on the horizon yet.</h2>
-          <p className="next-up-meta">Give one of your intentions a date to see it here.</p>
+          <p className="next-up-meta">Add an intention to see it here.</p>
         </div>
       )}
     </motion.section>

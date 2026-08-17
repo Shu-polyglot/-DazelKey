@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { motion } from 'motion/react';
 import BucketStepEditor from '../Modals/BucketStepEditor';
-import { getStatusLabel } from '../../lib/buckets';
+import { getStatusLabel, whenLabels, modeLabels } from '../../lib/buckets';
 import { formatDate } from '../../lib/dates';
 import { spring, easing } from '../../styles/motion';
 import '../Modals/Modals.css';
@@ -34,24 +34,19 @@ function getMeta(bucket) {
   if (bucket.status === 'completed') {
     return bucket.completedDate ? formatDate(bucket.completedDate) : 'Completed';
   }
-  if (bucket.dateType === 'someday') {
-    return 'Someday';
-  }
-  return bucket.targetDate ? formatDate(bucket.targetDate) : 'Date to be chosen';
+  return whenLabels[bucket.when];
 }
 
 function ExpandedCardView({ bucket, onEdit, onDelete, onClose, onComplete }) {
   const [completeDate, setCompleteDate] = useState('');
 
   function handleComplete() {
-    const chosenDate = bucket.dateType === 'someday' ? completeDate : bucket.targetDate;
-
-    if (!chosenDate) {
+    if (!completeDate) {
       alert('Choose the date this experience happened.');
       return;
     }
 
-    onComplete(bucket.id, chosenDate);
+    onComplete(bucket.id, completeDate);
   }
 
   function handleDelete() {
@@ -64,7 +59,7 @@ function ExpandedCardView({ bucket, onEdit, onDelete, onClose, onComplete }) {
     <div className="expanded-card-view">
       <div className="expanded-card-top">
         <div className="expanded-card-eyebrow-row">
-          <p className="bucket-category">{bucket.category}</p>
+          <p className="bucket-category">{bucket.status === 'completed' ? 'Completed' : whenLabels[bucket.when]}</p>
           <span className="bucket-status">{getStatusLabel(bucket)}</span>
         </div>
         <motion.button
@@ -84,34 +79,26 @@ function ExpandedCardView({ bucket, onEdit, onDelete, onClose, onComplete }) {
       <h2 className="expanded-card-title">{bucket.title}</h2>
       <p className="expanded-card-meta">{getMeta(bucket)}</p>
 
-      {bucket.description && <p className="expanded-card-description">{bucket.description}</p>}
+      {bucket.message && <p className="expanded-card-description">{bucket.message}</p>}
 
-      {(bucket.location || bucket.memory) && (
-        <div className="expanded-card-notes">
-          {bucket.location && (
-            <p>
-              <span className="expanded-card-note-label">Where</span>
-              {bucket.location}
-            </p>
-          )}
-          {bucket.memory && (
-            <p>
-              <span className="expanded-card-note-label">Memory</span>
-              {bucket.memory}
-            </p>
-          )}
-        </div>
-      )}
+      <div className="expanded-card-notes">
+        <p>
+          <span className="expanded-card-note-label">Place</span>
+          {bucket.place || 'Not set'}
+        </p>
+        <p>
+          <span className="expanded-card-note-label">Mode</span>
+          {modeLabels[bucket.mode]}
+        </p>
+      </div>
 
       {bucket.status !== 'completed' && (
         <div className="achieve-prompt">
           <p className="achieve-prompt-label">Did you do it?</p>
-          {bucket.dateType === 'someday' && (
-            <label className="achieve-date-field">
-              <span>When</span>
-              <input type="date" value={completeDate} onChange={(event) => setCompleteDate(event.target.value)} />
-            </label>
-          )}
+          <label className="achieve-date-field">
+            <span>When</span>
+            <input type="date" value={completeDate} onChange={(event) => setCompleteDate(event.target.value)} />
+          </label>
           <motion.button type="button" className="achieve-button" onClick={handleComplete} {...commitTapProps}>
             Mark it as done
           </motion.button>

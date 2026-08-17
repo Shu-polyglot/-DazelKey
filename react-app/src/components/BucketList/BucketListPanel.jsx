@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import { AnimatePresence, motion } from 'motion/react';
-import CategoryFilters from './CategoryFilters';
+import ModeFilters from './ModeFilters';
 import BucketCard from './BucketCard';
 import ExpandedBucketCard from './ExpandedBucketCard';
 import { dashboardEntrance, entranceTransition } from '../../styles/motion';
@@ -13,7 +13,7 @@ function BucketListPanel({ buckets, onUpdate, onDelete, onComplete }) {
   const openBuckets = useMemo(() => buckets.filter((bucket) => bucket.status !== 'completed'), [buckets]);
 
   const filteredBuckets = useMemo(
-    () => (activeFilter === 'All' ? openBuckets : openBuckets.filter((bucket) => bucket.category === activeFilter)),
+    () => (activeFilter === 'All' ? openBuckets : openBuckets.filter((bucket) => bucket.mode === activeFilter)),
     [openBuckets, activeFilter],
   );
 
@@ -27,7 +27,7 @@ function BucketListPanel({ buckets, onUpdate, onDelete, onComplete }) {
   const expandedBucket = buckets.find((bucket) => bucket.id === expandedId) || null;
 
   return (
-    <section className="app-section bucket-section">
+    <section className="app-section bucket-section" id="bucket-list-section">
       <motion.div
         initial={{ opacity: 0, y: 14, filter: 'blur(6px)' }}
         animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
@@ -38,7 +38,7 @@ function BucketListPanel({ buckets, onUpdate, onDelete, onComplete }) {
           <h2>What’s ahead</h2>
         </div>
 
-        <CategoryFilters activeFilter={activeFilter} onChange={setActiveFilter} />
+        <ModeFilters activeFilter={activeFilter} onChange={setActiveFilter} />
       </motion.div>
 
       <div className="bucket-list">

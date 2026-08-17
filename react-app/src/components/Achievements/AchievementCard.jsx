@@ -1,5 +1,6 @@
 import { motion } from 'motion/react';
 import { formatDate } from '../../lib/dates';
+import { modeLabels } from '../../lib/buckets';
 import { spring, dashboardEntrance, entranceTransition, staggerDelay } from '../../styles/motion';
 import './Achievements.css';
 
@@ -16,7 +17,7 @@ function AchievementCard({ bucket, index, onOpen }) {
     >
       <div className="achievement-card-frame">
         <div className="achievement-card-top">
-          <span className="achievement-card-eyebrow">{bucket.category}</span>
+          <span className="achievement-card-eyebrow">{modeLabels[bucket.mode]}</span>
           <span className="achievement-card-index">No. {String(index + 1).padStart(2, '0')}</span>
         </div>
 
@@ -26,9 +27,9 @@ function AchievementCard({ bucket, index, onOpen }) {
           <div className="achievement-card-rule" />
           <div className="achievement-card-meta">
             <span className="achievement-card-date">{formatDate(bucket.completedDate)}</span>
-            {bucket.location && <span className="achievement-card-location">{bucket.location}</span>}
+            {bucket.place && <span className="achievement-card-location">{bucket.place}</span>}
           </div>
-          {bucket.memory && <p className="achievement-card-memory">“{bucket.memory}”</p>}
+          {bucket.message && <p className="achievement-card-memory">“{bucket.message}”</p>}
         </div>
       </div>
     </motion.article>

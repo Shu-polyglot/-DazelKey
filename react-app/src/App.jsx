@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { AnimatePresence, motion } from 'motion/react';
 import Header from './components/Header';
 import OverviewPanel from './components/OverviewPanel';
@@ -6,13 +6,14 @@ import NextUpPanel from './components/NextUpPanel';
 import AchievementsShelf from './components/Achievements/AchievementsShelf';
 import CalendarPanel from './components/Calendar/CalendarPanel';
 import BucketListPanel from './components/BucketList/BucketListPanel';
-import IntentComposer from './components/Modals/IntentComposer';
+import BucketCreateModal from './components/Modals/BucketCreateModal';
 import BucketDetailsModal from './components/Modals/BucketDetailsModal';
 import ProfilePanel from './components/Modals/ProfilePanel';
 import OpeningExperience from './components/Onboarding/OpeningExperience';
+import ArchiveExperience from './components/Archive/ArchiveExperience';
 import { useBuckets } from './hooks/useBuckets';
 import { useProfile } from './hooks/useProfile';
-import { transitions } from './styles/motion';
+import { transitions, easing } from './styles/motion';
 import './App.css';
 
 function App() {
@@ -22,6 +23,9 @@ function App() {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [detailsBucketId, setDetailsBucketId] = useState(null);
+  const [isArchiveOpen, setIsArchiveOpen] = useState(false);
+  const [archiveCloseMode, setArchiveCloseMode] = useState('cancel');
+  const [archiveScrollTarget, setArchiveScrollTarget] = useState(null);
 
   const detailsBucket = buckets.find((bucket) => bucket.id === detailsBucketId) || null;
 
@@ -31,6 +35,27 @@ function App() {
     }
     setHasEntered(true);
   }
+
+  function closeArchive(closeMode, scrollTarget) {
+    setArchiveCloseMode(closeMode);
+    setArchiveScrollTarget(scrollTarget);
+    setIsArchiveOpen(false);
+  }
+
+  // Scrolls once the Archive's exit transition has substantially settled,
+  // so the destination section is already visible through the (by then)
+  // sharp, unblurred Dashboard rather than mid-transition.
+  useEffect(() => {
+    if (isArchiveOpen || !archiveScrollTarget) {
+      return undefined;
+    }
+    const target = archiveScrollTarget;
+    setArchiveScrollTarget(null);
+    const timer = setTimeout(() => {
+      document.getElementById(target)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 550);
+    return () => clearTimeout(timer);
+  }, [isArchiveOpen, archiveScrollTarget]);
 
   return (
     <>
@@ -44,8 +69,12 @@ function App() {
         <motion.div
           className="page-shell"
           initial={{ opacity: 0, y: 12 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={transitions.emphasis}
+          animate={
+            isArchiveOpen
+              ? { opacity: 1, y: 0, scale: 0.97, filter: 'blur(16px)' }
+              : { opacity: 1, y: 0, scale: 1, filter: 'blur(0px)' }
+          }
+          transition={isArchiveOpen ? { duration: 0.55, ease: easing.exit } : { duration: 0.5, ease: easing.emphasized }}
         >
           <Header
             title="Life OS"
@@ -59,7 +88,11 @@ function App() {
             <NextUpPanel buckets={buckets} onOpenBucket={setDetailsBucketId} />
           </main>
 
-          <AchievementsShelf buckets={buckets} onOpenBucket={setDetailsBucketId} />
+          <AchievementsShelf
+            buckets={buckets}
+            onOpenBucket={setDetailsBucketId}
+            onOpenArchive={() => setIsArchiveOpen(true)}
+          />
           <CalendarPanel buckets={buckets} onOpenBucket={setDetailsBucketId} />
           <BucketListPanel
             buckets={buckets}
@@ -70,7 +103,7 @@ function App() {
 
           <AnimatePresence>
             {isAddModalOpen && (
-              <IntentComposer key="add-modal" onClose={() => setIsAddModalOpen(false)} onAdd={addBucket} />
+              <BucketCreateModal key="add-modal" onClose={() => setIsAddModalOpen(false)} onAdd={addBucket} />
             )}
           </AnimatePresence>
 
@@ -105,6 +138,19 @@ function App() {
           </AnimatePresence>
         </motion.div>
       )}
+
+      <AnimatePresence>
+        {isArchiveOpen && (
+          <ArchiveExperience
+            key="archive"
+            buckets={buckets}
+            closeMode={archiveCloseMode}
+            onClose={() => closeArchive('cancel', 'archive-section')}
+            onReturnToDashboard={() => closeArchive('complete', 'archive-section')}
+            onExploreAhead={() => closeArchive('complete', 'bucket-list-section')}
+          />
+        )}
+      </AnimatePresence>
     </>
   );
 }
