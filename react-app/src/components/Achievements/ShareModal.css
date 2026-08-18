@@ -1,0 +1,114 @@
+.share-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-lg);
+  background: rgba(var(--color-void-1-rgb), 0.72);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+}
+
+.share-modal {
+  position: relative;
+  width: min(100%, 380px);
+  max-height: 92vh;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+  padding: var(--space-lg) var(--space-lg) calc(var(--space-lg) - var(--space-2xs));
+  background: rgba(var(--color-void-2-rgb), 0.96);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-strong);
+  overflow-y: auto;
+  cursor: default;
+}
+
+.share-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex: 0 0 auto;
+}
+
+.share-modal-header h3 {
+  margin: 0;
+  font-family: var(--font-family-display);
+  font-weight: var(--font-weight-regular);
+  font-size: 1.4rem;
+  letter-spacing: var(--tracking-tight);
+  color: var(--color-text-primary);
+}
+
+.share-modal-close {
+  width: 32px;
+  height: 32px;
+  font-size: 1.3rem;
+  flex: 0 0 auto;
+}
+
+.share-modal-preview {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.share-modal-preview .share-card {
+  width: min(100%, 260px);
+}
+
+.share-modal-actions {
+  display: flex;
+  gap: var(--space-xs);
+  flex: 0 0 auto;
+}
+
+.share-action-button {
+  flex: 1 1 0;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.share-modal-toast {
+  position: absolute;
+  left: 50%;
+  bottom: calc(var(--space-lg) + 56px);
+  transform: translateX(-50%);
+  padding: var(--space-2xs) var(--space-md);
+  border-radius: var(--radius-pill);
+  background: rgba(var(--color-void-1-rgb), 0.9);
+  border: 1px solid var(--color-border-strong);
+  color: var(--color-text-primary);
+  font-size: var(--font-size-body-sm);
+  letter-spacing: var(--tracking-wide);
+  box-shadow: var(--shadow-medium);
+  pointer-events: none;
+}
+
+@media (max-width: 640px) {
+  .share-modal-backdrop {
+    align-items: flex-end;
+    padding: 0;
+  }
+
+  .share-modal {
+    width: 100%;
+    max-height: 88dvh;
+    border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+    padding: var(--space-lg) var(--space-md) calc(env(safe-area-inset-bottom) + var(--space-md));
+  }
+
+  .share-modal-preview .share-card {
+    width: min(100%, 220px);
+  }
+
+  .share-action-button {
+    font-size: var(--font-size-caption);
+    padding: var(--space-sm) var(--space-xs);
+  }
+}

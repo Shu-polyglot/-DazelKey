@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
-import { motion } from 'motion/react';
+import { motion, AnimatePresence } from 'motion/react';
 import BucketStepEditor from '../Modals/BucketStepEditor';
+import ShareModal from './ShareModal';
 import { modeLabels } from '../../lib/buckets';
 import { formatDate } from '../../lib/dates';
 import { spring, easing } from '../../styles/motion';
@@ -25,7 +26,7 @@ const tapProps = {
   whileTap: { y: 1, scale: 0.96, transition: spring.press },
 };
 
-function AchievementExpandedView({ bucket, index, onEdit, onDelete, onClose }) {
+function AchievementExpandedView({ bucket, index, onEdit, onDelete, onClose, onShare }) {
   const hasPhoto = Boolean(bucket.image);
 
   function handleDelete() {
@@ -66,6 +67,9 @@ function AchievementExpandedView({ bucket, index, onEdit, onDelete, onClose }) {
       {bucket.message && <p className="achievement-expanded-message">“{bucket.message}”</p>}
 
       <div className="achievement-expanded-actions detail-actions">
+        <motion.button type="button" className="secondary-button" onClick={onShare} {...tapProps}>
+          ↗ Share
+        </motion.button>
         <motion.button type="button" className="secondary-button" onClick={onEdit} {...tapProps}>
           Edit
         </motion.button>
@@ -88,6 +92,7 @@ function AchievementExpandedView({ bucket, index, onEdit, onDelete, onClose }) {
  */
 function AchievementExpanded({ bucket, index, onClose, onUpdate, onDelete }) {
   const [mode, setMode] = useState('view');
+  const [isShareOpen, setIsShareOpen] = useState(false);
 
   useEffect(() => {
     function handleKeyDown(event) {
@@ -141,10 +146,15 @@ function AchievementExpanded({ bucket, index, onClose, onUpdate, onDelete }) {
               onEdit={() => setMode('edit')}
               onDelete={onDelete}
               onClose={onClose}
+              onShare={() => setIsShareOpen(true)}
             />
           )}
         </motion.div>
       </motion.article>
+
+      <AnimatePresence>
+        {isShareOpen && <ShareModal key="share-modal" bucket={bucket} onClose={() => setIsShareOpen(false)} />}
+      </AnimatePresence>
     </motion.div>
   );
 }

@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { AnimatePresence, motion } from 'motion/react';
 import AchievementCard from './AchievementCard';
 import AchievementExpanded from './AchievementExpanded';
@@ -28,6 +28,24 @@ function AchievementsShelf({ buckets, onUpdate, onDelete }) {
   );
 
   const expanded = indexedAchievements.find(({ bucket }) => bucket.id === expandedId) || null;
+
+  // Lets a Copy Link URL (#achievement-<id>) land directly on that
+  // achievement's detail view. Runs once achievements are available, not
+  // on every list change, so it never re-opens something the user closed.
+  const hashHandled = useRef(false);
+  useEffect(() => {
+    if (hashHandled.current || achievements.length === 0) {
+      return;
+    }
+    const match = window.location.hash.match(/^#achievement-(.+)$/);
+    if (match) {
+      const target = achievements.find((bucket) => String(bucket.id) === match[1]);
+      if (target) {
+        setExpandedId(target.id);
+      }
+    }
+    hashHandled.current = true;
+  }, [achievements]);
 
   return (
     <section className="app-section">
