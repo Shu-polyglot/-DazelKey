@@ -5,17 +5,27 @@ import { spring, dashboardEntrance, entranceTransition, staggerDelay } from '../
 import './Achievements.css';
 
 function AchievementCard({ bucket, index, onOpen }) {
+  const hasPhoto = Boolean(bucket.image);
+
   return (
     <motion.article
-      className="achievement-card"
+      className={`achievement-card${hasPhoto ? ' has-photo' : ''}`}
       onClick={() => onOpen(bucket.id)}
+      layoutId={`achievement-card-${bucket.id}`}
+      layout
       initial={{ opacity: 0, y: 14, filter: 'blur(6px)' }}
       animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
-      transition={entranceTransition(staggerDelay(dashboardEntrance.achievements, index))}
+      exit={{ opacity: 0, scale: 0.96, transition: { duration: 0.16 } }}
+      transition={{
+        layout: spring.soft,
+        default: entranceTransition(staggerDelay(dashboardEntrance.achievements, index)),
+      }}
       whileHover={{ y: -6, scale: 1.015, transition: spring.hover }}
       whileTap={{ y: -1, scale: 0.97, transition: spring.press }}
     >
       <div className="achievement-card-frame">
+        {hasPhoto && <div className="achievement-card-photo" style={{ backgroundImage: `url(${bucket.image})` }} />}
+        {hasPhoto && <div className="achievement-card-scrim" />}
         <div className="achievement-card-top">
           <span className="achievement-card-eyebrow">{modeLabels[bucket.mode]}</span>
           <span className="achievement-card-index">No. {String(index + 1).padStart(2, '0')}</span>

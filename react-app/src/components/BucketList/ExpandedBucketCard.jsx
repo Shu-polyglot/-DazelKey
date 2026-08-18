@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react';
 import { motion } from 'motion/react';
 import BucketStepEditor from '../Modals/BucketStepEditor';
+import CompletePrompt from '../shared/CompletePrompt';
+import CompletedPhotoHero from '../shared/CompletedPhotoHero';
 import { getStatusLabel, whenLabels, modeLabels } from '../../lib/buckets';
 import { formatDate } from '../../lib/dates';
 import { spring, easing } from '../../styles/motion';
@@ -25,11 +27,6 @@ const tapProps = {
   whileTap: { y: 1, scale: 0.96, transition: spring.press },
 };
 
-const commitTapProps = {
-  whileHover: { y: -2, transition: spring.hover },
-  whileTap: { y: 1, scale: 0.95, transition: spring.commit },
-};
-
 function getMeta(bucket) {
   if (bucket.status === 'completed') {
     return bucket.completedDate ? formatDate(bucket.completedDate) : 'Completed';
@@ -38,16 +35,7 @@ function getMeta(bucket) {
 }
 
 function ExpandedCardView({ bucket, onEdit, onDelete, onClose, onComplete }) {
-  const [completeDate, setCompleteDate] = useState('');
-
-  function handleComplete() {
-    if (!completeDate) {
-      alert('Choose the date this experience happened.');
-      return;
-    }
-
-    onComplete(bucket.id, completeDate);
-  }
+  const hasPhotoHero = bucket.status === 'completed' && Boolean(bucket.image);
 
   function handleDelete() {
     if (confirm('Delete this experience?\n\nThis action cannot be undone.')) {
@@ -74,10 +62,15 @@ function ExpandedCardView({ bucket, onEdit, onDelete, onClose, onComplete }) {
         </motion.button>
       </div>
 
-      {bucket.status === 'completed' && <p className="archived-tag">In the Archive</p>}
-
-      <h2 className="expanded-card-title">{bucket.title}</h2>
-      <p className="expanded-card-meta">{getMeta(bucket)}</p>
+      {hasPhotoHero ? (
+        <CompletedPhotoHero bucket={bucket} />
+      ) : (
+        <>
+          {bucket.status === 'completed' && <p className="archived-tag">In the Archive</p>}
+          <h2 className="expanded-card-title">{bucket.title}</h2>
+          <p className="expanded-card-meta">{getMeta(bucket)}</p>
+        </>
+      )}
 
       {bucket.message && <p className="expanded-card-description">{bucket.message}</p>}
 
@@ -92,18 +85,7 @@ function ExpandedCardView({ bucket, onEdit, onDelete, onClose, onComplete }) {
         </p>
       </div>
 
-      {bucket.status !== 'completed' && (
-        <div className="achieve-prompt">
-          <p className="achieve-prompt-label">Did you do it?</p>
-          <label className="achieve-date-field">
-            <span>When</span>
-            <input type="date" value={completeDate} onChange={(event) => setCompleteDate(event.target.value)} />
-          </label>
-          <motion.button type="button" className="achieve-button" onClick={handleComplete} {...commitTapProps}>
-            Mark it as done
-          </motion.button>
-        </div>
-      )}
+      {bucket.status !== 'completed' && <CompletePrompt bucketId={bucket.id} onComplete={onComplete} />}
 
       <div className="expanded-card-actions detail-actions">
         <motion.button type="button" className="secondary-button" onClick={onEdit} {...tapProps}>

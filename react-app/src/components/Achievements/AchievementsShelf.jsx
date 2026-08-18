@@ -1,10 +1,33 @@
-import { motion } from 'motion/react';
+import { useMemo, useState } from 'react';
+import { AnimatePresence, motion } from 'motion/react';
 import AchievementCard from './AchievementCard';
+import AchievementExpanded from './AchievementExpanded';
 import { dashboardEntrance, entranceTransition } from '../../styles/motion';
 import './Achievements.css';
 
-function AchievementsShelf({ buckets, onOpenBucket }) {
-  const achievements = buckets.filter((bucket) => bucket.status === 'completed');
+function AchievementsShelf({ buckets, onUpdate, onDelete }) {
+  const [expandedId, setExpandedId] = useState(null);
+
+  const achievements = useMemo(
+    () => buckets.filter((bucket) => bucket.status === 'completed'),
+    [buckets],
+  );
+
+  // Index carries the shelf's original position (No. 01, 02...) so the
+  // label doesn't reflow while the expanded card is excluded below.
+  const indexedAchievements = useMemo(
+    () => achievements.map((bucket, index) => ({ bucket, index })),
+    [achievements],
+  );
+
+  // Excluded from the shelf while expanded so its layoutId can project
+  // into AchievementExpanded instead of both instances existing at once.
+  const shelfAchievements = useMemo(
+    () => indexedAchievements.filter(({ bucket }) => bucket.id !== expandedId),
+    [indexedAchievements, expandedId],
+  );
+
+  const expanded = indexedAchievements.find(({ bucket }) => bucket.id === expandedId) || null;
 
   return (
     <section className="app-section">
@@ -28,11 +51,29 @@ function AchievementsShelf({ buckets, onOpenBucket }) {
         </motion.div>
       ) : (
         <div className="achievements-shelf">
-          {achievements.map((bucket, index) => (
-            <AchievementCard key={bucket.id} bucket={bucket} index={index} onOpen={onOpenBucket} />
-          ))}
+          <AnimatePresence mode="popLayout">
+            {shelfAchievements.map(({ bucket, index }) => (
+              <AchievementCard key={bucket.id} bucket={bucket} index={index} onOpen={setExpandedId} />
+            ))}
+          </AnimatePresence>
         </div>
       )}
+
+      <AnimatePresence>
+        {expanded && (
+          <AchievementExpanded
+            key={expanded.bucket.id}
+            bucket={expanded.bucket}
+            index={expanded.index}
+            onClose={() => setExpandedId(null)}
+            onUpdate={onUpdate}
+            onDelete={(id) => {
+              onDelete(id);
+              setExpandedId(null);
+            }}
+          />
+        )}
+      </AnimatePresence>
     </section>
   );
 }

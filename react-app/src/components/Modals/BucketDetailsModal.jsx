@@ -2,6 +2,8 @@ import { useState } from 'react';
 import { motion } from 'motion/react';
 import Modal from './Modal';
 import BucketStepEditor from './BucketStepEditor';
+import CompletePrompt from '../shared/CompletePrompt';
+import CompletedPhotoHero from '../shared/CompletedPhotoHero';
 import { getStatusLabel, whenLabels, modeLabels } from '../../lib/buckets';
 import { formatDate } from '../../lib/dates';
 import { spring } from '../../styles/motion';
@@ -11,13 +13,8 @@ const tapProps = {
   whileTap: { y: 1, scale: 0.96, transition: spring.press },
 };
 
-const commitTapProps = {
-  whileHover: { y: -2, transition: spring.hover },
-  whileTap: { y: 1, scale: 0.95, transition: spring.commit },
-};
-
 function DetailsView({ bucket, onClose, onEdit, onDelete, onComplete }) {
-  const [completeDate, setCompleteDate] = useState('');
+  const hasPhotoHero = bucket.status === 'completed' && Boolean(bucket.image);
 
   const entries = [
     ['Mode', modeLabels[bucket.mode]],
@@ -36,15 +33,6 @@ function DetailsView({ bucket, onClose, onEdit, onDelete, onComplete }) {
     entries.push(['Place', bucket.place]);
   }
 
-  function handleComplete() {
-    if (!completeDate) {
-      alert('Choose the date this experience happened.');
-      return;
-    }
-
-    onComplete(bucket.id, completeDate);
-  }
-
   function handleDelete() {
     if (confirm('Delete this experience?\n\nThis action cannot be undone.')) {
       onDelete(bucket.id);
@@ -53,8 +41,14 @@ function DetailsView({ bucket, onClose, onEdit, onDelete, onComplete }) {
 
   return (
     <>
-      {bucket.status === 'completed' && <p className="archived-tag">In the Archive</p>}
-      <h3>{bucket.title}</h3>
+      {hasPhotoHero ? (
+        <CompletedPhotoHero bucket={bucket} />
+      ) : (
+        <>
+          {bucket.status === 'completed' && <p className="archived-tag">In the Archive</p>}
+          <h3>{bucket.title}</h3>
+        </>
+      )}
 
       <div className="detail-section">
         <div className="detail-meta">
@@ -74,18 +68,7 @@ function DetailsView({ bucket, onClose, onEdit, onDelete, onComplete }) {
         )}
       </div>
 
-      {bucket.status !== 'completed' && (
-        <div className="achieve-prompt">
-          <p className="achieve-prompt-label">Did you do it?</p>
-          <label className="achieve-date-field">
-            <span>When</span>
-            <input type="date" value={completeDate} onChange={(event) => setCompleteDate(event.target.value)} />
-          </label>
-          <motion.button type="button" className="achieve-button" onClick={handleComplete} {...commitTapProps}>
-            Mark it as done
-          </motion.button>
-        </div>
-      )}
+      {bucket.status !== 'completed' && <CompletePrompt bucketId={bucket.id} onComplete={onComplete} />}
 
       <div className="detail-actions">
         <motion.button type="button" className="secondary-button" onClick={onEdit} {...tapProps}>

@@ -29,13 +29,17 @@ export function useBuckets() {
     setStoredBuckets((prev) => prev.filter((bucket) => bucket.id !== id));
   }
 
-  function completeBucket(id, chosenDate) {
+  function completeBucket(id, chosenDate, photo) {
     if (!chosenDate) {
       return;
     }
 
     setStoredBuckets((prev) =>
-      prev.map((bucket) => (bucket.id === id ? { ...bucket, status: 'completed', completedDate: chosenDate } : bucket)),
+      prev.map((bucket) =>
+        bucket.id === id
+          ? { ...bucket, status: 'completed', completedDate: chosenDate, image: photo || bucket.image || null }
+          : bucket,
+      ),
     );
   }
 

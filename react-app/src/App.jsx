@@ -88,7 +88,7 @@ function App() {
             <NextUpPanel buckets={buckets} onOpenBucket={setDetailsBucketId} />
           </main>
 
-          <AchievementsShelf buckets={buckets} onOpenBucket={setDetailsBucketId} />
+          <AchievementsShelf buckets={buckets} onUpdate={updateBucket} onDelete={deleteBucket} />
           <CalendarPanel buckets={buckets} onOpenBucket={setDetailsBucketId} />
           <BucketListPanel
             buckets={buckets}
