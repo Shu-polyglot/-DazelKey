@@ -16,10 +16,14 @@ function CalendarGrid({ cells, buckets, selectedDate, onDayClick }) {
 
         const matches = getBucketMatchesForDate(buckets, cell.isoDate);
         const hasCompleted = matches.some((bucket) => bucket.status === 'completed');
+        const photoBucket = matches.find((bucket) => bucket.status === 'completed' && bucket.image);
 
         const classNames = ['calendar-day'];
         if (matches.length) {
           classNames.push(hasCompleted ? 'has-event' : 'has-plan');
+        }
+        if (photoBucket) {
+          classNames.push('has-photo');
         }
         if (cell.isoDate === todayIso) {
           classNames.push('is-today');
@@ -46,6 +50,12 @@ function CalendarGrid({ cells, buckets, selectedDate, onDayClick }) {
                 : { y: 0, scale: 0.93, transition: spring.press }
             }
           >
+            {photoBucket && (
+              <>
+                <div className="calendar-day-photo" style={{ backgroundImage: `url(${photoBucket.image})` }} />
+                <div className="calendar-day-photo-scrim" />
+              </>
+            )}
             <span className="date-number">{cell.day}</span>
           </motion.div>
         );

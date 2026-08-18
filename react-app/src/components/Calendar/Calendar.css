@@ -54,6 +54,7 @@
 }
 
 .calendar-day {
+  position: relative;
   min-height: 105px;
   display: flex;
   flex-direction: column;
@@ -64,7 +65,40 @@
   background: rgba(var(--color-void-3-rgb), 0.4);
   color: var(--color-text-primary);
   cursor: pointer;
+  overflow: hidden;
   transition: border-color 0.2s ease, background 0.2s ease;
+}
+
+/*
+  The day's own photo, filling the cell behind the date number -- reuses
+  the achievement's existing image, just relocated. A top-heavy scrim
+  (mirrored from the achievement card's bottom-heavy one, since here the
+  only text sits at the top) keeps the date number legible without
+  flattening the photo underneath it.
+*/
+.calendar-day-photo {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background-size: cover;
+  background-position: center;
+}
+
+.calendar-day-photo-scrim {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: linear-gradient(
+    180deg,
+    rgba(var(--color-void-1-rgb), 0.62) 0%,
+    rgba(var(--color-void-1-rgb), 0.1) 45%,
+    rgba(var(--color-void-1-rgb), 0.4) 100%
+  );
+}
+
+.calendar-day.has-photo .date-number {
+  position: relative;
+  z-index: 2;
 }
 
 .calendar-day.is-muted {
