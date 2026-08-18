@@ -15,7 +15,16 @@ export function useLocalStorage(key, initialValueFn) {
   });
 
   useEffect(() => {
-    localStorage.setItem(key, JSON.stringify(value));
+    try {
+      localStorage.setItem(key, JSON.stringify(value));
+    } catch (error) {
+      // Most commonly QuotaExceededError. Left uncaught, this throws from
+      // inside a passive effect with no error boundary in the tree above
+      // it, which crashes the whole app to a blank screen. In-memory state
+      // (`value`) still holds the update, so the UI stays correct for this
+      // session even though the write didn't persist.
+      console.warn(`Unable to persist value for "${key}".`, error);
+    }
   }, [key, value]);
 
   return [value, setValue];
