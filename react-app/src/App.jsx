@@ -11,6 +11,7 @@ import BucketDetailsModal from './components/Modals/BucketDetailsModal';
 import ProfilePanel from './components/Modals/ProfilePanel';
 import OpeningExperience from './components/Onboarding/OpeningExperience';
 import ArchiveExperience from './components/Archive/ArchiveExperience';
+import WhatsAheadExperience from './components/Archive/WhatsAheadExperience';
 import TransitionRitual from './components/TransitionRitual';
 import { useBuckets } from './hooks/useBuckets';
 import { useProfile } from './hooks/useProfile';
@@ -28,6 +29,8 @@ function App() {
   const [isArchiveOpen, setIsArchiveOpen] = useState(false);
   const [archiveCloseMode, setArchiveCloseMode] = useState('cancel');
   const [archiveScrollTarget, setArchiveScrollTarget] = useState(null);
+  const [isWhatsAheadOpen, setIsWhatsAheadOpen] = useState(false);
+  const isOverlayOpen = isArchiveOpen || isWhatsAheadOpen;
 
   const detailsBucket = buckets.find((bucket) => bucket.id === detailsBucketId) || null;
 
@@ -47,6 +50,15 @@ function App() {
     setArchiveCloseMode(closeMode);
     setArchiveScrollTarget(scrollTarget);
     setIsArchiveOpen(false);
+  }
+
+  // The bridge's second option hands off to a different full-screen
+  // experience rather than back to the dashboard, so it skips
+  // closeArchive's scroll-target bookkeeping entirely.
+  function handleExploreAhead() {
+    setArchiveCloseMode('complete');
+    setIsArchiveOpen(false);
+    setIsWhatsAheadOpen(true);
   }
 
   // Scrolls once the Archive's exit transition has substantially settled,
@@ -81,11 +93,11 @@ function App() {
           className="page-shell"
           initial={{ opacity: 0, y: 12 }}
           animate={
-            isArchiveOpen
+            isOverlayOpen
               ? { opacity: 1, y: 0, scale: 0.97, filter: 'blur(16px)' }
               : { opacity: 1, y: 0, scale: 1, filter: 'blur(0px)' }
           }
-          transition={isArchiveOpen ? { duration: 0.55, ease: easing.exit } : { duration: 0.5, ease: easing.emphasized }}
+          transition={isOverlayOpen ? { duration: 0.55, ease: easing.exit } : { duration: 0.5, ease: easing.emphasized }}
         >
           <Header
             title="Life OS"
@@ -149,7 +161,18 @@ function App() {
             closeMode={archiveCloseMode}
             onClose={() => closeArchive('cancel', 'archive-section')}
             onReturnToDashboard={() => closeArchive('complete', 'archive-section')}
-            onExploreAhead={() => closeArchive('complete', 'bucket-list-section')}
+            onExploreAhead={handleExploreAhead}
+          />
+        )}
+      </AnimatePresence>
+
+      <AnimatePresence>
+        {isWhatsAheadOpen && (
+          <WhatsAheadExperience
+            key="whats-ahead"
+            buckets={buckets}
+            onClose={() => setIsWhatsAheadOpen(false)}
+            onComplete={completeBucket}
           />
         )}
       </AnimatePresence>

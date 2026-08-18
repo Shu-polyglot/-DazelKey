@@ -104,7 +104,10 @@
 
 .story-bridge-cta {
   position: relative;
-  z-index: 2;
+  /* Above .archive-tap-zone (z-index: 4) -- otherwise the invisible
+     left-side tap zone it sits on top of intercepts the click first and
+     this button is never actually reachable. */
+  z-index: 5;
   align-self: flex-start;
   appearance: none;
   margin: 0 0 calc(var(--space-3xl) + var(--space-md)) var(--space-lg);

@@ -32,7 +32,7 @@ function ArchiveBridge({ onReturnToDashboard, onExploreAhead }) {
           whileHover={{ y: -2, transition: spring.hover }}
           whileTap={{ y: 1, scale: 0.97, transition: spring.press }}
         >
-          Explore what&rsquo;s ahead
+          What&rsquo;s Ahead →
         </motion.button>
       </div>
     </motion.div>

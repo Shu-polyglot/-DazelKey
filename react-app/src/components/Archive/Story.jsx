@@ -58,7 +58,7 @@ function StoryContent({ story }) {
   );
 }
 
-function Story({ story, onOpenBridge }) {
+function Story({ story, onReturnToStart }) {
   const prefersReducedMotion = useReducedMotion();
 
   return (
@@ -70,11 +70,11 @@ function Story({ story, onOpenBridge }) {
           type="button"
           className="story-bridge-cta"
           variants={archiveContentVariants}
-          onClick={onOpenBridge}
+          onClick={onReturnToStart}
           whileHover={{ y: -2, transition: spring.hover }}
           whileTap={{ y: 1, scale: 0.97, transition: spring.press }}
         >
-          What&rsquo;s next →
+          Return
         </motion.button>
       )}
     </div>

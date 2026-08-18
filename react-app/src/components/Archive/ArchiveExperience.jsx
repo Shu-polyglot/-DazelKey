@@ -56,6 +56,13 @@ function ArchiveExperience({ buckets, closeMode, onClose, onReturnToDashboard, o
     goTo(index - 1, -1);
   }
 
+  // Explicit reset to the reel's first beat -- not a browser-history back,
+  // just the same local index state every other navigation here already
+  // drives, jumped straight to 0.
+  function handleReturnToStart() {
+    setIndexState([0, -1]);
+  }
+
   function togglePause() {
     if (isLongPress.current) {
       resume();
@@ -137,7 +144,7 @@ function ArchiveExperience({ buckets, closeMode, onClose, onReturnToDashboard, o
               animate="center"
               exit="exit"
             >
-              <Story story={activeStory} onOpenBridge={() => setShowBridge(true)} />
+              <Story story={activeStory} onReturnToStart={handleReturnToStart} />
             </motion.div>
           )}
         </AnimatePresence>
