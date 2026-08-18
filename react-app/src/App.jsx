@@ -11,6 +11,7 @@ import BucketDetailsModal from './components/Modals/BucketDetailsModal';
 import ProfilePanel from './components/Modals/ProfilePanel';
 import OpeningExperience from './components/Onboarding/OpeningExperience';
 import ArchiveExperience from './components/Archive/ArchiveExperience';
+import TransitionRitual from './components/TransitionRitual';
 import { useBuckets } from './hooks/useBuckets';
 import { useProfile } from './hooks/useProfile';
 import { transitions, easing } from './styles/motion';
@@ -20,6 +21,7 @@ function App() {
   const { buckets, addBucket, updateBucket, deleteBucket, completeBucket } = useBuckets();
   const { profile, updateProfile, completeProfile } = useProfile();
   const [hasEntered, setHasEntered] = useState(false);
+  const [showEntryRitual, setShowEntryRitual] = useState(false);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [detailsBucketId, setDetailsBucketId] = useState(null);
@@ -33,6 +35,11 @@ function App() {
     if (patch) {
       completeProfile(patch);
     }
+    setShowEntryRitual(true);
+  }
+
+  function handleEntryRitualContinue() {
+    setShowEntryRitual(false);
     setHasEntered(true);
   }
 
@@ -60,9 +67,13 @@ function App() {
   return (
     <>
       <AnimatePresence>
-        {!hasEntered && (
+        {!hasEntered && !showEntryRitual && (
           <OpeningExperience key="onboarding" profile={profile} onComplete={handleOnboardingComplete} />
         )}
+      </AnimatePresence>
+
+      <AnimatePresence>
+        {showEntryRitual && <TransitionRitual key="entry-ritual" onContinue={handleEntryRitualContinue} />}
       </AnimatePresence>
 
       {hasEntered && (

@@ -33,8 +33,18 @@ function CalendarGrid({ cells, buckets, selectedDate, onDayClick }) {
             key={cell.isoDate}
             className={classNames.join(' ')}
             onClick={() => onDayClick(cell.isoDate)}
-            whileHover={{ y: -2, transition: spring.hover }}
-            whileTap={{ y: 0, scale: 0.93, transition: spring.press }}
+            animate={hasCompleted ? { scale: 1.05, y: -3 } : { scale: 1, y: 0 }}
+            transition={hasCompleted ? spring.soft : undefined}
+            whileHover={
+              hasCompleted
+                ? { scale: 1.07, y: -5, transition: spring.hover }
+                : { y: -2, transition: spring.hover }
+            }
+            whileTap={
+              hasCompleted
+                ? { scale: 1.1, y: -6, transition: spring.commit }
+                : { y: 0, scale: 0.93, transition: spring.press }
+            }
           >
             <span className="date-number">{cell.day}</span>
           </motion.div>

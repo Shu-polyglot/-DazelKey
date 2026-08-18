@@ -94,24 +94,41 @@
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.03);
 }
 
-.calendar-day.has-event::after,
-.calendar-day.has-plan::after {
-  content: '';
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  display: block;
-  margin-left: auto;
+/*
+  Achievement day -- a lived memory is rendered as if it has quietly
+  lifted one layer out of the calendar's flat plane, rather than as a
+  marker on top of it. Depth comes from scale (driven by Motion, see
+  CalendarGrid, so it composes with the hover/tap gestures instead of
+  fighting them via a competing CSS transform), a restrained blue
+  border/glow, and a darker-than-surroundings fill -- deliberately not
+  a neon accent. Intensity does not scale with how many experiences
+  landed on the day; one memory reads the same as the day's presence.
+*/
+.calendar-day.has-event {
+  position: relative;
+  z-index: 3;
+  border: 2px solid rgba(var(--color-glow-bright-rgb), 0.38);
+  background: linear-gradient(180deg, rgba(var(--color-void-1-rgb), 0.94), rgba(var(--color-void-2-rgb), 0.97));
+  box-shadow:
+    0 0 0 1px rgba(var(--color-glow-rgb), 0.1),
+    0 16px 30px rgba(var(--color-void-1-rgb), 0.55),
+    0 0 24px rgba(var(--color-glow-rgb), 0.28),
+    0 0 48px rgba(var(--color-glow-rgb), 0.12);
+  transition: border-color 0.3s ease, background 0.3s ease, box-shadow 0.3s ease;
 }
 
-.calendar-day.has-event::after {
-  background: var(--color-accent);
-  box-shadow: 0 0 0 4px var(--color-accent-subtle);
+.calendar-day.has-event:hover {
+  border-color: rgba(var(--color-glow-bright-rgb), 0.58);
+  box-shadow:
+    0 0 0 1px rgba(var(--color-glow-rgb), 0.16),
+    0 20px 36px rgba(var(--color-void-1-rgb), 0.6),
+    0 0 30px rgba(var(--color-glow-rgb), 0.38),
+    0 0 58px rgba(var(--color-glow-rgb), 0.16);
 }
 
-.calendar-day.has-plan::after {
-  background: var(--color-inprogress);
-  box-shadow: 0 0 0 4px var(--color-inprogress-subtle);
+.calendar-day.has-event .date-number {
+  color: #ffffff;
+  text-shadow: 0 0 10px rgba(var(--color-glow-bright-rgb), 0.4);
 }
 
 .calendar-details {
