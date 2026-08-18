@@ -48,7 +48,7 @@ function AchievementsShelf({ buckets, onUpdate, onDelete }) {
   }, [achievements]);
 
   return (
-    <section className="app-section">
+    <section className="app-section" id="achievements-section">
       <motion.div
         className="section-heading"
         initial={{ opacity: 0, y: 14, filter: 'blur(6px)' }}
