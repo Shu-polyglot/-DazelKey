@@ -1,7 +1,7 @@
 import { useState } from 'react';
-import { motion } from 'motion/react';
+import { motion, AnimatePresence } from 'motion/react';
 import Modal from './Modal';
-import BucketStepEditor from './BucketStepEditor';
+import ShareModal from '../Achievements/ShareModal';
 import CompletePrompt from '../shared/CompletePrompt';
 import CompletedPhotoHero from '../shared/CompletedPhotoHero';
 import { getStatusLabel, whenLabels, modeLabels } from '../../lib/buckets';
@@ -13,7 +13,7 @@ const tapProps = {
   whileTap: { y: 1, scale: 0.96, transition: spring.press },
 };
 
-function DetailsView({ bucket, onClose, onEdit, onDelete, onComplete }) {
+function DetailsView({ bucket, onClose, onShare, onComplete }) {
   const hasPhotoHero = bucket.status === 'completed' && Boolean(bucket.image);
 
   const entries = [
@@ -31,12 +31,6 @@ function DetailsView({ bucket, onClose, onEdit, onDelete, onComplete }) {
 
   if (bucket.place) {
     entries.push(['Place', bucket.place]);
-  }
-
-  function handleDelete() {
-    if (confirm('Delete this experience?\n\nThis action cannot be undone.')) {
-      onDelete(bucket.id);
-    }
   }
 
   return (
@@ -71,11 +65,8 @@ function DetailsView({ bucket, onClose, onEdit, onDelete, onComplete }) {
       {bucket.status !== 'completed' && <CompletePrompt bucketId={bucket.id} onComplete={onComplete} />}
 
       <div className="detail-actions">
-        <motion.button type="button" className="secondary-button" onClick={onEdit} {...tapProps}>
-          Edit
-        </motion.button>
-        <motion.button type="button" className="secondary-button" onClick={handleDelete} {...tapProps}>
-          Delete
+        <motion.button type="button" className="secondary-button" onClick={onShare} {...tapProps}>
+          ↗ Share
         </motion.button>
         <motion.button type="button" className="secondary-button" onClick={onClose} {...tapProps}>
           Close
@@ -85,49 +76,35 @@ function DetailsView({ bucket, onClose, onEdit, onDelete, onComplete }) {
   );
 }
 
-function BucketDetailsModal({ bucket, onClose, onUpdate, onDelete, onComplete }) {
-  const [mode, setMode] = useState('view');
-  const isEditing = mode === 'edit';
+function BucketDetailsModal({ bucket, onClose, onComplete }) {
+  const [isShareOpen, setIsShareOpen] = useState(false);
 
   return (
-    <Modal onClose={onClose} className={isEditing ? 'detail-modal step-editor-modal' : 'detail-modal'}>
-      {isEditing ? (
-        <BucketStepEditor
-          bucket={bucket}
-          onCancel={() => setMode('view')}
-          onSave={(patch) => {
-            onUpdate(bucket.id, patch);
-            setMode('view');
-          }}
-        />
-      ) : (
-        <>
-          <div className="modal-header detail-header">
-            <h3>Bucket details</h3>
-            <motion.button
-              type="button"
-              className="icon-button"
-              aria-label="Close details"
-              onClick={onClose}
-              whileHover={{ rotate: 90, transition: spring.hover }}
-              whileTap={{ scale: 0.88, transition: spring.press }}
-            >
-              ×
-            </motion.button>
-          </div>
+    <>
+      <Modal onClose={onClose} className="detail-modal">
+        <div className="modal-header detail-header">
+          <h3>Bucket details</h3>
+          <motion.button
+            type="button"
+            className="icon-button"
+            aria-label="Close details"
+            onClick={onClose}
+            whileHover={{ rotate: 90, transition: spring.hover }}
+            whileTap={{ scale: 0.88, transition: spring.press }}
+          >
+            ×
+          </motion.button>
+        </div>
 
-          <div className="detail-content">
-            <DetailsView
-              bucket={bucket}
-              onClose={onClose}
-              onEdit={() => setMode('edit')}
-              onDelete={onDelete}
-              onComplete={onComplete}
-            />
-          </div>
-        </>
-      )}
-    </Modal>
+        <div className="detail-content">
+          <DetailsView bucket={bucket} onClose={onClose} onShare={() => setIsShareOpen(true)} onComplete={onComplete} />
+        </div>
+      </Modal>
+
+      <AnimatePresence>
+        {isShareOpen && <ShareModal key="share-modal" bucket={bucket} onClose={() => setIsShareOpen(false)} />}
+      </AnimatePresence>
+    </>
   );
 }
 

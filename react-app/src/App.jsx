@@ -120,11 +120,6 @@ function App() {
                 key={detailsBucket.id}
                 bucket={detailsBucket}
                 onClose={() => setDetailsBucketId(null)}
-                onUpdate={updateBucket}
-                onDelete={(id) => {
-                  deleteBucket(id);
-                  setDetailsBucketId(null);
-                }}
                 onComplete={completeBucket}
               />
             )}

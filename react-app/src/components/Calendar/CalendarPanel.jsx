@@ -1,9 +1,8 @@
 import { useMemo, useState } from 'react';
 import { AnimatePresence, motion } from 'motion/react';
 import CalendarGrid from './CalendarGrid';
-import CalendarDayDetails from './CalendarDayDetails';
 import CalendarExpandedOverlay from './CalendarExpandedOverlay';
-import { buildMonthGrid } from '../../lib/calendar';
+import { buildMonthGrid, getBucketMatchesForDate } from '../../lib/calendar';
 import { formatMonth } from '../../lib/dates';
 import { spring, dashboardEntrance, entranceTransition } from '../../styles/motion';
 import './Calendar.css';
@@ -25,9 +24,20 @@ function CalendarPanel({ buckets, onOpenBucket }) {
     setCurrentMonth((prev) => new Date(prev.getFullYear(), prev.getMonth() + 1, 1));
   }
 
+  // A day with exactly one lived experience opens its Bucket Details
+  // directly -- no intermediate list. A day with more than one still shows
+  // CalendarExpandedOverlay so the user can pick which one; that ambiguity
+  // is unavoidable without inventing a new per-bucket UI on the grid itself.
   function handleDayClick(isoDate) {
     setSelectedDate(isoDate);
-    setExpandedDate(isoDate);
+    const matches = getBucketMatchesForDate(buckets, isoDate);
+    if (matches.length === 1) {
+      onOpenBucket(matches[0].id);
+      return;
+    }
+    if (matches.length > 1) {
+      setExpandedDate(isoDate);
+    }
   }
 
   return (
@@ -70,7 +80,6 @@ function CalendarPanel({ buckets, onOpenBucket }) {
       </div>
 
       <CalendarGrid cells={cells} buckets={buckets} selectedDate={selectedDate} onDayClick={handleDayClick} />
-      <CalendarDayDetails selectedDate={selectedDate} buckets={buckets} onOpenBucket={onOpenBucket} />
 
       <AnimatePresence>
         {expandedDate && (
