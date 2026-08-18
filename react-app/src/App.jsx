@@ -80,7 +80,7 @@ function App() {
     <>
       <AnimatePresence>
         {!hasEntered && !showEntryRitual && (
-          <OpeningExperience key="onboarding" profile={profile} onComplete={handleOnboardingComplete} />
+          <OpeningExperience key="onboarding" profile={profile} buckets={buckets} onComplete={handleOnboardingComplete} />
         )}
       </AnimatePresence>
 
