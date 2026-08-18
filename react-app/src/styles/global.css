@@ -35,6 +35,11 @@ p {
 button {
   font: inherit;
   color: inherit;
+  /* Mobile Safari/Chrome otherwise hold a tap briefly to see if it turns
+     into a double-tap-to-zoom or scroll gesture before firing click --
+     manipulation removes that ambiguity so every button responds to a
+     single, ordinary tap. Purely behavioral, no visual change. */
+  touch-action: manipulation;
 }
 
 img {

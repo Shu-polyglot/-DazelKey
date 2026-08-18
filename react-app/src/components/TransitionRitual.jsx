@@ -67,6 +67,12 @@ function TransitionRitual({ onContinue }) {
       animate="visible"
       exit="exit"
       variants={overlayVariants}
+      // "Press Enter to continue" only has a keyboard to fall back to on
+      // desktop -- on mobile there is no key to press, so the ritual also
+      // has to advance on a plain tap/click anywhere on the screen once
+      // canContinue's fade-in beat has passed.
+      onClick={canContinue ? onContinue : undefined}
+      style={{ cursor: canContinue ? 'pointer' : 'default' }}
     >
       <div className="transition-ritual-content">
         <motion.p className="transition-ritual-quote" variants={quoteVariants}>

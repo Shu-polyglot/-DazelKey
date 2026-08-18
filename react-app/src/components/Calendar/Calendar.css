@@ -66,6 +66,9 @@
   color: var(--color-text-primary);
   cursor: pointer;
   overflow: hidden;
+  touch-action: manipulation;
+  user-select: none;
+  -webkit-user-select: none;
   transition: border-color 0.2s ease, background 0.2s ease;
 }
 

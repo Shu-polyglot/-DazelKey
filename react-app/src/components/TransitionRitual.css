@@ -7,6 +7,13 @@
   align-items: center;
   justify-content: center;
   padding: var(--space-2xl) var(--space-lg);
+  touch-action: manipulation;
+  /* The whole screen is a tap target (see the onClick on this element in
+     TransitionRitual.jsx) -- without this, a tap that lands on the quote
+     text can be read as the start of a text selection instead of a
+     plain tap, which swallows the click. */
+  user-select: none;
+  -webkit-user-select: none;
   background: radial-gradient(
     ellipse at 50% 42%,
     var(--color-bg-elevated) 0%,

@@ -38,6 +38,9 @@
 .cinematic-overlay {
   position: absolute;
   inset: 0;
+  /* Purely decorative wash -- must never sit between a tap and the
+     controls stacked above it (Enter, the step continue buttons). */
+  pointer-events: none;
   background: linear-gradient(
     180deg,
     rgba(var(--color-void-1-rgb), 0.42) 0%,
