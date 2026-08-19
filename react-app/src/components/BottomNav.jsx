@@ -8,6 +8,7 @@ import './BottomNav.css';
 const NAV_ITEMS = [
   { route: 'bucket-lists', label: 'The Bucket Lists', matches: ['bucket-lists', 'story'] },
   { route: 'achievement', label: 'The Achievement', matches: ['achievement'] },
+  { route: 'profile', label: 'Profile', matches: ['profile'] },
 ];
 
 function BottomNav({ active, onNavigate }) {

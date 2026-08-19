@@ -7,6 +7,7 @@ import NextUpPanel from './components/NextUpPanel';
 import AchievementsShelf from './components/Achievements/AchievementsShelf';
 import CalendarPanel from './components/Calendar/CalendarPanel';
 import BucketListPanel from './components/BucketList/BucketListPanel';
+import ProfilePage from './components/ProfilePage';
 import BucketCreateModal from './components/Modals/BucketCreateModal';
 import BucketDetailsModal from './components/Modals/BucketDetailsModal';
 import ProfilePanel from './components/Modals/ProfilePanel';
@@ -134,6 +135,10 @@ function App() {
               />
               <CalendarPanel buckets={buckets} onOpenBucket={setDetailsBucketId} />
               <AchievementsShelf buckets={buckets} onUpdate={updateBucket} onDelete={deleteBucket} />
+            </div>
+
+            <div className={`tab-page${route === 'profile' ? ' is-active' : ''}`} aria-hidden={route !== 'profile'}>
+              <ProfilePage profile={profile} onEditProfile={() => setIsProfileOpen(true)} />
             </div>
           </main>
 

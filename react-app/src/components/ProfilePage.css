@@ -1,0 +1,48 @@
+.profile-page {
+  padding: var(--space-xl) var(--space-lg);
+}
+
+.profile-page-body {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: var(--space-sm);
+  margin-top: var(--space-md);
+}
+
+.profile-avatar {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  background: linear-gradient(180deg, rgba(var(--color-glow-rgb), 0.22), rgba(var(--color-glow-rgb), 0.06));
+  background-size: cover;
+  background-position: center;
+  border: 1px solid var(--color-border);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08), 0 18px 32px rgba(var(--color-void-1-rgb), 0.5);
+  display: grid;
+  place-items: center;
+  font-family: var(--font-family-display);
+  font-size: 2.25rem;
+  color: var(--color-text-primary);
+  margin-bottom: var(--space-xs);
+}
+
+.profile-page-name {
+  font-family: var(--font-family-display);
+  font-weight: var(--font-weight-regular);
+  font-size: clamp(1.8rem, 3.5vw, 2.4rem);
+  letter-spacing: var(--tracking-tight);
+  color: var(--color-text-primary);
+}
+
+.profile-page-age {
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-body-sm);
+  letter-spacing: var(--tracking-wide);
+  text-transform: uppercase;
+}
+
+.profile-page-edit {
+  margin-top: var(--space-md);
+}

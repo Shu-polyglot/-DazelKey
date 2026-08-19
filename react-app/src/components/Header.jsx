@@ -1,19 +1,7 @@
 import { motion } from 'motion/react';
 import { spring, dashboardEntrance, entranceTransition } from '../styles/motion';
+import { getInitials } from '../lib/profile';
 import './Header.css';
-
-function getInitials(name) {
-  if (!name) {
-    return 'LA';
-  }
-  const initials = name
-    .trim()
-    .split(/\s+/)
-    .slice(0, 2)
-    .map((part) => part[0]?.toUpperCase())
-    .join('');
-  return initials || 'LA';
-}
 
 function Header({ title, profile, onAddBucket, onOpenProfile }) {
   return (
