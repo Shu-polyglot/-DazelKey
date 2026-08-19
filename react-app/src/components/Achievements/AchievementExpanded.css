@@ -28,13 +28,6 @@
   cursor: default;
 }
 
-.achievement-expanded.is-editing {
-  height: auto;
-  max-height: min(88vh, 860px);
-  overflow-y: auto;
-  padding: var(--space-xl) var(--space-lg) var(--space-lg);
-}
-
 .achievement-expanded-content {
   display: flex;
   flex-direction: column;
@@ -88,6 +81,75 @@
   );
 }
 
+/* Restrained tap-to-add/change-photo affordance: an inset dashed frame
+   with a small "+", not a labeled upload button -- it should read as
+   part of the photo, not a form control dropped onto it. Sits below the
+   close button (z-index 2) and overlay-content (z-index 1) in the
+   default stacking order so it never steals taps meant for the title
+   input, mode chips, or the × -- see AchievementExpandedEdit. */
+.achievement-expanded-photo-edit {
+  appearance: none;
+  position: absolute;
+  inset: 56px var(--space-lg) var(--space-lg);
+  border: 1px dashed rgba(var(--color-mist-rgb), 0.22);
+  border-radius: var(--radius-md);
+  background: transparent;
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+  transition: border-color 0.2s ease, background 0.2s ease;
+}
+
+.achievement-expanded-photo-edit:hover,
+.achievement-expanded-photo-edit:focus-visible {
+  border-color: rgba(var(--color-mist-rgb), 0.4);
+  background: rgba(var(--color-void-1-rgb), 0.08);
+  outline: none;
+}
+
+.achievement-expanded-photo-edit-plus {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  border: 1px solid rgba(var(--color-mist-rgb), 0.28);
+  background: rgba(var(--color-void-1-rgb), 0.3);
+  color: rgba(var(--color-mist-rgb), 0.75);
+  font-size: 0.95rem;
+  line-height: 1;
+  display: grid;
+  place-items: center;
+}
+
+.achievement-expanded-photo-input {
+  display: none;
+}
+
+/* Small, text-only, and off to the side -- the dashed frame covers
+   "choose a photo"; this just keeps the live in-page camera capture
+   (CameraCapture, same one CompletePrompt uses) reachable too. */
+.achievement-expanded-photo-camera {
+  appearance: none;
+  position: absolute;
+  top: var(--space-md);
+  left: var(--space-md);
+  z-index: 1;
+  padding: var(--space-3xs) var(--space-sm);
+  border-radius: var(--radius-pill);
+  border: 1px solid rgba(var(--color-mist-rgb), 0.24);
+  background: rgba(var(--color-void-1-rgb), 0.35);
+  color: rgba(var(--color-mist-rgb), 0.8);
+  font-size: var(--font-size-caption);
+  letter-spacing: var(--tracking-wide);
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: border-color 0.2s ease, color 0.2s ease;
+}
+
+.achievement-expanded-photo-camera:hover {
+  border-color: rgba(var(--color-mist-rgb), 0.4);
+  color: var(--color-text-primary);
+}
+
 .achievement-expanded-close {
   position: absolute;
   top: var(--space-md);
@@ -128,6 +190,75 @@
   text-shadow: 0 2px 24px rgba(0, 0, 0, 0.45);
 }
 
+/* Edit mode: same slot the eyebrow occupies in view mode, just split
+   between the editable mode toggle and the (untouched) shelf index. */
+.achievement-expanded-eyebrow-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-sm);
+  margin-bottom: var(--space-sm);
+}
+
+.achievement-expanded-mode-chips {
+  display: flex;
+  gap: var(--space-2xs);
+}
+
+.achievement-expanded-mode-chip {
+  appearance: none;
+  padding: var(--space-3xs) var(--space-sm);
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--color-border-strong);
+  background: rgba(var(--color-void-1-rgb), 0.35);
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-caption);
+  letter-spacing: var(--tracking-wide);
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+}
+
+.achievement-expanded-mode-chip.is-active {
+  background: rgba(var(--color-glow-rgb), 0.24);
+  border-color: rgba(var(--color-glow-rgb), 0.5);
+  color: var(--color-text-primary);
+}
+
+.achievement-expanded-index {
+  font-size: var(--font-size-label);
+  letter-spacing: var(--tracking-wider);
+  text-transform: uppercase;
+  color: var(--color-text-secondary);
+  text-shadow: 0 1px 12px rgba(0, 0, 0, 0.5);
+  flex: none;
+}
+
+/* Same type ramp as .achievement-expanded-title -- it visually replaces
+   that heading in place, so it has to read as the same headline, not a
+   form field dropped onto the photo. */
+.achievement-expanded-title-input {
+  appearance: none;
+  width: 100%;
+  padding: 0 0 var(--space-3xs);
+  margin: 0 0 var(--space-2xs);
+  border: none;
+  border-bottom: 1px solid rgba(var(--color-mist-rgb), 0.35);
+  background: transparent;
+  font-family: var(--font-family-display);
+  font-weight: var(--font-weight-regular);
+  font-size: clamp(1.8rem, 4.5vw, 2.75rem);
+  line-height: 1.1;
+  letter-spacing: var(--tracking-tight);
+  color: var(--color-text-primary);
+  text-shadow: 0 2px 24px rgba(0, 0, 0, 0.45);
+}
+
+.achievement-expanded-title-input:focus {
+  outline: none;
+  border-bottom-color: var(--color-accent);
+}
+
 .achievement-expanded-meta {
   display: flex;
   flex-wrap: wrap;
@@ -157,10 +288,43 @@
   flex: 0 0 auto;
 }
 
+/* Same slot and type ramp as .achievement-expanded-message, editable. */
+.achievement-expanded-message-input {
+  appearance: none;
+  resize: none;
+  width: 100%;
+  margin: 0;
+  padding: var(--space-md) var(--space-lg);
+  border: none;
+  border-top: 1px solid var(--color-border);
+  background: transparent;
+  font: inherit;
+  font-family: var(--font-family-display);
+  font-style: italic;
+  color: var(--color-text-secondary);
+  font-size: 1.05rem;
+  line-height: var(--leading-relaxed);
+  flex: 0 0 auto;
+}
+
+.achievement-expanded-message-input:focus {
+  outline: none;
+  background: rgba(var(--color-mist-rgb), 0.03);
+}
+
+.achievement-expanded-message-input::placeholder {
+  color: var(--color-text-muted);
+}
+
 .achievement-expanded-actions {
   flex: 0 0 auto;
   padding: 0 var(--space-lg) var(--space-lg);
   margin-top: var(--space-sm);
+}
+
+.achievement-expanded-actions .primary-button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
 }
 
 @media (max-width: 640px) {
@@ -174,11 +338,6 @@
     height: 100dvh;
     max-height: 100dvh;
     border-radius: 0;
-  }
-
-  .achievement-expanded.is-editing {
-    padding: calc(var(--space-lg) + env(safe-area-inset-top)) var(--space-md)
-      calc(var(--space-lg) + var(--nav-height) + env(safe-area-inset-bottom));
   }
 
   /* The card goes edge-to-edge (100dvh) at this width, so its own action
