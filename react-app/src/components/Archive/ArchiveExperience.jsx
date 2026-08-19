@@ -3,8 +3,9 @@ import { AnimatePresence, motion } from 'motion/react';
 import CinematicBackground from '../Onboarding/CinematicBackground';
 import Story from './Story';
 import StoryProgressBar from './StoryProgressBar';
+import YearNav from './YearNav';
 import ArchiveBridge from './ArchiveBridge';
-import { buildArchiveSequence } from '../../lib/archive';
+import { getArchiveYears, buildYearStorySequence } from '../../lib/archive';
 import { useStoryProgress } from '../../hooks/useStoryProgress';
 import { easing } from '../../styles/motion';
 import '../Onboarding/Onboarding.css';
@@ -14,14 +15,20 @@ import './Story.css';
 const LONG_PRESS_MS = 180;
 
 /*
-  Owns the whole Life Archive layer: which Story is active, which direction
-  it arrived from (for the dissolve-through transition), the auto-advance
-  timer, and the final Now -> bridge hand-off. Rendered as a fixed overlay
-  from App.jsx, the same shape as every other full-screen layer in this
-  app (Onboarding, the Expanded Bucket Card) — no router.
+  Owns the whole Life Archive layer: which calendar year is selected, which
+  Story within it is active, which direction it arrived from (for the
+  dissolve-through transition), the auto-advance timer, and the final
+  Now -> bridge hand-off. Rendered as a fixed overlay from App.jsx, the
+  same shape as every other full-screen layer in this app (Onboarding, the
+  Expanded Bucket Card) — no router.
 */
 function ArchiveExperience({ buckets, closeMode, onClose, onReturnToDashboard, onExploreAhead }) {
-  const stories = useMemo(() => buildArchiveSequence(buckets), [buckets]);
+  const years = useMemo(() => getArchiveYears(buckets), [buckets]);
+  // This layer always remounts fresh on open (it has no BottomNav tab of
+  // its own), so reading the newest year once at mount is enough --
+  // opening the archive always starts closest to "now".
+  const [selectedYear, setSelectedYear] = useState(() => years[0] ?? null);
+  const stories = useMemo(() => buildYearStorySequence(buckets, selectedYear), [buckets, selectedYear]);
   const [[index, direction], setIndexState] = useState([0, 0]);
   const [showBridge, setShowBridge] = useState(false);
   const longPressTimer = useRef(null);
@@ -35,6 +42,19 @@ function ArchiveExperience({ buckets, closeMode, onClose, onReturnToDashboard, o
       return;
     }
     setIndexState([nextIndex, dir]);
+  }
+
+  // Jumping to a different year restarts that year's reel from its first
+  // beat -- direction leans on the same forward/backward dissolve the
+  // Next/Prev tap zones already use, biased by whether the newly chosen
+  // year sits later or earlier than the one just left.
+  function handleSelectYear(year) {
+    if (year === selectedYear) {
+      return;
+    }
+    const dir = selectedYear !== null && year < selectedYear ? -1 : 1;
+    setSelectedYear(year);
+    setIndexState([0, dir]);
   }
 
   const { progress, pause, resume } = useStoryProgress({
@@ -131,7 +151,11 @@ function ArchiveExperience({ buckets, closeMode, onClose, onReturnToDashboard, o
         ×
       </button>
 
-      {!showBridge && <StoryProgressBar count={stories.length} activeIndex={index} progress={progress} />}
+      {!showBridge && <StoryProgressBar stories={stories} activeIndex={index} progress={progress} />}
+
+      {!showBridge && years.length > 1 && (
+        <YearNav years={years} selectedYear={selectedYear} onSelectYear={handleSelectYear} />
+      )}
 
       <div className="archive-stage">
         <AnimatePresence custom={direction} initial={false}>

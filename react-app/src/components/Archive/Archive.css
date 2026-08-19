@@ -76,6 +76,134 @@
 }
 
 /* ------------------------------------------------------------------ */
+/* Year Navigation                                                      */
+/* ------------------------------------------------------------------ */
+
+/*
+  A vertical year rail, not a row of tabs -- closer to a Photos-app date
+  scrubber than anything Instagram has, which is deliberate: it should
+  read as this app's own timeline device. Sits on the stage's right edge,
+  above the tap zones (z-index 4) so its own clicks land first, but narrow
+  enough that everywhere else in that tap zone still reaches Next/Prev.
+*/
+.year-nav {
+  position: absolute;
+  top: 50%;
+  right: var(--space-md);
+  transform: translateY(-50%);
+  z-index: 5;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: var(--space-sm);
+}
+
+.year-nav-spine {
+  position: absolute;
+  top: 4px;
+  bottom: 4px;
+  right: 5px;
+  width: 1px;
+  background: var(--color-border-strong);
+  pointer-events: none;
+}
+
+.year-nav-item {
+  position: relative;
+  appearance: none;
+  border: none;
+  background: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+  padding: var(--space-3xs) var(--space-3xs) var(--space-3xs) var(--space-md);
+  color: var(--color-text-muted);
+}
+
+.year-nav-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--color-text-muted);
+  opacity: 0.55;
+  transition: opacity 0.2s ease, transform 0.2s ease, background-color 0.2s ease;
+}
+
+/* Compact by default -- the cinematic photo stays the focus -- each
+   numeral only reveals itself on hover (desktop) so the rail reads as a
+   quiet mark on the timeline until you reach for it. */
+.year-nav-label {
+  font-family: var(--font-family-display);
+  font-size: var(--font-size-caption);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: var(--tracking-wide);
+  opacity: 0;
+  transform: translateX(4px);
+  transition: opacity 0.2s ease, transform 0.2s ease, color 0.2s ease;
+}
+
+.year-nav-item.is-selected {
+  color: var(--color-text-primary);
+}
+
+.year-nav-item.is-selected .year-nav-dot {
+  opacity: 1;
+  transform: scale(1.7);
+  background: var(--color-accent-strong);
+}
+
+.year-nav-item.is-selected .year-nav-label {
+  opacity: 1;
+  transform: translateX(0);
+  color: var(--color-accent-strong);
+  font-weight: var(--font-weight-medium);
+}
+
+@media (hover: hover) {
+  .year-nav-item:hover .year-nav-label {
+    opacity: 1;
+    transform: translateX(0);
+  }
+
+  .year-nav-item:hover .year-nav-dot {
+    opacity: 0.85;
+  }
+
+  .year-nav-item:hover:not(.is-selected) {
+    color: var(--color-text-secondary);
+  }
+}
+
+.year-nav-item:focus-visible {
+  outline: none;
+}
+
+.year-nav-item:focus-visible .year-nav-label {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+@media (max-width: 640px) {
+  .year-nav {
+    right: var(--space-sm);
+    gap: var(--space-xs);
+  }
+
+  .year-nav-item {
+    padding-left: var(--space-sm);
+  }
+
+  /* No hover on touch -- every numeral stays legible all the time so a
+     tap target is never a mystery dot. */
+  .year-nav-label {
+    opacity: 1;
+    transform: none;
+    font-size: 0.7rem;
+  }
+}
+
+/* ------------------------------------------------------------------ */
 /* Stage + tap zones                                                    */
 /* ------------------------------------------------------------------ */
 

@@ -54,6 +54,39 @@ function buildStoryFromBucket(bucket) {
   };
 }
 
+// The one place completedDate is turned into a calendar year -- every
+// other Year-aware helper below reads through this, so a bucket with no
+// date (or an unparsable one) consistently has no year rather than
+// silently sorting into whichever year happens to come first.
+function getCalendarYear(dateStr) {
+  if (!dateStr) {
+    return null;
+  }
+  const ms = new Date(`${dateStr}T12:00:00`).getTime();
+  if (Number.isNaN(ms)) {
+    return null;
+  }
+  return new Date(ms).getFullYear();
+}
+
+// Real calendar years that actually have a completed experience in them --
+// never a fixed/synthetic range -- newest first, so Year Navigation always
+// opens on "now" and lets the user step backward through their own
+// history.
+export function getArchiveYears(buckets) {
+  const years = new Set();
+  buckets.forEach((bucket) => {
+    if (bucket.status !== 'completed') {
+      return;
+    }
+    const year = getCalendarYear(bucket.completedDate);
+    if (year !== null) {
+      years.add(year);
+    }
+  });
+  return Array.from(years).sort((a, b) => b - a);
+}
+
 function buildNowStory(buckets) {
   const completed = buckets.filter((bucket) => bucket.status === 'completed').length;
 
@@ -70,13 +103,20 @@ function buildNowStory(buckets) {
 }
 
 /*
-  Oldest -> newest, ending on a synthesized "now" beat that is never user
-  data, only ever a live read of the current archive at the moment the
-  user opens it.
+  The reel for one selected calendar year -- oldest -> newest within that
+  year, ending on the same synthesized "now" beat every year's reel ends
+  on (never user data, just a live read of the current archive), so
+  finishing playback always reaches the same Return/bridge hand-off no
+  matter which year was being explored. `year: null` (nothing in the
+  archive to select) still returns a valid one-beat reel.
 */
-export function buildArchiveSequence(buckets) {
+export function buildYearStorySequence(buckets, year) {
+  if (year === null || year === undefined) {
+    return [buildNowStory(buckets)];
+  }
+
   const stories = buckets
-    .filter((bucket) => bucket.status === 'completed')
+    .filter((bucket) => bucket.status === 'completed' && getCalendarYear(bucket.completedDate) === year)
     .slice()
     .sort((a, b) => (a.completedDate || '').localeCompare(b.completedDate || ''))
     .map(buildStoryFromBucket);
