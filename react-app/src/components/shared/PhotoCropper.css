@@ -1,0 +1,56 @@
+.photo-cropper-modal {
+  max-width: 420px;
+}
+
+.photo-cropper-modal .primary-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.photo-cropper-stage {
+  position: relative;
+  width: min(280px, 68vw);
+  height: min(280px, 68vw);
+  margin: 0 auto;
+  overflow: hidden;
+  border-radius: 50%;
+  border: 1.5px solid var(--color-border-strong);
+  background: rgba(var(--color-void-1-rgb), 0.6);
+  box-shadow: var(--shadow-subtle);
+  cursor: grab;
+  touch-action: none;
+  user-select: none;
+}
+
+.photo-cropper-stage:active {
+  cursor: grabbing;
+}
+
+.photo-cropper-stage img {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  max-width: none;
+  pointer-events: none;
+}
+
+.photo-cropper-hint {
+  margin: var(--space-sm) 0 0;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-caption);
+  text-align: center;
+}
+
+.photo-cropper-zoom-slider {
+  display: block;
+  width: 100%;
+  margin: var(--space-sm) 0 0;
+  accent-color: var(--color-accent);
+}
+
+@media (max-width: 640px) {
+  .photo-cropper-stage {
+    width: min(240px, 72vw);
+    height: min(240px, 72vw);
+  }
+}

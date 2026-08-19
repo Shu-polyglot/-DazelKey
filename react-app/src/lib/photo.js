@@ -44,3 +44,19 @@ export async function resizeImageToDataUrl(file) {
 
   return canvas.toDataURL('image/jpeg', JPEG_QUALITY);
 }
+
+// Avatars are always cropped to a square, then displayed as either a square
+// or a circle (border-radius) depending on where they're used -- so the
+// stored source only ever needs to be one fixed square size.
+export const AVATAR_OUTPUT_SIZE = 512;
+const AVATAR_JPEG_QUALITY = 0.9;
+
+// sourceX/sourceY/sourceSize describe the square region to lift out of the
+// source image, in that image's own natural pixel coordinates.
+export function cropSquareToDataUrl(image, sourceX, sourceY, sourceSize, outputSize = AVATAR_OUTPUT_SIZE) {
+  const canvas = document.createElement('canvas');
+  canvas.width = outputSize;
+  canvas.height = outputSize;
+  canvas.getContext('2d').drawImage(image, sourceX, sourceY, sourceSize, sourceSize, 0, 0, outputSize, outputSize);
+  return canvas.toDataURL('image/jpeg', AVATAR_JPEG_QUALITY);
+}

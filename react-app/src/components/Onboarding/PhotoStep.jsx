@@ -1,5 +1,6 @@
 import { useRef, useState } from 'react';
 import { motion } from 'motion/react';
+import PhotoCropper from '../shared/PhotoCropper';
 import { transitions, spring } from '../../styles/motion';
 
 const containerVariants = {
@@ -8,26 +9,29 @@ const containerVariants = {
   exit: { opacity: 0, y: -20, filter: 'blur(10px)', transition: transitions.exit },
 };
 
-function readFileAsDataUrl(file) {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = () => resolve(reader.result);
-    reader.onerror = reject;
-    reader.readAsDataURL(file);
-  });
-}
-
 function PhotoStep({ initialValue = null, onSubmit }) {
   const [photo, setPhoto] = useState(initialValue);
+  const [cropSource, setCropSource] = useState(null);
   const inputRef = useRef(null);
 
-  async function handleFile(event) {
+  function handleFile(event) {
     const file = event.target.files?.[0];
+    event.target.value = '';
     if (!file) {
       return;
     }
-    const dataUrl = await readFileAsDataUrl(file);
+    setCropSource(URL.createObjectURL(file));
+  }
+
+  function handleCropConfirm(dataUrl) {
     setPhoto(dataUrl);
+    URL.revokeObjectURL(cropSource);
+    setCropSource(null);
+  }
+
+  function handleCropCancel() {
+    URL.revokeObjectURL(cropSource);
+    setCropSource(null);
   }
 
   return (
@@ -62,6 +66,8 @@ function PhotoStep({ initialValue = null, onSubmit }) {
       >
         {photo ? 'Continue' : 'Skip for now'}
       </motion.button>
+
+      {cropSource && <PhotoCropper imageSrc={cropSource} onConfirm={handleCropConfirm} onCancel={handleCropCancel} />}
     </motion.div>
   );
 }

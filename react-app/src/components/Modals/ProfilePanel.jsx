@@ -1,6 +1,7 @@
 import { useRef, useState } from 'react';
 import { motion } from 'motion/react';
 import Modal from './Modal';
+import PhotoCropper from '../shared/PhotoCropper';
 import { spring } from '../../styles/motion';
 import { SOCIAL_PLATFORMS, getSocialPlatform, normalizeSocialUrl } from '../../lib/profile';
 import './Modals.css';
@@ -9,15 +10,6 @@ import './ProfilePanel.css';
 const MIN_AGE = 1;
 const MAX_AGE = 119;
 
-function readFileAsDataUrl(file) {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = () => resolve(reader.result);
-    reader.onerror = reject;
-    reader.readAsDataURL(file);
-  });
-}
-
 function ProfilePanel({ profile, onClose, onSave }) {
   const [name, setName] = useState(profile?.name || '');
   const [age, setAge] = useState(profile?.age ?? '');
@@ -25,15 +17,27 @@ function ProfilePanel({ profile, onClose, onSave }) {
   const [bio, setBio] = useState(profile?.bio || '');
   const [role, setRole] = useState(profile?.role || '');
   const [socialLinks, setSocialLinks] = useState(() => (profile?.socialLinks || []).map((link) => ({ ...link })));
+  const [cropSource, setCropSource] = useState(null);
   const fileInputRef = useRef(null);
 
-  async function handleFile(event) {
+  function handleFile(event) {
     const file = event.target.files?.[0];
+    event.target.value = '';
     if (!file) {
       return;
     }
-    const dataUrl = await readFileAsDataUrl(file);
+    setCropSource(URL.createObjectURL(file));
+  }
+
+  function handleCropConfirm(dataUrl) {
     setPhoto(dataUrl);
+    URL.revokeObjectURL(cropSource);
+    setCropSource(null);
+  }
+
+  function handleCropCancel() {
+    URL.revokeObjectURL(cropSource);
+    setCropSource(null);
   }
 
   function addSocialLink(platformId) {
@@ -193,6 +197,8 @@ function ProfilePanel({ profile, onClose, onSave }) {
           </motion.button>
         </div>
       </form>
+
+      {cropSource && <PhotoCropper imageSrc={cropSource} onConfirm={handleCropConfirm} onCancel={handleCropCancel} />}
     </Modal>
   );
 }
