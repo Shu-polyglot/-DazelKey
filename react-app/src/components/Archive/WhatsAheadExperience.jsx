@@ -59,7 +59,7 @@ function WhatsAheadExperience({ buckets, onClose, onComplete }) {
             transition: { duration: 0.6, delay: 0.35, ease: easing.emphasized },
           }}
         >
-          <span className="archive-bridge-eyebrow">What&rsquo;s ahead</span>
+          <span className="archive-bridge-eyebrow">The Bucket List</span>
           <h1 className="whats-ahead-headline">The story isn&rsquo;t finished.</h1>
           <p className="archive-bridge-copy">
             {upcoming.length > 0

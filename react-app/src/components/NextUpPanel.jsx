@@ -13,7 +13,7 @@ function NextUpPanel({ buckets, onOpenBucket }) {
       animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
       transition={entranceTransition(dashboardEntrance.nextUp)}
     >
-      <p className="eyebrow">What’s ahead</p>
+      <p className="eyebrow">The Bucket List</p>
 
       {next ? (
         <motion.button

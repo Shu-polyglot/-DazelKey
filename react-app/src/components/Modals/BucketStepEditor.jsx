@@ -334,7 +334,7 @@ function BucketStepEditor({ bucket, onCancel, onSave }) {
 
         {isLastStep ? (
           <motion.button type="button" className="primary-button" onClick={handleSave} {...tapProps}>
-            {isCreating ? 'Add to what’s ahead' : 'Save'}
+            {isCreating ? 'Add to The Bucket List' : 'Save'}
           </motion.button>
         ) : (
           <motion.button

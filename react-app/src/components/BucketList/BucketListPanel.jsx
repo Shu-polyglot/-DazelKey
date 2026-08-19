@@ -35,7 +35,7 @@ function BucketListPanel({ buckets, onUpdate, onDelete, onComplete }) {
       >
         <div className="section-heading">
           <span className="section-label">Intentions</span>
-          <h2>What’s ahead</h2>
+          <h2>The Bucket List</h2>
         </div>
 
         <ModeFilters activeFilter={activeFilter} onChange={setActiveFilter} />

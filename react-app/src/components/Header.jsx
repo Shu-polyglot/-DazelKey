@@ -48,7 +48,7 @@ function Header({ title, profile, onAddBucket, onOpenProfile }) {
         whileHover={{ y: -2, transition: spring.hover }}
         whileTap={{ y: 1, scale: 0.96, transition: spring.press }}
       >
-        + Add to What’s ahead
+        + Add to The Bucket List
       </motion.button>
     </motion.header>
   );
