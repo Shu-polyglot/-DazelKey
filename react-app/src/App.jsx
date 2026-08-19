@@ -217,7 +217,7 @@ function App() {
         )}
       </AnimatePresence>
 
-      {hasEntered && <BottomNav active={route} onNavigate={handleNavigate} />}
+      {hasEntered && <BottomNav active={route} onNavigate={handleNavigate} profile={profile} />}
     </>
   );
 }

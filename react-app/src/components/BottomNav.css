@@ -1,6 +1,11 @@
 /* Sits above every full-screen experience (Archive/WhatsAhead, z-index 200)
    so it stays reachable no matter which of the three destinations is
-   showing -- but only ever appears once the user has entered the app. */
+   showing -- but only ever appears once the user has entered the app.
+   min-height (not height) so the bar grows to absorb the home-indicator
+   safe-area inset below its icons instead of squeezing them -- App.css's
+   page-shell padding already budgets for --nav-height *plus*
+   env(safe-area-inset-bottom) as two separate terms, so this keeps the
+   bar's real rendered height matching that same model. */
 .bottom-nav {
   position: fixed;
   left: 0;
@@ -9,30 +14,30 @@
   z-index: 220;
   display: flex;
   justify-content: center;
-  gap: var(--space-xl);
-  padding: var(--space-sm) var(--space-md) calc(var(--space-sm) + env(safe-area-inset-bottom));
-  height: var(--nav-height);
+  align-items: stretch;
+  gap: var(--space-2xl);
+  padding: 0 var(--space-md) env(safe-area-inset-bottom);
+  min-height: var(--nav-height);
   box-sizing: border-box;
-  background: rgba(var(--color-void-2-rgb), 0.82);
+  background: rgba(var(--color-void-2-rgb), 0.86);
   backdrop-filter: blur(var(--blur-md));
   -webkit-backdrop-filter: blur(var(--blur-md));
   border-top: 1px solid var(--color-border);
   box-shadow: 0 -16px 40px rgba(var(--color-void-1-rgb), 0.45);
 }
 
+/* Icon-only, no visible label (aria-label carries the accessible name) --
+   compact by design, but each item still spans a roomy tap column. */
 .bottom-nav-item {
   appearance: none;
   border: none;
   background: none;
   cursor: pointer;
-  flex: 0 1 200px;
+  flex: 0 0 auto;
+  width: 64px;
   display: flex;
-  flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 6px;
-  padding: var(--space-2xs) var(--space-md);
-  border-radius: var(--radius-md);
   color: var(--color-text-muted);
   transition: color 0.2s ease;
 }
@@ -43,51 +48,74 @@
 
 .bottom-nav-item:focus-visible {
   outline: none;
+}
+
+.bottom-nav-item:focus-visible .bottom-nav-icon,
+.bottom-nav-item:focus-visible .bottom-nav-avatar {
   box-shadow: 0 0 0 3px var(--color-accent-subtle);
 }
 
-.bottom-nav-indicator {
-  width: 4px;
-  height: 4px;
-  border-radius: 50%;
-  background: var(--color-accent);
-  opacity: 0;
-  transform: scale(0.4);
-  transition: opacity 0.2s ease, transform 0.2s ease;
+/* Selected state reads the way Instagram's tab bar does -- the glyph
+   itself switches from outline to solid -- plus a soft accent pill behind
+   it, which is this app's own touch (the same --radius-pill/
+   --color-accent-subtle language its buttons and badges already use). */
+.bottom-nav-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 32px;
+  border-radius: var(--radius-pill);
+  transition: background-color 0.2s ease;
 }
 
 .bottom-nav-item.is-active {
-  color: var(--color-text-primary);
-}
-
-.bottom-nav-item.is-active .bottom-nav-indicator {
-  opacity: 1;
-  transform: scale(1);
-}
-
-.bottom-nav-label {
-  font-size: clamp(0.68rem, 2.6vw, 0.8rem);
-  font-weight: var(--font-weight-medium);
-  letter-spacing: var(--tracking-wide);
-  text-transform: uppercase;
-  line-height: var(--leading-tight);
-  text-align: center;
-  white-space: normal;
-}
-
-.bottom-nav-item.is-active .bottom-nav-label {
   color: var(--color-accent-strong);
 }
 
-@media (max-width: 480px) {
+.bottom-nav-item.is-active .bottom-nav-icon {
+  background: var(--color-accent-subtle);
+}
+
+/* Profile tab shows the user's own avatar instead of a glyph -- selection
+   reads as a ring around it, mirroring how Instagram highlights the
+   profile photo tab rather than swapping its icon shape. */
+.bottom-nav-avatar {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background-size: cover;
+  background-position: center;
+  background-color: rgba(var(--color-mist-rgb), 0.14);
+  display: grid;
+  place-items: center;
+  font-family: var(--font-family-display);
+  font-size: 0.62rem;
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-secondary);
+  border: 1.5px solid transparent;
+  transition: border-color 0.2s ease, color 0.2s ease;
+}
+
+.bottom-nav-item.is-active .bottom-nav-avatar {
+  border-color: var(--color-accent-strong);
+  color: var(--color-text-primary);
+}
+
+/* Below the desktop/tablet breakpoint the bar switches from a centered
+   icon cluster to full-bleed equal columns -- Instagram's actual mobile
+   layout -- so every tab gets the widest possible tap area. */
+@media (max-width: 640px) {
   .bottom-nav {
-    gap: var(--space-xs);
+    justify-content: space-between;
+    gap: 0;
     padding-left: var(--space-2xs);
     padding-right: var(--space-2xs);
   }
 
   .bottom-nav-item {
-    padding-left: 2px;
-    padding-right: 2px;
+    flex: 1 1 0;
+    width: auto;
+    min-width: 44px;
   }
 }
