@@ -114,8 +114,8 @@ function OverviewPanel({ buckets, onOpenArchive }) {
           whileHover={{ y: -1, transition: spring.hover }}
           whileTap={{ y: 1, scale: 0.98, transition: spring.press }}
         >
-          <span className="overview-invite-label">What you’ve lived</span>
-          <span className="overview-invite-cta">Learn more →</span>
+          <span className="overview-invite-label">The Story</span>
+          <span className="overview-invite-cta">Watch the story →</span>
         </motion.button>
       </div>
 
