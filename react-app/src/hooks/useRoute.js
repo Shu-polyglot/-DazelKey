@@ -1,6 +1,9 @@
 import { useEffect, useState } from 'react';
 
-export const ROUTES = ['story', 'achievement', 'bucket-lists', 'timeline'];
+// Timeline no longer has its own tab -- it now lives at the top of the
+// Achievement tab -- so it's not a navigable route, but old #/timeline
+// hashes are still recognized below and mapped onto 'achievement'.
+export const ROUTES = ['story', 'achievement', 'bucket-lists'];
 const DEFAULT_ROUTE = 'bucket-lists';
 
 // Recognizes both the tab hashes this router owns (#/story, #/achievement...)
@@ -9,7 +12,7 @@ const DEFAULT_ROUTE = 'bucket-lists';
 function readRouteFromHash(hash) {
   const tabMatch = hash.match(/^#\/(story|achievement|bucket-lists|timeline)\b/);
   if (tabMatch) {
-    return tabMatch[1];
+    return tabMatch[1] === 'timeline' ? 'achievement' : tabMatch[1];
   }
   if (/^#achievement-/.test(hash)) {
     return 'achievement';

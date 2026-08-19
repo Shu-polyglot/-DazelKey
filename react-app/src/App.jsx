@@ -65,6 +65,16 @@ function App() {
     navigate('bucket-lists');
   }
 
+  // The Achievement tab now opens on Your Timeline, so jumping here from
+  // the "experiences archived" count still needs to land on the shelf
+  // itself, not just the top of the tab.
+  function handleViewAchievements() {
+    navigate('achievement');
+    window.setTimeout(() => {
+      document.getElementById('achievements-section')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 350);
+  }
+
   // The bridge's second option hands off to a different full-screen
   // experience rather than back to a tab, so it skips closeStory entirely.
   function handleExploreAhead() {
@@ -109,7 +119,7 @@ function App() {
                 <OverviewPanel
                   buckets={buckets}
                   onOpenArchive={() => navigate('story')}
-                  onViewAchievements={() => navigate('achievement')}
+                  onViewAchievements={handleViewAchievements}
                 />
                 <NextUpPanel buckets={buckets} onOpenBucket={setDetailsBucketId} />
               </div>
@@ -123,11 +133,8 @@ function App() {
             </div>
 
             <div className={`tab-page${route === 'achievement' ? ' is-active' : ''}`} aria-hidden={route !== 'achievement'}>
-              <AchievementsShelf buckets={buckets} onUpdate={updateBucket} onDelete={deleteBucket} />
-            </div>
-
-            <div className={`tab-page${route === 'timeline' ? ' is-active' : ''}`} aria-hidden={route !== 'timeline'}>
               <CalendarPanel buckets={buckets} onOpenBucket={setDetailsBucketId} />
+              <AchievementsShelf buckets={buckets} onUpdate={updateBucket} onDelete={deleteBucket} />
             </div>
           </main>
 

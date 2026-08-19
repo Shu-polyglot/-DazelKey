@@ -2,18 +2,19 @@ import { motion } from 'motion/react';
 import { spring } from '../styles/motion';
 import './BottomNav.css';
 
+// The Story has no tab of its own -- it's reached from within The Bucket
+// Lists (see OverviewPanel's "Watch the story" link) and returns there on
+// close -- so it's treated as part of that tab for the active indicator.
 const NAV_ITEMS = [
-  { route: 'story', label: 'The Story' },
-  { route: 'achievement', label: 'The Achievement' },
-  { route: 'bucket-lists', label: 'The Bucket Lists' },
-  { route: 'timeline', label: 'Your Timeline' },
+  { route: 'bucket-lists', label: 'The Bucket Lists', matches: ['bucket-lists', 'story'] },
+  { route: 'achievement', label: 'The Achievement', matches: ['achievement'] },
 ];
 
 function BottomNav({ active, onNavigate }) {
   return (
     <nav className="bottom-nav" aria-label="Primary">
       {NAV_ITEMS.map((item) => {
-        const isActive = active === item.route;
+        const isActive = item.matches.includes(active);
         return (
           <motion.button
             key={item.route}

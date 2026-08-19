@@ -9,12 +9,13 @@
   padding: var(--space-2xl) var(--space-md) calc(var(--space-3xl) + var(--nav-height) + env(safe-area-inset-bottom));
 }
 
-/* Every in-page tab (Achievement / Bucket Lists / Timeline) stays mounted
-   so filters, expanded cards, and the visible month persist across tab
-   switches -- only visibility toggles. The Story tab is the exception: it
-   renders as its own fixed overlay (see ArchiveExperience) and always
-   remounts fresh, matching the reel-restart behavior it already had as a
-   modal before tab navigation existed. */
+/* Both in-page tabs (Bucket Lists / Achievement, the latter opening on
+   Your Timeline) stay mounted so filters, expanded cards, and the visible
+   month persist across tab switches -- only visibility toggles. The Story
+   tab is the exception: it has no BottomNav entry of its own (it's reached
+   from within Bucket Lists) and renders as its own fixed overlay (see
+   ArchiveExperience), always remounting fresh -- matching the reel-restart
+   behavior it already had as a modal before tab navigation existed. */
 .tab-page {
   display: none;
 }
@@ -23,10 +24,10 @@
   display: block;
 }
 
-/* The Achievement and Timeline tabs open directly below the header, with
-   no sibling section above them the way BucketListPanel still has
-   main-layout -- so the shared .app-section top hairline would otherwise
-   float with nothing to separate. */
+/* The Achievement tab opens directly below the header with Your Timeline
+   as its first section, with no sibling above it the way BucketListPanel
+   still has main-layout -- so the shared .app-section top hairline would
+   otherwise float with nothing to separate. */
 .tab-page > .app-section:first-child {
   border-top: none;
   padding-top: 0;
