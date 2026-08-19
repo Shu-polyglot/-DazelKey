@@ -5,7 +5,7 @@ import ArchiveProgressModal from './Modals/ArchiveProgressModal';
 import { dashboardEntrance, entranceTransition, easing, spring } from '../styles/motion';
 import './OverviewPanel.css';
 
-function OverviewPanel({ buckets, onOpenArchive, onViewAchievements }) {
+function OverviewPanel({ buckets, onOpenArchive, onViewRemaining }) {
   const stats = useMemo(() => {
     const completed = buckets.filter((bucket) => bucket.status === 'completed').length;
     const inProgress = buckets.filter((bucket) => bucket.status === 'in-progress').length;
@@ -33,11 +33,13 @@ function OverviewPanel({ buckets, onOpenArchive, onViewAchievements }) {
   }
 
   // Closes the (small, quick) progress modal first so its exit isn't still
-  // settling underneath the scroll -- mirrors the delay App.jsx uses after
-  // closing the Life Archive, just shorter since this modal is lighter.
+  // settling underneath the jump to The Bucket Lists -- mirrors the delay
+  // App.jsx uses after closing the Life Archive, just shorter since this
+  // modal is lighter. The jump itself (switching tabs, then scrolling once
+  // there) is owned by App.jsx since this now lives on The Achievement tab.
   function handleViewRemaining() {
     setIsProgressOpen(false);
-    window.setTimeout(() => scrollToSection('bucket-list-section'), 220);
+    window.setTimeout(() => onViewRemaining?.(), 220);
   }
 
   // Ties to the dashboard's entrance sequence on first mount, then reacts
@@ -81,7 +83,7 @@ function OverviewPanel({ buckets, onOpenArchive, onViewAchievements }) {
           <motion.button
             type="button"
             className="overview-count-trigger"
-            onClick={onViewAchievements}
+            onClick={() => scrollToSection('achievements-section')}
             aria-label={`View ${stats.completed} archived experiences`}
             whileHover={{ y: -2, transition: spring.hover }}
             whileTap={{ y: 1, scale: 0.98, transition: spring.press }}

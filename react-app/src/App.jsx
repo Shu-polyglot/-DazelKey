@@ -65,13 +65,14 @@ function App() {
     navigate('bucket-lists');
   }
 
-  // The Achievement tab now opens on Your Timeline, so jumping here from
-  // the "experiences archived" count still needs to land on the shelf
-  // itself, not just the top of the tab.
-  function handleViewAchievements() {
-    navigate('achievement');
+  // OverviewPanel now lives at the top of The Achievement tab, so its
+  // "remaining" link (from the archive progress modal) has to leave the
+  // tab -- switch to The Bucket Lists, then scroll once that tab is
+  // actually showing.
+  function handleViewRemainingBuckets() {
+    navigate('bucket-lists');
     window.setTimeout(() => {
-      document.getElementById('achievements-section')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      document.getElementById('bucket-list-section')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }, 350);
   }
 
@@ -115,14 +116,7 @@ function App() {
 
           <main className="tab-content">
             <div className={`tab-page${route === 'bucket-lists' ? ' is-active' : ''}`} aria-hidden={route !== 'bucket-lists'}>
-              <div className="main-layout">
-                <OverviewPanel
-                  buckets={buckets}
-                  onOpenArchive={() => navigate('story')}
-                  onViewAchievements={handleViewAchievements}
-                />
-                <NextUpPanel buckets={buckets} onOpenBucket={setDetailsBucketId} />
-              </div>
+              <NextUpPanel buckets={buckets} onOpenBucket={setDetailsBucketId} />
 
               <BucketListPanel
                 buckets={buckets}
@@ -133,6 +127,11 @@ function App() {
             </div>
 
             <div className={`tab-page${route === 'achievement' ? ' is-active' : ''}`} aria-hidden={route !== 'achievement'}>
+              <OverviewPanel
+                buckets={buckets}
+                onOpenArchive={() => navigate('story')}
+                onViewRemaining={handleViewRemainingBuckets}
+              />
               <CalendarPanel buckets={buckets} onOpenBucket={setDetailsBucketId} />
               <AchievementsShelf buckets={buckets} onUpdate={updateBucket} onDelete={deleteBucket} />
             </div>

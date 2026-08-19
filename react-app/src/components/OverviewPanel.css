@@ -1,5 +1,4 @@
 .overview-panel {
-  grid-column: 1;
   padding: var(--space-lg) var(--space-md);
   display: flex;
   flex-direction: column;

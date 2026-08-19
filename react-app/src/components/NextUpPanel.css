@@ -1,5 +1,4 @@
 .next-up-panel {
-  grid-column: 2;
   padding: var(--space-lg) var(--space-lg) var(--space-md);
   display: flex;
   flex-direction: column;
@@ -44,10 +43,4 @@
   font-size: var(--font-size-body-sm);
   letter-spacing: var(--tracking-wide);
   text-transform: uppercase;
-}
-
-@media (max-width: 840px) {
-  .next-up-panel {
-    grid-column: 1;
-  }
 }

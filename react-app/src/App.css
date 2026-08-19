@@ -24,34 +24,20 @@
   display: block;
 }
 
-/* The Achievement tab opens directly below the header with Your Timeline
-   as its first section, with no sibling above it the way BucketListPanel
-   still has main-layout -- so the shared .app-section top hairline would
-   otherwise float with nothing to separate. */
-.tab-page > .app-section:first-child {
-  border-top: none;
-  padding-top: 0;
-}
-
-/* Overview + Next up read as one shared surface, split by a hairline —
-   not two boxes placed side by side. */
-.main-layout {
-  position: relative;
-  display: grid;
-  grid-template-columns: 0.9fr 1.7fr;
-  background: linear-gradient(180deg, rgba(var(--color-void-3-rgb), 0.7), rgba(var(--color-void-2-rgb), 0.75));
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-xl);
-  box-shadow: var(--shadow-medium);
-  overflow: hidden;
-}
-
 .panel {
   position: relative;
 }
 
-.main-layout > .panel + .panel {
-  border-left: 1px solid var(--color-border);
+/* Archive Overview (top of The Achievement tab) and Next Up (top of The
+   Bucket Lists tab) each stand alone as their own tab's lead card now --
+   they used to share one surface split by a hairline when they sat side
+   by side, so this is that same card chrome given to each individually. */
+.overview-panel,
+.next-up-panel {
+  background: linear-gradient(180deg, rgba(var(--color-void-3-rgb), 0.7), rgba(var(--color-void-2-rgb), 0.75));
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-medium);
 }
 
 .panel-label {
@@ -92,17 +78,3 @@
   color: var(--color-text-primary);
 }
 
-@media (max-width: 840px) {
-  .main-layout {
-    grid-template-columns: 1fr;
-  }
-
-  .main-layout > * {
-    grid-column: 1 !important;
-  }
-
-  .main-layout > .panel + .panel {
-    border-left: none;
-    border-top: 1px solid var(--color-border);
-  }
-}
