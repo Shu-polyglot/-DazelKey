@@ -175,3 +175,46 @@
     width: 200px;
   }
 }
+
+/* Profile's Achievement Gallery: same card, square, meta/memory dropped
+   (see AchievementCard's `variant="gallery"`) so it reads as a compact
+   grid thumbnail instead of the shelf's tall strip card. */
+.achievement-gallery-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--space-sm);
+}
+
+.achievement-card--gallery {
+  width: 100%;
+}
+
+.achievement-card--gallery .achievement-card-frame {
+  aspect-ratio: 1 / 1;
+  padding: var(--space-sm);
+}
+
+.achievement-card--gallery .achievement-card-top {
+  gap: var(--space-2xs);
+}
+
+.achievement-card--gallery .achievement-card-eyebrow,
+.achievement-card--gallery .achievement-card-index {
+  font-size: 0.6rem;
+}
+
+.achievement-card--gallery .achievement-card-title {
+  font-size: 0.85rem;
+  margin-top: var(--space-xs);
+  -webkit-line-clamp: 2;
+}
+
+@media (max-width: 480px) {
+  .achievement-gallery-grid {
+    gap: var(--space-2xs);
+  }
+
+  .achievement-card--gallery .achievement-card-frame {
+    padding: var(--space-2xs);
+  }
+}

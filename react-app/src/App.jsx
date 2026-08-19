@@ -5,6 +5,7 @@ import Header from './components/Header';
 import OverviewPanel from './components/OverviewPanel';
 import NextUpPanel from './components/NextUpPanel';
 import AchievementsShelf from './components/Achievements/AchievementsShelf';
+import AchievementGallery from './components/Achievements/AchievementGallery';
 import CalendarPanel from './components/Calendar/CalendarPanel';
 import BucketListPanel from './components/BucketList/BucketListPanel';
 import ProfilePage from './components/ProfilePage';
@@ -139,6 +140,7 @@ function App() {
 
             <div className={`tab-page${route === 'profile' ? ' is-active' : ''}`} aria-hidden={route !== 'profile'}>
               <ProfilePage profile={profile} onEditProfile={() => setIsProfileOpen(true)} />
+              <AchievementGallery buckets={buckets} onUpdate={updateBucket} onDelete={deleteBucket} />
             </div>
           </main>
 

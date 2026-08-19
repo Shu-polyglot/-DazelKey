@@ -4,14 +4,20 @@ import { modeLabels } from '../../lib/buckets';
 import { spring, dashboardEntrance, entranceTransition, staggerDelay } from '../../styles/motion';
 import './Achievements.css';
 
-function AchievementCard({ bucket, index, onOpen }) {
+// `variant="gallery"` is Profile's compact square grid thumbnail -- same
+// component, same data, just the meta/memory footer dropped for space and
+// a distinct `layoutId` (see AchievementGallery) so it doesn't collide
+// with AchievementsShelf's identically-keyed cards, which stay mounted
+// (display:none, not unmounted) on the other tab at the same time.
+function AchievementCard({ bucket, index, onOpen, variant = 'shelf', layoutId }) {
   const hasPhoto = Boolean(bucket.image);
+  const resolvedLayoutId = layoutId || `achievement-card-${bucket.id}`;
 
   return (
     <motion.article
-      className={`achievement-card${hasPhoto ? ' has-photo' : ''}`}
+      className={`achievement-card${hasPhoto ? ' has-photo' : ''}${variant === 'gallery' ? ' achievement-card--gallery' : ''}`}
       onClick={() => onOpen(bucket.id)}
-      layoutId={`achievement-card-${bucket.id}`}
+      layoutId={resolvedLayoutId}
       layout
       initial={{ opacity: 0, y: 14, filter: 'blur(6px)' }}
       animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
@@ -33,14 +39,16 @@ function AchievementCard({ bucket, index, onOpen }) {
 
         <h3 className="achievement-card-title">{bucket.title}</h3>
 
-        <div className="achievement-card-bottom">
-          <div className="achievement-card-rule" />
-          <div className="achievement-card-meta">
-            <span className="achievement-card-date">{formatDate(bucket.completedDate)}</span>
-            {bucket.place && <span className="achievement-card-location">{bucket.place}</span>}
+        {variant !== 'gallery' && (
+          <div className="achievement-card-bottom">
+            <div className="achievement-card-rule" />
+            <div className="achievement-card-meta">
+              <span className="achievement-card-date">{formatDate(bucket.completedDate)}</span>
+              {bucket.place && <span className="achievement-card-location">{bucket.place}</span>}
+            </div>
+            {bucket.message && <p className="achievement-card-memory">“{bucket.message}”</p>}
           </div>
-          {bucket.message && <p className="achievement-card-memory">“{bucket.message}”</p>}
-        </div>
+        )}
       </div>
     </motion.article>
   );

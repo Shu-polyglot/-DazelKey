@@ -248,8 +248,14 @@ function AchievementExpandedEdit({ bucket, index, onCancel, onSave }) {
  * modal. A spring-driven layout transition (rather than the grid's eased
  * duration) is deliberate here -- this is the one "step into the memory"
  * moment in the product, so it gets the springier, more physical feel.
+ *
+ * `layoutId` defaults to the same key AchievementsShelf's cards use, but
+ * callers with their own independently-keyed AchievementCard instances
+ * (AchievementGallery, on Profile) must pass their own -- otherwise two
+ * on-screen elements would share one layoutId at once, which Motion can't
+ * resolve.
  */
-function AchievementExpanded({ bucket, index, onClose, onUpdate, onDelete }) {
+function AchievementExpanded({ bucket, index, onClose, onUpdate, onDelete, layoutId }) {
   const [mode, setMode] = useState('view');
   const [isShareOpen, setIsShareOpen] = useState(false);
 
@@ -278,7 +284,7 @@ function AchievementExpanded({ bucket, index, onClose, onUpdate, onDelete }) {
       }}
     >
       <motion.article
-        layoutId={`achievement-card-${bucket.id}`}
+        layoutId={layoutId || `achievement-card-${bucket.id}`}
         className="achievement-expanded"
         transition={{ layout: spring.soft }}
       >
