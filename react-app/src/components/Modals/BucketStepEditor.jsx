@@ -4,22 +4,19 @@ import { whenOptions, whenLabels, modeOptions, modeLabels } from '../../lib/buck
 import { spring, transitions } from '../../styles/motion';
 import './BucketStepEditor.css';
 
-const STEPS = ['title', 'mode', 'when', 'place', 'message', 'confirm'];
+const STEPS = ['title', 'when', 'mode', 'message'];
 
 const STEP_LABELS = {
-  title: 'Name the intention',
-  mode: 'Who this is with',
+  title: 'Bucket title',
   when: 'When you want it',
-  place: 'Where',
+  mode: 'Who this is with',
   message: 'A message to your future self',
-  confirm: 'Review',
 };
 
 const BLANK_BUCKET = {
   title: '',
   mode: 'solo',
   when: 'soon',
-  place: '',
   message: '',
 };
 
@@ -74,9 +71,12 @@ function StepDots({ current }) {
 
 /**
  * One step-at-a-time surface for defining a future life experience --
- * title, who it's with, how far away it feels, where, and an optional
- * note to whoever you'll be when it happens. Used both to create a new
- * Bucket (no `bucket` prop) and to edit an existing one.
+ * title (the experience and where it happens, combined), how far away it
+ * feels, who it's with, and an optional note to whoever you'll be when it
+ * happens. Used both to create a new Bucket (no `bucket` prop) and to
+ * edit an existing one. Existing Buckets may still carry a `place` value
+ * from before this field was folded into the title; it's preserved on
+ * save (via updateBucket's merge) even though it's no longer editable here.
  */
 function BucketStepEditor({ bucket, onCancel, onSave }) {
   const isCreating = !bucket;
@@ -85,7 +85,6 @@ function BucketStepEditor({ bucket, onCancel, onSave }) {
   const [title, setTitle] = useState(source.title);
   const [mode, setMode] = useState(source.mode);
   const [when, setWhen] = useState(source.when);
-  const [place, setPlace] = useState(source.place || '');
   const [message, setMessage] = useState(source.message || '');
   const [[step, direction], setStep] = useState([0, 0]);
   const advanceTimeout = useRef(null);
@@ -95,7 +94,6 @@ function BucketStepEditor({ bucket, onCancel, onSave }) {
   const stepKey = STEPS[step];
   const isLastStep = step === STEPS.length - 1;
   const titleEmpty = !title.trim();
-  const placeEmpty = !place.trim();
 
   function goNext() {
     setStep(([current]) => [Math.min(current + 1, STEPS.length - 1), 1]);
@@ -111,9 +109,6 @@ function BucketStepEditor({ bucket, onCancel, onSave }) {
 
   function handleNext() {
     if (stepKey === 'title' && titleEmpty) {
-      return;
-    }
-    if (stepKey === 'place' && placeEmpty) {
       return;
     }
     goNext();
@@ -137,16 +132,11 @@ function BucketStepEditor({ bucket, onCancel, onSave }) {
       setStep([0, -1]);
       return;
     }
-    if (!place.trim()) {
-      setStep([3, -1]);
-      return;
-    }
 
     onSave({
       title: trimmedTitle,
       mode,
       when,
-      place: place.trim(),
       message: message.trim(),
     });
   }
@@ -158,17 +148,12 @@ function BucketStepEditor({ bucket, onCancel, onSave }) {
     }
   }
 
-  function isStepSkippable() {
-    if (stepKey === 'message') return !message.trim();
-    return false;
-  }
-
   function renderStep() {
     switch (stepKey) {
       case 'title':
         return (
           <div className="step-editor-block">
-            <p className="step-editor-eyebrow">What do you want to make happen?</p>
+            <p className="step-editor-eyebrow">What do you want to make happen — and where?</p>
             <label className="step-editor-title-label" htmlFor="step-title-input">
               <span className="sr-only">Title</span>
               <input
@@ -178,30 +163,10 @@ function BucketStepEditor({ bucket, onCancel, onSave }) {
                 value={title}
                 onChange={(event) => setTitle(event.target.value)}
                 onKeyDown={handleEnterKey}
-                placeholder="Run a marathon"
+                placeholder="Watch the Northern Lights in Iceland"
                 autoFocus
               />
             </label>
-          </div>
-        );
-
-      case 'mode':
-        return (
-          <div className="step-editor-block">
-            <p className="step-editor-eyebrow">Who is this with?</p>
-            <div className="step-editor-chip-row" role="group" aria-label="Mode">
-              {modeOptions.map((option) => (
-                <motion.button
-                  key={option}
-                  type="button"
-                  className={`step-editor-chip${mode === option ? ' is-active' : ''}`}
-                  onClick={() => handleModePick(option)}
-                  {...chipTap}
-                >
-                  {modeLabels[option]}
-                </motion.button>
-              ))}
-            </div>
           </div>
         );
 
@@ -225,23 +190,23 @@ function BucketStepEditor({ bucket, onCancel, onSave }) {
           </div>
         );
 
-      case 'place':
+      case 'mode':
         return (
           <div className="step-editor-block">
-            <p className="step-editor-eyebrow">Where will this happen?</p>
-            <label className="step-editor-field-label" htmlFor="step-place-input">
-              <span className="sr-only">Place</span>
-              <input
-                id="step-place-input"
-                type="text"
-                className="step-editor-field-input"
-                value={place}
-                onChange={(event) => setPlace(event.target.value)}
-                onKeyDown={handleEnterKey}
-                placeholder="Bali"
-                autoFocus
-              />
-            </label>
+            <p className="step-editor-eyebrow">Who is this with?</p>
+            <div className="step-editor-chip-row" role="group" aria-label="Mode">
+              {modeOptions.map((option) => (
+                <motion.button
+                  key={option}
+                  type="button"
+                  className={`step-editor-chip${mode === option ? ' is-active' : ''}`}
+                  onClick={() => handleModePick(option)}
+                  {...chipTap}
+                >
+                  {modeLabels[option]}
+                </motion.button>
+              ))}
+            </div>
           </div>
         );
 
@@ -264,34 +229,8 @@ function BucketStepEditor({ bucket, onCancel, onSave }) {
           </div>
         );
 
-      case 'confirm':
       default:
-        return (
-          <div className="step-editor-block step-editor-confirm">
-            <p className="step-editor-eyebrow">Here's the shape of it</p>
-            <h3 className="step-editor-confirm-title">{title.trim() || 'Untitled intention'}</h3>
-            <div className="step-editor-confirm-meta">
-              <div className="step-editor-confirm-item">
-                <span className="label">Mode</span>
-                <span className="value">{modeLabels[mode]}</span>
-              </div>
-              <div className="step-editor-confirm-item">
-                <span className="label">When</span>
-                <span className="value">{whenLabels[when]}</span>
-              </div>
-              <div className="step-editor-confirm-item">
-                <span className="label">Place</span>
-                <span className="value">{place.trim() || 'Not set'}</span>
-              </div>
-            </div>
-            {message.trim() && (
-              <div className="step-editor-confirm-note">
-                <span className="label">Message</span>
-                <p className="value">{message.trim()}</p>
-              </div>
-            )}
-          </div>
-        );
+        return null;
     }
   }
 
@@ -341,10 +280,10 @@ function BucketStepEditor({ bucket, onCancel, onSave }) {
             type="button"
             className="primary-button"
             onClick={handleNext}
-            disabled={(stepKey === 'title' && titleEmpty) || (stepKey === 'place' && placeEmpty)}
+            disabled={stepKey === 'title' && titleEmpty}
             {...tapProps}
           >
-            {isStepSkippable() ? 'Skip' : 'Next'}
+            Next
           </motion.button>
         )}
       </div>
