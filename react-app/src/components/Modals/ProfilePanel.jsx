@@ -2,6 +2,7 @@ import { useRef, useState } from 'react';
 import { motion } from 'motion/react';
 import Modal from './Modal';
 import { spring } from '../../styles/motion';
+import { SOCIAL_PLATFORMS, getSocialPlatform, normalizeSocialUrl } from '../../lib/profile';
 import './Modals.css';
 import './ProfilePanel.css';
 
@@ -21,6 +22,9 @@ function ProfilePanel({ profile, onClose, onSave }) {
   const [name, setName] = useState(profile?.name || '');
   const [age, setAge] = useState(profile?.age ?? '');
   const [photo, setPhoto] = useState(profile?.photo || null);
+  const [bio, setBio] = useState(profile?.bio || '');
+  const [role, setRole] = useState(profile?.role || '');
+  const [socialLinks, setSocialLinks] = useState(() => (profile?.socialLinks || []).map((link) => ({ ...link })));
   const fileInputRef = useRef(null);
 
   async function handleFile(event) {
@@ -31,6 +35,22 @@ function ProfilePanel({ profile, onClose, onSave }) {
     const dataUrl = await readFileAsDataUrl(file);
     setPhoto(dataUrl);
   }
+
+  function addSocialLink(platformId) {
+    setSocialLinks((prev) => [...prev, { id: `social-${Date.now()}-${platformId}`, platform: platformId, url: '' }]);
+  }
+
+  function updateSocialLinkUrl(id, url) {
+    setSocialLinks((prev) => prev.map((link) => (link.id === id ? { ...link, url } : link)));
+  }
+
+  function removeSocialLink(id) {
+    setSocialLinks((prev) => prev.filter((link) => link.id !== id));
+  }
+
+  const availablePlatforms = SOCIAL_PLATFORMS.filter(
+    (platform) => !socialLinks.some((link) => link.platform === platform.id),
+  );
 
   function handleSubmit(event) {
     event.preventDefault();
@@ -43,6 +63,11 @@ function ProfilePanel({ profile, onClose, onSave }) {
       name: trimmedName,
       age: validAge,
       photo,
+      bio: bio.trim(),
+      role: role.trim(),
+      socialLinks: socialLinks
+        .map((link) => ({ ...link, url: normalizeSocialUrl(link.url) }))
+        .filter((link) => link.url),
     });
   }
 
@@ -52,7 +77,7 @@ function ProfilePanel({ profile, onClose, onSave }) {
         <h3>Your profile</h3>
       </div>
 
-      <form className="detail-form" onSubmit={handleSubmit}>
+      <form className="detail-form" onSubmit={handleSubmit} noValidate>
         <button
           type="button"
           className="profile-photo-button"
@@ -81,6 +106,72 @@ function ProfilePanel({ profile, onClose, onSave }) {
             max={MAX_AGE}
           />
         </label>
+
+        <label className="detail-form-label">
+          <span>Role</span>
+          <input
+            type="text"
+            value={role}
+            onChange={(event) => setRole(event.target.value)}
+            placeholder="e.g. Product Designer"
+          />
+        </label>
+
+        <label className="detail-form-label">
+          <span>Bio</span>
+          <textarea
+            value={bio}
+            onChange={(event) => setBio(event.target.value)}
+            placeholder="A short line about you"
+            rows={3}
+          />
+        </label>
+
+        <div className="detail-form-label">
+          <span>Social Links</span>
+
+          {socialLinks.length > 0 && (
+            <div className="social-links-editor">
+              {socialLinks.map((link) => {
+                const platform = getSocialPlatform(link.platform);
+                return (
+                  <div className="social-link-row" key={link.id}>
+                    <span className="social-link-platform">{platform?.label || link.platform}</span>
+                    <input
+                      type="url"
+                      value={link.url}
+                      onChange={(event) => updateSocialLinkUrl(link.id, event.target.value)}
+                      placeholder={platform?.placeholder || 'https://'}
+                    />
+                    <button
+                      type="button"
+                      className="icon-button social-link-remove"
+                      onClick={() => removeSocialLink(link.id)}
+                      aria-label={`Remove ${platform?.label || link.platform}`}
+                    >
+                      ×
+                    </button>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+
+          {availablePlatforms.length > 0 && (
+            <div className="social-link-add-row">
+              {availablePlatforms.map((platform) => (
+                <button
+                  type="button"
+                  key={platform.id}
+                  className="social-link-add-button"
+                  onClick={() => addSocialLink(platform.id)}
+                >
+                  + {platform.label}
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
 
         <div className="modal-actions">
           <motion.button

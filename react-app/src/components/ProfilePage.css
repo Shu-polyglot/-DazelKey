@@ -36,11 +36,48 @@
   color: var(--color-text-primary);
 }
 
+.profile-page-role {
+  color: var(--color-accent-strong);
+  font-size: var(--font-size-body-sm);
+  font-weight: var(--font-weight-medium);
+}
+
 .profile-page-age {
   color: var(--color-text-secondary);
   font-size: var(--font-size-body-sm);
   letter-spacing: var(--tracking-wide);
   text-transform: uppercase;
+}
+
+.profile-page-bio {
+  max-width: 440px;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-body-sm);
+  line-height: var(--leading-relaxed);
+}
+
+.profile-page-links {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--space-2xs);
+}
+
+.profile-page-link {
+  padding: var(--space-3xs) var(--space-sm);
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--color-border);
+  background: rgba(var(--color-mist-rgb), 0.04);
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-body-sm);
+  text-decoration: none;
+  transition: border-color 0.2s ease, color 0.2s ease, background 0.2s ease;
+}
+
+.profile-page-link:hover {
+  border-color: rgba(var(--color-glow-rgb), 0.4);
+  color: var(--color-text-primary);
+  background: rgba(var(--color-mist-rgb), 0.08);
 }
 
 .profile-page-edit {

@@ -1,5 +1,5 @@
 import { motion } from 'motion/react';
-import { getInitials } from '../lib/profile';
+import { getInitials, getSocialPlatformLabel } from '../lib/profile';
 import { entranceTransition, spring } from '../styles/motion';
 import './ProfilePage.css';
 
@@ -28,8 +28,27 @@ function ProfilePage({ profile, onEditProfile }) {
 
         <div className="profile-page-info">
           <h2 className="profile-page-name">{profile?.name || 'Your name'}</h2>
+          {profile?.role ? <p className="profile-page-role">{profile.role}</p> : null}
           {profile?.age ? <p className="profile-page-age">{profile.age} years old</p> : null}
         </div>
+
+        {profile?.bio ? <p className="profile-page-bio">{profile.bio}</p> : null}
+
+        {profile?.socialLinks?.length > 0 && (
+          <div className="profile-page-links">
+            {profile.socialLinks.map((link) => (
+              <a
+                key={link.id}
+                href={link.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="profile-page-link"
+              >
+                {getSocialPlatformLabel(link.platform)}
+              </a>
+            ))}
+          </div>
+        )}
 
         <motion.button
           type="button"

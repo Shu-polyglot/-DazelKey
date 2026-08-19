@@ -25,3 +25,67 @@
 .photo-input {
   display: none;
 }
+
+.social-links-editor {
+  display: grid;
+  gap: var(--space-xs);
+}
+
+.social-link-row {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: var(--space-xs);
+}
+
+.social-link-platform {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-body-sm);
+  white-space: nowrap;
+}
+
+.social-link-row input {
+  min-width: 0;
+}
+
+.social-link-remove {
+  width: 30px;
+  height: 30px;
+  font-size: 1.1rem;
+  flex-shrink: 0;
+}
+
+.social-link-add-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2xs);
+  margin-top: var(--space-2xs);
+}
+
+.social-link-add-button {
+  appearance: none;
+  padding: var(--space-2xs) var(--space-sm);
+  border-radius: var(--radius-pill);
+  border: 1px dashed var(--color-border-strong);
+  background: transparent;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-body-sm);
+  cursor: pointer;
+  transition: border-color 0.2s ease, color 0.2s ease, background 0.2s ease;
+}
+
+.social-link-add-button:hover {
+  border-color: rgba(var(--color-glow-rgb), 0.4);
+  color: var(--color-text-primary);
+  background: rgba(var(--color-mist-rgb), 0.05);
+}
+
+@media (max-width: 420px) {
+  .social-link-row {
+    grid-template-columns: 1fr auto;
+  }
+
+  .social-link-platform {
+    grid-column: 1 / -1;
+  }
+}
