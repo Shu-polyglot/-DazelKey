@@ -237,6 +237,12 @@
   text-transform: uppercase;
 }
 
+.achieve-photo-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2xs);
+}
+
 .achieve-photo-upload {
   position: relative;
   display: inline-flex;
@@ -245,6 +251,7 @@
   padding: var(--space-2xs) var(--space-sm);
   border: 1px dashed var(--color-border-strong);
   border-radius: var(--radius-sm);
+  background: transparent;
   color: var(--color-text-secondary);
   font-size: var(--font-size-body-sm);
   text-transform: none;
@@ -297,6 +304,24 @@
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+.camera-capture-modal {
+  max-width: 420px;
+}
+
+.camera-capture-video {
+  width: 100%;
+  aspect-ratio: 3 / 4;
+  object-fit: cover;
+  border-radius: var(--radius-sm);
+  background: #000;
+}
+
+.camera-capture-error {
+  padding: var(--space-md) 0;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-body-sm);
 }
 
 .completed-photo-hero {
