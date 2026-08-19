@@ -3,10 +3,10 @@ import { createPortal } from 'react-dom';
 import { AnimatePresence, motion } from 'motion/react';
 import AchievementCard from './AchievementCard';
 import AchievementExpanded from './AchievementExpanded';
-import { dashboardEntrance, entranceTransition } from '../../styles/motion';
+import { dashboardEntrance, entranceTransition, spring } from '../../styles/motion';
 import './Achievements.css';
 
-function AchievementsShelf({ buckets, onUpdate, onDelete }) {
+function AchievementsShelf({ buckets, onUpdate, onDelete, onOpenStory }) {
   const [expandedId, setExpandedId] = useState(null);
 
   const achievements = useMemo(
@@ -58,6 +58,19 @@ function AchievementsShelf({ buckets, onUpdate, onDelete }) {
       >
         <span className="section-label">The Achievement</span>
       </motion.div>
+
+      <motion.button
+        type="button"
+        className="achievement-story-link"
+        onClick={onOpenStory}
+        initial={{ opacity: 0, y: 14, filter: 'blur(6px)' }}
+        animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
+        transition={entranceTransition(dashboardEntrance.achievements + 0.03)}
+        whileHover={{ y: -1, transition: spring.hover }}
+        whileTap={{ y: 1, scale: 0.97, transition: spring.press }}
+      >
+        Story
+      </motion.button>
 
       {achievements.length === 0 ? (
         <motion.div

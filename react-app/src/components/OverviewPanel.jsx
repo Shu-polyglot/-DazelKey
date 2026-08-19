@@ -5,7 +5,7 @@ import ArchiveProgressModal from './Modals/ArchiveProgressModal';
 import { dashboardEntrance, entranceTransition, easing, spring } from '../styles/motion';
 import './OverviewPanel.css';
 
-function OverviewPanel({ buckets, onOpenArchive, onViewRemaining }) {
+function OverviewPanel({ buckets, onViewRemaining }) {
   const stats = useMemo(() => {
     const completed = buckets.filter((bucket) => bucket.status === 'completed').length;
     const inProgress = buckets.filter((bucket) => bucket.status === 'in-progress').length;
@@ -108,17 +108,6 @@ function OverviewPanel({ buckets, onOpenArchive, onViewRemaining }) {
             </motion.div>
           </motion.button>
         </div>
-
-        <motion.button
-          type="button"
-          className="overview-invite"
-          onClick={onOpenArchive}
-          whileHover={{ y: -1, transition: spring.hover }}
-          whileTap={{ y: 1, scale: 0.98, transition: spring.press }}
-        >
-          <span className="overview-invite-label">The Story</span>
-          <span className="overview-invite-cta">Watch the story →</span>
-        </motion.button>
       </div>
 
       {createPortal(

@@ -64,7 +64,7 @@ function App() {
 
   function closeStory(closeMode) {
     setArchiveCloseMode(closeMode);
-    navigate('bucket-lists');
+    navigate('achievement');
   }
 
   // OverviewPanel now lives at the top of The Achievement tab, so its
@@ -129,13 +129,14 @@ function App() {
             </div>
 
             <div className={`tab-page${route === 'achievement' ? ' is-active' : ''}`} aria-hidden={route !== 'achievement'}>
-              <OverviewPanel
-                buckets={buckets}
-                onOpenArchive={() => navigate('story')}
-                onViewRemaining={handleViewRemainingBuckets}
-              />
+              <OverviewPanel buckets={buckets} onViewRemaining={handleViewRemainingBuckets} />
               <CalendarPanel buckets={buckets} onOpenBucket={setDetailsBucketId} />
-              <AchievementsShelf buckets={buckets} onUpdate={updateBucket} onDelete={deleteBucket} />
+              <AchievementsShelf
+                buckets={buckets}
+                onUpdate={updateBucket}
+                onDelete={deleteBucket}
+                onOpenStory={() => navigate('story')}
+              />
             </div>
 
             <div className={`tab-page${route === 'profile' ? ' is-active' : ''}`} aria-hidden={route !== 'profile'}>

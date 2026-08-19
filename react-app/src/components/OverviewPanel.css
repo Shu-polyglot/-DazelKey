@@ -48,43 +48,6 @@
   margin: 0;
 }
 
-.overview-invite {
-  appearance: none;
-  border: none;
-  background: none;
-  padding: 0;
-  margin: 0;
-  width: 100%;
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: var(--space-md);
-  padding-top: var(--space-md);
-  border-top: 1px solid var(--color-border);
-  font: inherit;
-  color: inherit;
-  text-align: left;
-  cursor: pointer;
-}
-
-.overview-invite-label {
-  font-family: var(--font-family-display);
-  font-size: 1.05rem;
-  color: var(--color-text-primary);
-}
-
-.overview-invite-cta {
-  flex: none;
-  font-size: var(--font-size-body-sm);
-  color: var(--color-text-secondary);
-  letter-spacing: var(--tracking-wide);
-  transition: color 0.2s ease;
-}
-
-.overview-invite:hover .overview-invite-cta {
-  color: var(--color-accent-strong);
-}
-
 .overview-count {
   display: flex;
   flex-direction: column;
