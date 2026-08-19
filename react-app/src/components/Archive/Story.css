@@ -48,7 +48,9 @@
   width: 100%;
   max-width: 680px;
   margin: 0 auto;
-  padding: 0 var(--space-lg) calc(var(--space-3xl) + var(--space-md));
+  /* Clears the persistent BottomNav, which sits above this full-screen
+     experience so The Story stays reachable from the other tabs. */
+  padding: 0 var(--space-lg) calc(var(--space-3xl) + var(--space-md) + var(--nav-height));
   text-align: left;
 }
 
@@ -110,7 +112,7 @@
   z-index: 5;
   align-self: flex-start;
   appearance: none;
-  margin: 0 0 calc(var(--space-3xl) + var(--space-md)) var(--space-lg);
+  margin: 0 0 calc(var(--space-3xl) + var(--space-md) + var(--nav-height)) var(--space-lg);
   padding: var(--space-sm) var(--space-lg);
   border: 1px solid var(--color-border-strong);
   border-radius: var(--radius-pill);
@@ -125,11 +127,11 @@
 @media (max-width: 640px) {
   .story-content {
     max-width: none;
-    padding: 0 var(--space-md) calc(var(--space-2xl) + env(safe-area-inset-bottom));
+    padding: 0 var(--space-md) calc(var(--space-2xl) + var(--nav-height) + env(safe-area-inset-bottom));
   }
 
   .story-bridge-cta {
-    margin: 0 0 calc(var(--space-2xl) + env(safe-area-inset-bottom)) var(--space-md);
+    margin: 0 0 calc(var(--space-2xl) + var(--nav-height) + env(safe-area-inset-bottom)) var(--space-md);
   }
 }
 
@@ -146,7 +148,7 @@
   align-items: center;
   justify-content: center;
   text-align: center;
-  padding: var(--space-xl) var(--space-lg);
+  padding: var(--space-xl) var(--space-lg) calc(var(--space-xl) + var(--nav-height));
   background:
     radial-gradient(ellipse 70% 55% at 50% 30%, rgba(var(--color-glow-rgb), 0.16), transparent 65%),
     var(--color-bg);

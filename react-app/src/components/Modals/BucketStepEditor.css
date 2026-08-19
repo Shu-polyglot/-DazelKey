@@ -274,6 +274,9 @@
     max-height: 100dvh;
     border-radius: 0;
     justify-content: space-between;
+    /* Full-screen at this width, so the footer's Next/Back buttons need
+       their own clearance from the persistent BottomNav. */
+    padding-bottom: calc(var(--space-lg) + var(--nav-height) + env(safe-area-inset-bottom));
   }
 
   .step-editor-confirm-meta {

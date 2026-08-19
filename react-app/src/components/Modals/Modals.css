@@ -4,7 +4,9 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: var(--space-md);
+  /* Extra bottom padding shifts the flex-centered card up, clear of the
+     persistent BottomNav. */
+  padding: var(--space-md) var(--space-md) calc(var(--space-md) + var(--nav-height));
   background: rgba(var(--color-void-1-rgb), 0.6);
   backdrop-filter: blur(10px);
   z-index: 30;

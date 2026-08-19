@@ -11,7 +11,7 @@
   z-index: 2;
   height: 100%;
   overflow-y: auto;
-  padding: calc(var(--space-3xl) + var(--space-lg)) var(--space-xl) var(--space-3xl);
+  padding: calc(var(--space-3xl) + var(--space-lg)) var(--space-xl) calc(var(--space-3xl) + var(--nav-height));
 }
 
 .whats-ahead-header {
@@ -56,7 +56,7 @@
 @media (max-width: 640px) {
   .whats-ahead-scroll {
     padding: calc(var(--space-2xl) + env(safe-area-inset-top)) var(--space-md)
-      calc(var(--space-2xl) + env(safe-area-inset-bottom));
+      calc(var(--space-2xl) + var(--nav-height) + env(safe-area-inset-bottom));
   }
 
   .whats-ahead-header {

@@ -5,7 +5,9 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: var(--space-lg);
+  /* Extra bottom padding shifts the flex-centered card up, clear of the
+     persistent BottomNav. */
+  padding: var(--space-lg) var(--space-lg) calc(var(--space-lg) + var(--nav-height));
   background: rgba(var(--color-void-1-rgb), 0.72);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
@@ -176,7 +178,14 @@
 
   .achievement-expanded.is-editing {
     padding: calc(var(--space-lg) + env(safe-area-inset-top)) var(--space-md)
-      calc(var(--space-lg) + env(safe-area-inset-bottom));
+      calc(var(--space-lg) + var(--nav-height) + env(safe-area-inset-bottom));
+  }
+
+  /* The card goes edge-to-edge (100dvh) at this width, so its own action
+     row -- not the flex-centered overlay padding above -- is what needs
+     to clear the persistent BottomNav. */
+  .achievement-expanded-actions {
+    padding-bottom: calc(var(--space-lg) + var(--nav-height) + env(safe-area-inset-bottom));
   }
 
   .achievement-expanded-media {

@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { AnimatePresence, motion } from 'motion/react';
 import ModeFilters from './ModeFilters';
 import BucketCard from './BucketCard';
@@ -61,21 +62,27 @@ function BucketListPanel({ buckets, onUpdate, onDelete, onComplete }) {
         </AnimatePresence>
       </div>
 
-      <AnimatePresence>
-        {expandedBucket && (
-          <ExpandedBucketCard
-            key={expandedBucket.id}
-            bucket={expandedBucket}
-            onClose={() => setExpandedId(null)}
-            onUpdate={onUpdate}
-            onDelete={(id) => {
-              onDelete(id);
-              setExpandedId(null);
-            }}
-            onComplete={onComplete}
-          />
-        )}
-      </AnimatePresence>
+      {/* Portaled to escape page-shell's filter-trap (see App.jsx) so this
+          stays truly viewport-fixed instead of centering within
+          page-shell's full content height. */}
+      {createPortal(
+        <AnimatePresence>
+          {expandedBucket && (
+            <ExpandedBucketCard
+              key={expandedBucket.id}
+              bucket={expandedBucket}
+              onClose={() => setExpandedId(null)}
+              onUpdate={onUpdate}
+              onDelete={(id) => {
+                onDelete(id);
+                setExpandedId(null);
+              }}
+              onComplete={onComplete}
+            />
+          )}
+        </AnimatePresence>,
+        document.body,
+      )}
     </section>
   );
 }

@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { AnimatePresence, motion } from 'motion/react';
 import CalendarGrid from './CalendarGrid';
 import CalendarExpandedOverlay from './CalendarExpandedOverlay';
@@ -81,20 +82,26 @@ function CalendarPanel({ buckets, onOpenBucket }) {
 
       <CalendarGrid cells={cells} buckets={buckets} selectedDate={selectedDate} onDayClick={handleDayClick} />
 
-      <AnimatePresence>
-        {expandedDate && (
-          <CalendarExpandedOverlay
-            key={expandedDate}
-            isoDate={expandedDate}
-            buckets={buckets}
-            onClose={() => setExpandedDate(null)}
-            onOpenBucket={(id) => {
-              setExpandedDate(null);
-              onOpenBucket(id);
-            }}
-          />
-        )}
-      </AnimatePresence>
+      {/* Portaled to escape page-shell's filter-trap (see App.jsx) so this
+          bottom sheet anchors to the true viewport bottom instead of
+          page-shell's full content height. */}
+      {createPortal(
+        <AnimatePresence>
+          {expandedDate && (
+            <CalendarExpandedOverlay
+              key={expandedDate}
+              isoDate={expandedDate}
+              buckets={buckets}
+              onClose={() => setExpandedDate(null)}
+              onOpenBucket={(id) => {
+                setExpandedDate(null);
+                onOpenBucket(id);
+              }}
+            />
+          )}
+        </AnimatePresence>,
+        document.body,
+      )}
     </motion.section>
   );
 }

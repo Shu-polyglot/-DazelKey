@@ -5,7 +5,9 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: var(--space-lg);
+  /* Extra bottom padding shifts the flex-centered card up, clear of the
+     persistent BottomNav. */
+  padding: var(--space-lg) var(--space-lg) calc(var(--space-lg) + var(--nav-height));
   background: rgba(var(--color-void-1-rgb), 0.72);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
@@ -100,7 +102,7 @@
     width: 100%;
     max-height: 88dvh;
     border-radius: var(--radius-lg) var(--radius-lg) 0 0;
-    padding: var(--space-lg) var(--space-md) calc(env(safe-area-inset-bottom) + var(--space-md));
+    padding: var(--space-lg) var(--space-md) calc(var(--nav-height) + env(safe-area-inset-bottom) + var(--space-md));
   }
 
   .share-modal-preview .share-card {

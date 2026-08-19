@@ -5,7 +5,7 @@ import ArchiveProgressModal from './Modals/ArchiveProgressModal';
 import { dashboardEntrance, entranceTransition, easing, spring } from '../styles/motion';
 import './OverviewPanel.css';
 
-function OverviewPanel({ buckets, onOpenArchive }) {
+function OverviewPanel({ buckets, onOpenArchive, onViewAchievements }) {
   const stats = useMemo(() => {
     const completed = buckets.filter((bucket) => bucket.status === 'completed').length;
     const inProgress = buckets.filter((bucket) => bucket.status === 'in-progress').length;
@@ -81,7 +81,7 @@ function OverviewPanel({ buckets, onOpenArchive }) {
           <motion.button
             type="button"
             className="overview-count-trigger"
-            onClick={() => scrollToSection('achievements-section')}
+            onClick={onViewAchievements}
             aria-label={`View ${stats.completed} archived experiences`}
             whileHover={{ y: -2, transition: spring.hover }}
             whileTap={{ y: 1, scale: 0.98, transition: spring.press }}

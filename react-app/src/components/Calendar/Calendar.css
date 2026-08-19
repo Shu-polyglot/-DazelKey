@@ -217,7 +217,7 @@
   width: 90%;
   max-width: 600px;
   max-height: 80vh;
-  padding: var(--space-xl) var(--space-lg);
+  padding: var(--space-xl) var(--space-lg) calc(var(--space-lg) + var(--nav-height) + env(safe-area-inset-bottom));
   background: linear-gradient(180deg, rgba(var(--color-void-3-rgb), 0.97), rgba(var(--color-void-2-rgb), 0.94));
   border: 1px solid var(--color-border);
   border-radius: 28px 28px 0 0;

@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { AnimatePresence, motion } from 'motion/react';
 import AchievementCard from './AchievementCard';
 import AchievementExpanded from './AchievementExpanded';
@@ -77,21 +78,28 @@ function AchievementsShelf({ buckets, onUpdate, onDelete }) {
         </div>
       )}
 
-      <AnimatePresence>
-        {expanded && (
-          <AchievementExpanded
-            key={expanded.bucket.id}
-            bucket={expanded.bucket}
-            index={expanded.index}
-            onClose={() => setExpandedId(null)}
-            onUpdate={onUpdate}
-            onDelete={(id) => {
-              onDelete(id);
-              setExpandedId(null);
-            }}
-          />
-        )}
-      </AnimatePresence>
+      {/* Portaled to escape page-shell's filter-trap (see App.jsx) so this
+          stays truly viewport-fixed instead of centering within
+          page-shell's full content height. ShareModal, nested inside,
+          inherits the fix since it's no longer under that filter either. */}
+      {createPortal(
+        <AnimatePresence>
+          {expanded && (
+            <AchievementExpanded
+              key={expanded.bucket.id}
+              bucket={expanded.bucket}
+              index={expanded.index}
+              onClose={() => setExpandedId(null)}
+              onUpdate={onUpdate}
+              onDelete={(id) => {
+                onDelete(id);
+                setExpandedId(null);
+              }}
+            />
+          )}
+        </AnimatePresence>,
+        document.body,
+      )}
     </section>
   );
 }

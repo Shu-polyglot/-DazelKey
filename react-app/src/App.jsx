@@ -1,4 +1,5 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
+import { createPortal } from 'react-dom';
 import { AnimatePresence, motion } from 'motion/react';
 import Header from './components/Header';
 import OverviewPanel from './components/OverviewPanel';
@@ -13,24 +14,26 @@ import OpeningExperience from './components/Onboarding/OpeningExperience';
 import ArchiveExperience from './components/Archive/ArchiveExperience';
 import WhatsAheadExperience from './components/Archive/WhatsAheadExperience';
 import TransitionRitual from './components/TransitionRitual';
+import BottomNav from './components/BottomNav';
 import { useBuckets } from './hooks/useBuckets';
 import { useProfile } from './hooks/useProfile';
+import { useRoute } from './hooks/useRoute';
 import { transitions, easing } from './styles/motion';
 import './App.css';
 
 function App() {
   const { buckets, addBucket, updateBucket, deleteBucket, completeBucket } = useBuckets();
   const { profile, updateProfile, completeProfile } = useProfile();
+  const [route, navigate] = useRoute();
   const [hasEntered, setHasEntered] = useState(false);
   const [showEntryRitual, setShowEntryRitual] = useState(false);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [detailsBucketId, setDetailsBucketId] = useState(null);
-  const [isArchiveOpen, setIsArchiveOpen] = useState(false);
   const [archiveCloseMode, setArchiveCloseMode] = useState('cancel');
-  const [archiveScrollTarget, setArchiveScrollTarget] = useState(null);
   const [isWhatsAheadOpen, setIsWhatsAheadOpen] = useState(false);
-  const isOverlayOpen = isArchiveOpen || isWhatsAheadOpen;
+  const isStoryOpen = route === 'story';
+  const isOverlayOpen = isStoryOpen || isWhatsAheadOpen;
 
   const detailsBucket = buckets.find((bucket) => bucket.id === detailsBucketId) || null;
 
@@ -46,35 +49,29 @@ function App() {
     setHasEntered(true);
   }
 
-  function closeArchive(closeMode, scrollTarget) {
+  // Tab taps always win over whatever's currently on screen, so the nav
+  // reliably delivers a single-tap jump to any destination regardless of
+  // which overlay or modal happens to be open.
+  function handleNavigate(nextRoute) {
+    setIsWhatsAheadOpen(false);
+    setIsAddModalOpen(false);
+    setIsProfileOpen(false);
+    setDetailsBucketId(null);
+    navigate(nextRoute);
+  }
+
+  function closeStory(closeMode) {
     setArchiveCloseMode(closeMode);
-    setArchiveScrollTarget(scrollTarget);
-    setIsArchiveOpen(false);
+    navigate('bucket-lists');
   }
 
   // The bridge's second option hands off to a different full-screen
-  // experience rather than back to the dashboard, so it skips
-  // closeArchive's scroll-target bookkeeping entirely.
+  // experience rather than back to a tab, so it skips closeStory entirely.
   function handleExploreAhead() {
     setArchiveCloseMode('complete');
-    setIsArchiveOpen(false);
+    navigate('bucket-lists');
     setIsWhatsAheadOpen(true);
   }
-
-  // Scrolls once the Archive's exit transition has substantially settled,
-  // so the destination section is already visible through the (by then)
-  // sharp, unblurred Dashboard rather than mid-transition.
-  useEffect(() => {
-    if (isArchiveOpen || !archiveScrollTarget) {
-      return undefined;
-    }
-    const target = archiveScrollTarget;
-    setArchiveScrollTarget(null);
-    const timer = setTimeout(() => {
-      document.getElementById(target)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }, 550);
-    return () => clearTimeout(timer);
-  }, [isArchiveOpen, archiveScrollTarget]);
 
   return (
     <>
@@ -106,61 +103,90 @@ function App() {
             onOpenProfile={() => setIsProfileOpen(true)}
           />
 
-          <main className="main-layout">
-            <OverviewPanel buckets={buckets} onOpenArchive={() => setIsArchiveOpen(true)} />
-            <NextUpPanel buckets={buckets} onOpenBucket={setDetailsBucketId} />
-          </main>
+          <main className="tab-content">
+            <div className={`tab-page${route === 'bucket-lists' ? ' is-active' : ''}`} aria-hidden={route !== 'bucket-lists'}>
+              <div className="main-layout">
+                <OverviewPanel
+                  buckets={buckets}
+                  onOpenArchive={() => navigate('story')}
+                  onViewAchievements={() => navigate('achievement')}
+                />
+                <NextUpPanel buckets={buckets} onOpenBucket={setDetailsBucketId} />
+              </div>
 
-          <AchievementsShelf buckets={buckets} onUpdate={updateBucket} onDelete={deleteBucket} />
-          <CalendarPanel buckets={buckets} onOpenBucket={setDetailsBucketId} />
-          <BucketListPanel
-            buckets={buckets}
-            onUpdate={updateBucket}
-            onDelete={deleteBucket}
-            onComplete={completeBucket}
-          />
-
-          <AnimatePresence>
-            {isAddModalOpen && (
-              <BucketCreateModal key="add-modal" onClose={() => setIsAddModalOpen(false)} onAdd={addBucket} />
-            )}
-          </AnimatePresence>
-
-          <AnimatePresence>
-            {detailsBucket && (
-              <BucketDetailsModal
-                key={detailsBucket.id}
-                bucket={detailsBucket}
-                onClose={() => setDetailsBucketId(null)}
+              <BucketListPanel
+                buckets={buckets}
+                onUpdate={updateBucket}
+                onDelete={deleteBucket}
                 onComplete={completeBucket}
               />
-            )}
-          </AnimatePresence>
+            </div>
 
-          <AnimatePresence>
-            {isProfileOpen && (
-              <ProfilePanel
-                key="profile-panel"
-                profile={profile}
-                onClose={() => setIsProfileOpen(false)}
-                onSave={(patch) => {
-                  updateProfile(patch);
-                  setIsProfileOpen(false);
-                }}
-              />
-            )}
-          </AnimatePresence>
+            <div className={`tab-page${route === 'achievement' ? ' is-active' : ''}`} aria-hidden={route !== 'achievement'}>
+              <AchievementsShelf buckets={buckets} onUpdate={updateBucket} onDelete={deleteBucket} />
+            </div>
+
+            <div className={`tab-page${route === 'timeline' ? ' is-active' : ''}`} aria-hidden={route !== 'timeline'}>
+              <CalendarPanel buckets={buckets} onOpenBucket={setDetailsBucketId} />
+            </div>
+          </main>
+
+          {/* Portaled to document.body: page-shell's Motion-animated filter
+              (see the WhatsAheadExperience comment for the full mechanics)
+              traps position:fixed descendants into its own -- much taller
+              -- content box instead of the viewport, which would center
+              these dialogs somewhere off-screen and tuck their bottom
+              actions under BottomNav. Portaling escapes that entirely. */}
+          {createPortal(
+            <AnimatePresence>
+              {isAddModalOpen && (
+                <BucketCreateModal key="add-modal" onClose={() => setIsAddModalOpen(false)} onAdd={addBucket} />
+              )}
+            </AnimatePresence>,
+            document.body,
+          )}
+
+          {createPortal(
+            <AnimatePresence>
+              {detailsBucket && (
+                <BucketDetailsModal
+                  key={detailsBucket.id}
+                  bucket={detailsBucket}
+                  onClose={() => setDetailsBucketId(null)}
+                  onComplete={completeBucket}
+                />
+              )}
+            </AnimatePresence>,
+            document.body,
+          )}
+
+          {createPortal(
+            <AnimatePresence>
+              {isProfileOpen && (
+                <ProfilePanel
+                  key="profile-panel"
+                  profile={profile}
+                  onClose={() => setIsProfileOpen(false)}
+                  onSave={(patch) => {
+                    updateProfile(patch);
+                    setIsProfileOpen(false);
+                  }}
+                />
+              )}
+            </AnimatePresence>,
+            document.body,
+          )}
         </motion.div>
       )}
 
       <AnimatePresence>
-        {isArchiveOpen && (
+        {isStoryOpen && (
           <ArchiveExperience
             key="archive"
             buckets={buckets}
             closeMode={archiveCloseMode}
-            onClose={() => closeArchive('cancel', 'archive-section')}
-            onReturnToDashboard={() => closeArchive('complete', 'archive-section')}
+            onClose={() => closeStory('cancel')}
+            onReturnToDashboard={() => closeStory('complete')}
             onExploreAhead={handleExploreAhead}
           />
         )}
@@ -176,6 +202,8 @@ function App() {
           />
         )}
       </AnimatePresence>
+
+      {hasEntered && <BottomNav active={route} onNavigate={handleNavigate} />}
     </>
   );
 }
