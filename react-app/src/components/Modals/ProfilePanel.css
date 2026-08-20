@@ -1,3 +1,9 @@
+.trait-quiz-entry-button {
+  display: block;
+  width: 100%;
+  margin-bottom: var(--space-lg);
+}
+
 .profile-photo-button {
   appearance: none;
   justify-self: center;

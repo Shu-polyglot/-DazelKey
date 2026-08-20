@@ -19,7 +19,12 @@ function BucketListPanel({
   const [activeFilter, setActiveFilter] = useState('All');
   const [expandedId, setExpandedId] = useState(null);
 
-  const openBuckets = useMemo(() => buckets.filter((bucket) => bucket.status !== 'completed'), [buckets]);
+  // Become Buckets (traits) live entirely on Strategy -- this list is
+  // Have-only, the same split Strategy's own filter makes in reverse.
+  const openBuckets = useMemo(
+    () => buckets.filter((bucket) => bucket.status !== 'completed' && bucket.goalType !== 'become'),
+    [buckets],
+  );
 
   const filteredBuckets = useMemo(
     () => (activeFilter === 'All' ? openBuckets : openBuckets.filter((bucket) => bucket.mode === activeFilter)),

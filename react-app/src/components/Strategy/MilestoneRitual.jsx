@@ -78,7 +78,7 @@ function MilestoneRitual({ commitment, onContinue }) {
         </motion.p>
         {commitment && (
           <motion.p className="transition-ritual-attribution" variants={attributionVariants}>
-            &ldquo;{commitment}&rdquo;
+            {commitment}
           </motion.p>
         )}
       </div>

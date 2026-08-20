@@ -144,18 +144,6 @@
   color: var(--color-text-primary);
 }
 
-.step-editor-milestones {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-md);
-  width: 100%;
-  max-width: 320px;
-}
-
-.step-editor-milestones .step-editor-field-input {
-  max-width: none;
-}
-
 .step-editor-date-input,
 .step-editor-field-input {
   width: 100%;

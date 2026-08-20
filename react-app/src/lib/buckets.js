@@ -28,10 +28,13 @@ export const modeLabels = {
 /*
   A Bucket is either something to Have (an experience, a possession --
   the original model above) or someone to Become (an identity, tracked by
-  Strategy's daily votes instead of a single completedDate). `commitment`
-  only carries meaning for Become buckets -- the one-sentence, first-person
-  identity statement Strategy's vote button and milestone ritual quote
-  back at the user every time.
+  Strategy's daily votes instead of a single completedDate). Become
+  Buckets are never created through BucketStepEditor -- Strategy creates
+  them directly by activating a trait from data/traits.js, so a Become
+  Bucket's `title` is always exactly a trait name (see StrategyPage /
+  useActivateTrait-style creation in App.jsx). `commitment` is carried
+  along equal to the trait name for any older display code that still
+  reads it.
 */
 export const goalTypeOptions = ['have', 'become'];
 
@@ -164,17 +167,17 @@ export const defaultBuckets = [
   },
   {
     id: 12,
-    title: 'Become someone who studies English every day',
+    title: 'Focused',
     mode: 'solo',
-    when: 'thisYear',
-    place: 'Home',
+    when: 'longTerm',
+    place: '',
     message: '',
     status: 'planned',
     completedDate: null,
     image: null,
     goalType: 'become',
-    commitment: 'A person who studies English every day.',
-    customMilestones: ['Take a mock TOEFL test', 'Have a 10-minute conversation in English'],
+    commitment: 'Focused',
+    customMilestones: ['Finish a whole deep-work session without checking my phone', 'Ship something I kept putting off'],
     // Fictional demo history, same spirit as the other seed dates above --
     // far enough back that Strategy's vote grid has real weeks to show.
     createdAt: '2026-07-10',
@@ -223,7 +226,7 @@ const whenPriority = { soon: 0, thisYear: 1, longTerm: 2, beforeIDie: 3 };
   rather than whatever was added most recently.
 */
 export function getNextUpcoming(buckets) {
-  const open = buckets.filter((bucket) => bucket.status !== 'completed');
+  const open = buckets.filter((bucket) => bucket.status !== 'completed' && bucket.goalType !== 'become');
   if (!open.length) {
     return null;
   }

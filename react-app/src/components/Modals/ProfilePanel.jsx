@@ -1,7 +1,9 @@
 import { useRef, useState } from 'react';
-import { motion } from 'motion/react';
+import { createPortal } from 'react-dom';
+import { AnimatePresence, motion } from 'motion/react';
 import Modal from './Modal';
 import PhotoCropper from '../shared/PhotoCropper';
+import TraitQuiz from '../Strategy/TraitQuiz';
 import { spring } from '../../styles/motion';
 import { SOCIAL_PLATFORMS, getSocialPlatform, normalizeSocialUrl } from '../../lib/profile';
 import './Modals.css';
@@ -10,7 +12,12 @@ import './ProfilePanel.css';
 const MIN_AGE = 1;
 const MAX_AGE = 119;
 
-function ProfilePanel({ profile, onClose, onSave }) {
+function ProfilePanel({ profile, buckets, onActivateTrait, onClose, onSave }) {
+  const [isQuizOpen, setIsQuizOpen] = useState(false);
+  const activeTraitNames = new Set(
+    (buckets || []).filter((bucket) => bucket.goalType === 'become').map((bucket) => bucket.title),
+  );
+
   const [name, setName] = useState(profile?.name || '');
   const [age, setAge] = useState(profile?.age ?? '');
   const [photo, setPhoto] = useState(profile?.photo || null);
@@ -80,6 +87,16 @@ function ProfilePanel({ profile, onClose, onSave }) {
       <div className="modal-header">
         <h3>Your profile</h3>
       </div>
+
+      <motion.button
+        type="button"
+        className="secondary-button trait-quiz-entry-button"
+        onClick={() => setIsQuizOpen(true)}
+        whileHover={{ y: -1, transition: spring.hover }}
+        whileTap={{ y: 1, scale: 0.97, transition: spring.press }}
+      >
+        Take the Trait Quiz
+      </motion.button>
 
       <form className="detail-form" onSubmit={handleSubmit} noValidate>
         <button
@@ -199,6 +216,24 @@ function ProfilePanel({ profile, onClose, onSave }) {
       </form>
 
       {cropSource && <PhotoCropper imageSrc={cropSource} onConfirm={handleCropConfirm} onCancel={handleCropCancel} />}
+
+      {/* Portaled for the same reason every other modal in this app is --
+          nesting a second fixed-position Modal directly under this one
+          would get trapped by whichever ancestor Framer Motion happens to
+          be mid-animating a transform/filter on. */}
+      {createPortal(
+        <AnimatePresence>
+          {isQuizOpen && (
+            <TraitQuiz
+              key="trait-quiz"
+              activeTraitNames={activeTraitNames}
+              onActivateTrait={onActivateTrait}
+              onClose={() => setIsQuizOpen(false)}
+            />
+          )}
+        </AnimatePresence>,
+        document.body,
+      )}
     </Modal>
   );
 }

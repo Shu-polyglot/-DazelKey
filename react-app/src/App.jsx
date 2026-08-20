@@ -102,7 +102,7 @@ function App() {
     const vote = castVote(goalId);
     if (vote?.isMilestone) {
       const goal = buckets.find((bucket) => bucket.id === goalId);
-      setMilestoneCommitment(goal?.commitment || null);
+      setMilestoneCommitment(goal ? `Your ${goal.title} side.` : null);
     }
   }
 
@@ -110,8 +110,27 @@ function App() {
     const marked = markMilestone(voteId, label);
     if (marked) {
       const goal = buckets.find((bucket) => bucket.id === goalId);
-      setMilestoneCommitment(goal?.commitment || null);
+      setMilestoneCommitment(goal ? `Your ${goal.title} side.` : null);
     }
+  }
+
+  // Activating a trait *is* creating a Become Bucket -- no wizard, one
+  // tap. A trait can only ever be active once; re-suggesting an
+  // already-active one from a retaken quiz is a no-op here.
+  function handleActivateTrait(trait) {
+    const alreadyActive = buckets.some((bucket) => bucket.goalType === 'become' && bucket.title === trait);
+    if (alreadyActive) {
+      return;
+    }
+    addBucket({
+      title: trait,
+      goalType: 'become',
+      commitment: trait,
+      mode: 'solo',
+      when: 'longTerm',
+      message: '',
+      customMilestones: [],
+    });
   }
 
   return (
@@ -162,6 +181,7 @@ function App() {
                 votes={votes}
                 onCastVote={handleCastVote}
                 onMarkMilestone={handleMarkMilestone}
+                onActivateTrait={handleActivateTrait}
               />
             </div>
 
@@ -249,6 +269,8 @@ function App() {
                 <ProfilePanel
                   key="profile-panel"
                   profile={profile}
+                  buckets={buckets}
+                  onActivateTrait={handleActivateTrait}
                   onClose={() => setIsProfileOpen(false)}
                   onSave={(patch) => {
                     updateProfile(patch);

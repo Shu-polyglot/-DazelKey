@@ -24,18 +24,21 @@
   box-shadow: var(--shadow-medium);
 }
 
-.strategy-goal-commitment {
-  font-family: var(--font-family-display);
-  font-style: italic;
-  font-size: 1.2rem;
-  line-height: var(--leading-relaxed);
-  color: var(--color-text-primary);
+.strategy-goal-dimension {
+  display: inline-block;
+  font-size: var(--font-size-label);
+  letter-spacing: var(--tracking-wider);
+  text-transform: uppercase;
+  color: var(--color-accent);
 }
 
-.strategy-goal-title {
-  margin-top: var(--space-sm);
-  font-size: var(--font-size-body-sm);
-  color: var(--color-text-muted);
+.strategy-goal-commitment {
+  margin-top: var(--space-2xs);
+  font-family: var(--font-family-display);
+  font-style: italic;
+  font-size: 1.4rem;
+  line-height: var(--leading-relaxed);
+  color: var(--color-text-primary);
 }
 
 .strategy-goal-tap-area {
@@ -202,4 +205,170 @@
   font-size: var(--font-size-caption);
   color: var(--color-text-muted);
   white-space: nowrap;
+}
+
+/* Trait pickers -- the quiz's suggestion screen and Strategy's own
+   "+ Add a Trait" browser share this exact grouped-chip layout. */
+.trait-picker {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg);
+  margin-top: var(--space-md);
+}
+
+.trait-picker-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+}
+
+.trait-picker-dimension {
+  font-size: var(--font-size-label);
+  letter-spacing: var(--tracking-wider);
+  text-transform: uppercase;
+  color: var(--color-accent);
+}
+
+.trait-chip-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-xs);
+}
+
+.trait-chip {
+  appearance: none;
+  padding: var(--space-xs) var(--space-md);
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--color-border);
+  background: rgba(var(--color-mist-rgb), 0.04);
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  font-size: var(--font-size-body-sm);
+  transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+}
+
+.trait-chip:hover:not(:disabled) {
+  border-color: var(--color-border-strong);
+  color: var(--color-text-primary);
+}
+
+.trait-chip.is-active {
+  background: var(--color-accent-subtle);
+  border-color: rgba(var(--color-glow-rgb), 0.35);
+  color: var(--color-accent-strong);
+  cursor: default;
+}
+
+.strategy-add-trait-button {
+  margin-top: var(--space-lg);
+}
+
+/* Trait Quiz */
+.trait-quiz-modal {
+  max-height: 88vh;
+}
+
+.trait-quiz-intro {
+  margin-bottom: var(--space-md);
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-body-sm);
+  line-height: var(--leading-relaxed);
+}
+
+.trait-quiz-questions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg);
+}
+
+.trait-quiz-question-text {
+  color: var(--color-text-primary);
+  font-size: var(--font-size-body-sm);
+  line-height: var(--leading-relaxed);
+  margin-bottom: var(--space-xs);
+}
+
+.trait-quiz-scale {
+  display: flex;
+  gap: var(--space-2xs);
+}
+
+.trait-quiz-scale-button {
+  appearance: none;
+  flex: 1;
+  padding: var(--space-xs) 0;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--color-border);
+  background: rgba(var(--color-mist-rgb), 0.04);
+  color: var(--color-text-muted);
+  cursor: pointer;
+  font-size: var(--font-size-body-sm);
+  transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+}
+
+.trait-quiz-scale-button:hover {
+  border-color: var(--color-border-strong);
+  color: var(--color-text-primary);
+}
+
+.trait-quiz-scale-button.is-active {
+  background: rgba(var(--color-glow-rgb), 0.16);
+  border-color: rgba(var(--color-glow-rgb), 0.45);
+  color: var(--color-text-primary);
+}
+
+/* Radar chart -- fixed, quiet grid underneath; only the filled shape
+   reacts to votes. Raw counts stay hidden until an axis is hovered/tapped
+   (see RadarChart.jsx's `hovered` state). */
+.radar-chart-wrap {
+  display: flex;
+  justify-content: center;
+  margin: var(--space-md) 0 var(--space-xl);
+}
+
+.radar-chart {
+  width: 100%;
+  max-width: 320px;
+  height: auto;
+}
+
+.radar-chart-grid {
+  fill: none;
+  stroke: var(--color-border-strong);
+  stroke-width: 1;
+}
+
+.radar-chart-spoke {
+  stroke: var(--color-border);
+  stroke-width: 1;
+}
+
+.radar-chart-value {
+  fill: rgba(var(--color-glow-rgb), 0.2);
+  stroke: rgba(var(--color-glow-bright-rgb), 0.65);
+  stroke-width: 1.5;
+  stroke-linejoin: round;
+}
+
+.radar-chart-hit {
+  fill: transparent;
+  cursor: pointer;
+}
+
+.radar-chart-label {
+  fill: var(--color-text-muted);
+  font-size: 9px;
+  letter-spacing: var(--tracking-wider);
+  text-transform: uppercase;
+  font-family: var(--font-family-base);
+  dominant-baseline: central;
+  pointer-events: none;
+}
+
+.radar-chart-count {
+  fill: var(--color-accent-strong);
+  font-size: 9px;
+  font-family: var(--font-family-base);
+  dominant-baseline: central;
+  pointer-events: none;
 }
