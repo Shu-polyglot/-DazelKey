@@ -22,6 +22,9 @@ function hasPhoto(bucket) {
 
 // Real life moments only -- completed buckets with a photo, most recent
 // first, capped at however many the layouts below know how to place.
+// `title`/`date` ride along unused by WelcomeStep's corner cards, but are
+// exactly what AchievementBanner's full-screen slot needs -- same list,
+// no second selector.
 export function pickOpeningAchievements(buckets) {
   return buckets
     .filter((bucket) => bucket.status === 'completed' && hasPhoto(bucket))
@@ -31,7 +34,16 @@ export function pickOpeningAchievements(buckets) {
       id: bucket.id,
       image: bucket.image,
       caption: (bucket.message && bucket.message.trim()) || bucket.title,
+      title: bucket.title,
+      date: bucket.completedDate,
     }));
+}
+
+// Whether the achievement banner has anything to show -- lets the caller
+// skip straight from the title to the quote card for a new user with no
+// photographed achievements yet, rather than rendering an empty screen.
+export function hasOpeningAchievements(buckets) {
+  return pickOpeningAchievements(buckets).length > 0;
 }
 
 /*

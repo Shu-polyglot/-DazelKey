@@ -15,6 +15,7 @@ import BucketDetailsModal from './components/Modals/BucketDetailsModal';
 import ProfilePanel from './components/Modals/ProfilePanel';
 import DMThreadModal from './components/Modals/DMThreadModal';
 import OpeningExperience from './components/Onboarding/OpeningExperience';
+import AchievementBanner from './components/Onboarding/AchievementBanner';
 import ArchiveExperience from './components/Archive/ArchiveExperience';
 import WhatsAheadExperience from './components/Archive/WhatsAheadExperience';
 import TransitionRitual from './components/TransitionRitual';
@@ -27,6 +28,7 @@ import { useContributions } from './hooks/useContributions';
 import { useRoute } from './hooks/useRoute';
 import { todayIso } from './lib/dates';
 import { getTotalProgress } from './lib/doing';
+import { hasOpeningAchievements } from './data/openingSequence';
 import { transitions, easing } from './styles/motion';
 import './App.css';
 
@@ -37,6 +39,7 @@ function App() {
   const { contributions, addContribution } = useContributions();
   const [route, navigate] = useRoute();
   const [hasEntered, setHasEntered] = useState(false);
+  const [showAchievementBanner, setShowAchievementBanner] = useState(false);
   const [showEntryRitual, setShowEntryRitual] = useState(false);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
@@ -58,6 +61,18 @@ function App() {
     if (patch) {
       completeProfile(patch);
     }
+    // A new user with no photographed achievements yet has nothing for
+    // the banner to show -- skip straight to the quote card rather than
+    // rendering an empty screen.
+    if (hasOpeningAchievements(buckets)) {
+      setShowAchievementBanner(true);
+    } else {
+      setShowEntryRitual(true);
+    }
+  }
+
+  function handleAchievementBannerContinue() {
+    setShowAchievementBanner(false);
     setShowEntryRitual(true);
   }
 
@@ -224,8 +239,14 @@ function App() {
   return (
     <>
       <AnimatePresence>
-        {!hasEntered && !showEntryRitual && (
+        {!hasEntered && !showAchievementBanner && !showEntryRitual && (
           <OpeningExperience key="onboarding" profile={profile} buckets={buckets} onComplete={handleOnboardingComplete} />
+        )}
+      </AnimatePresence>
+
+      <AnimatePresence>
+        {showAchievementBanner && (
+          <AchievementBanner key="achievement-banner" buckets={buckets} onContinue={handleAchievementBannerContinue} />
         )}
       </AnimatePresence>
 
