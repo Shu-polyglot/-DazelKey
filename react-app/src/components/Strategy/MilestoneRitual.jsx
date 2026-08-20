@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { motion } from 'motion/react';
 import { getRandomMilestoneIdiom } from '../../data/milestoneIdioms';
+import { getRandomCompletionIdiom } from '../../data/doingCompletionIdioms';
 import { easing } from '../../styles/motion';
 import '../TransitionRitual.css';
 
@@ -35,13 +36,21 @@ const attributionVariants = {
 /*
   Strategy's special-vote celebration -- same full-screen ritual shell as
   TransitionRitual (reusing its CSS as-is, see the import), just a random
-  growth idiom instead of a book quote, and the goal's own identity
-  commitment standing in for an author line. No numbers here on purpose --
-  "10 votes" would read as a game score; the commitment sentence keeps the
-  moment about who this vote was for, not how many there have been.
+  growth idiom instead of a book quote, and the goal's own name/identity
+  standing in for an author line. No numbers here on purpose -- "10
+  votes" would read as a game score; the caption keeps the moment about
+  which goal this was for, not how many there have been.
+
+  `variant="completion"` is the one step up from an ordinary milestone --
+  a Doing goal's money target actually reached -- and draws from its own
+  idiom pool (data/doingCompletionIdioms.js) so that moment reads as
+  distinctly rarer than the regular one.
 */
-function MilestoneRitual({ commitment, onContinue }) {
-  const idiom = useMemo(() => getRandomMilestoneIdiom(), []);
+function MilestoneRitual({ caption, variant = 'milestone', onContinue }) {
+  const idiom = useMemo(
+    () => (variant === 'completion' ? getRandomCompletionIdiom() : getRandomMilestoneIdiom()),
+    [variant],
+  );
   const [canContinue, setCanContinue] = useState(false);
 
   useEffect(() => {
@@ -76,9 +85,9 @@ function MilestoneRitual({ commitment, onContinue }) {
         <motion.p className="transition-ritual-quote" variants={quoteVariants}>
           {idiom}
         </motion.p>
-        {commitment && (
+        {caption && (
           <motion.p className="transition-ritual-attribution" variants={attributionVariants}>
-            {commitment}
+            {caption}
           </motion.p>
         )}
       </div>

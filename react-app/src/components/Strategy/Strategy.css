@@ -1,3 +1,41 @@
+/* Becoming / Doing toggle -- same underline-tab recipe ProfilePage's own
+   tab switcher uses, kept as a separate copy here so Strategy.css stays
+   self-contained rather than importing across features. */
+.strategy-tabs {
+  display: flex;
+  border-bottom: 1px solid var(--color-border);
+  margin-bottom: var(--space-xl);
+}
+
+.strategy-tab {
+  position: relative;
+  flex: 1;
+  appearance: none;
+  background: none;
+  border: none;
+  padding: var(--space-sm) var(--space-xs);
+  font-size: var(--font-size-body-sm);
+  font-weight: var(--font-weight-medium);
+  letter-spacing: var(--tracking-wide);
+  text-transform: uppercase;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.strategy-tab.is-active {
+  color: var(--color-text-primary);
+}
+
+.strategy-tab-indicator {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -1px;
+  height: 2px;
+  background: var(--color-text-primary);
+}
+
 .strategy-empty {
   padding: var(--space-2xl) var(--space-md);
   border: 1px solid var(--color-border);
@@ -371,4 +409,235 @@
   font-family: var(--font-family-base);
   dominant-baseline: central;
   pointer-events: none;
+}
+
+/* Doing (Have Buckets tracked on Strategy) */
+.doing-goal-tap-area {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: var(--space-sm);
+}
+
+.doing-goal-title {
+  font-family: var(--font-family-display);
+  font-style: italic;
+  font-size: 1.2rem;
+  color: var(--color-text-primary);
+}
+
+.doing-checklist-summary {
+  font-size: var(--font-size-caption);
+  color: var(--color-text-muted);
+}
+
+.doing-goal-footer {
+  flex-direction: column;
+  align-items: stretch;
+}
+
+.doing-goal-footer .strategy-vote-button,
+.doing-goal-footer .secondary-button {
+  max-width: none;
+  width: 100%;
+}
+
+.progress-ring {
+  width: 140px;
+  height: 140px;
+}
+
+.progress-ring-track {
+  stroke: var(--color-border);
+}
+
+.progress-ring-value {
+  stroke: rgba(var(--color-glow-bright-rgb), 0.75);
+  stroke-linecap: round;
+}
+
+.progress-ring-current {
+  fill: var(--color-text-primary);
+  font-family: var(--font-family-display);
+  font-size: 14px;
+}
+
+.progress-ring-target {
+  fill: var(--color-text-muted);
+  font-size: 8px;
+  letter-spacing: var(--tracking-wide);
+}
+
+.doing-detail-ring {
+  display: flex;
+  justify-content: center;
+  margin: var(--space-sm) 0;
+}
+
+.doing-saved-line {
+  text-align: center;
+  font-size: var(--font-size-caption);
+  color: var(--color-text-muted);
+}
+
+.doing-unit-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-sm);
+  margin-top: var(--space-lg);
+  padding-top: var(--space-md);
+  border-top: 1px solid var(--color-border);
+  font-size: var(--font-size-body-sm);
+  color: var(--color-text-secondary);
+}
+
+.doing-unit-form {
+  display: flex;
+  gap: var(--space-xs);
+}
+
+.doing-unit-input {
+  width: 110px;
+  padding: var(--space-2xs) var(--space-xs);
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-sm);
+  background: rgba(var(--color-void-1-rgb), 0.6);
+  color: var(--color-text-primary);
+}
+
+/* Checklist/milestone -- unified list, dims (never strikes through) once
+   checked; the star just marks which items are wired to the ritual. */
+.doing-checklist {
+  margin-top: var(--space-lg);
+  padding-top: var(--space-md);
+  border-top: 1px solid var(--color-border);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+}
+
+.doing-checklist-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+  padding: var(--space-xs) var(--space-sm);
+  border-radius: var(--radius-sm);
+  background: rgba(var(--color-mist-rgb), 0.04);
+  border: 1px solid var(--color-border);
+  color: var(--color-text-primary);
+  font-size: var(--font-size-body-sm);
+  cursor: pointer;
+  transition: opacity 0.25s ease, transform 0.25s ease;
+}
+
+.doing-checklist-item.is-done {
+  opacity: 0.5;
+  transform: translateY(1px);
+}
+
+.doing-checklist-star {
+  margin-left: auto;
+  color: var(--color-accent-strong);
+}
+
+/* Add extra */
+.doing-add-extra-modal {
+  max-width: 420px;
+}
+
+.doing-quick-amounts {
+  display: flex;
+  gap: var(--space-xs);
+  margin-bottom: var(--space-md);
+}
+
+.doing-tag-row {
+  display: flex;
+  gap: var(--space-xs);
+  margin: var(--space-md) 0;
+}
+
+/* Add a Goal wizard */
+.add-goal-empty {
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-body-sm);
+  line-height: var(--leading-relaxed);
+  text-align: center;
+}
+
+.add-goal-bucket-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+  width: 100%;
+  max-height: 40vh;
+  overflow-y: auto;
+}
+
+.add-goal-bucket-row {
+  appearance: none;
+  width: 100%;
+  padding: var(--space-sm) var(--space-md);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--color-border);
+  background: rgba(var(--color-mist-rgb), 0.04);
+  color: var(--color-text-primary);
+  text-align: left;
+  cursor: pointer;
+  font-size: var(--font-size-body-sm);
+  transition: background 0.2s ease, border-color 0.2s ease;
+}
+
+.add-goal-bucket-row:hover {
+  border-color: var(--color-border-strong);
+}
+
+.add-goal-bucket-row.is-active {
+  background: var(--color-accent-subtle);
+  border-color: rgba(var(--color-glow-rgb), 0.35);
+}
+
+.add-goal-checklist-preview {
+  width: 100%;
+  max-width: 320px;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2xs);
+  margin-bottom: var(--space-md);
+}
+
+.add-goal-checklist-preview-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-sm);
+  padding: var(--space-2xs) var(--space-sm);
+  border-radius: var(--radius-sm);
+  background: rgba(var(--color-mist-rgb), 0.04);
+  border: 1px solid var(--color-border);
+  color: var(--color-text-primary);
+  font-size: var(--font-size-body-sm);
+}
+
+.add-goal-checklist-form {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-sm);
+  width: 100%;
+  max-width: 320px;
+}
+
+.add-goal-checklist-form .step-editor-field-input {
+  max-width: none;
+}
+
+.add-goal-milestone-toggle {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+  font-size: var(--font-size-body-sm);
+  color: var(--color-text-secondary);
 }

@@ -23,7 +23,10 @@ import BottomNav from './components/BottomNav';
 import { useBuckets } from './hooks/useBuckets';
 import { useProfile } from './hooks/useProfile';
 import { useVotes } from './hooks/useVotes';
+import { useContributions } from './hooks/useContributions';
 import { useRoute } from './hooks/useRoute';
+import { todayIso } from './lib/dates';
+import { getTotalProgress } from './lib/doing';
 import { transitions, easing } from './styles/motion';
 import './App.css';
 
@@ -31,6 +34,7 @@ function App() {
   const { buckets, addBucket, updateBucket, deleteBucket, completeBucket } = useBuckets();
   const { profile, updateProfile, completeProfile } = useProfile();
   const { votes, castVote, markMilestone } = useVotes();
+  const { contributions, addContribution } = useContributions();
   const [route, navigate] = useRoute();
   const [hasEntered, setHasEntered] = useState(false);
   const [showEntryRitual, setShowEntryRitual] = useState(false);
@@ -38,7 +42,11 @@ function App() {
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [detailsBucketId, setDetailsBucketId] = useState(null);
   const [dmRecipient, setDmRecipient] = useState(null);
-  const [milestoneCommitment, setMilestoneCommitment] = useState(null);
+  // { caption, variant: 'milestone' | 'completion' } | null -- one piece
+  // of state drives MilestoneRitual for every trigger across both Strategy
+  // sides (Becoming's vote-count/custom milestones, Doing's same plus its
+  // own bigger "goal amount reached" moment).
+  const [ritual, setRitual] = useState(null);
   const [archiveCloseMode, setArchiveCloseMode] = useState('cancel');
   const [isWhatsAheadOpen, setIsWhatsAheadOpen] = useState(false);
   const isStoryOpen = route === 'story';
@@ -102,7 +110,7 @@ function App() {
     const vote = castVote(goalId);
     if (vote?.isMilestone) {
       const goal = buckets.find((bucket) => bucket.id === goalId);
-      setMilestoneCommitment(goal ? `Your ${goal.title} side.` : null);
+      setRitual(goal ? { caption: `Your ${goal.title} side.`, variant: 'milestone' } : null);
     }
   }
 
@@ -110,7 +118,7 @@ function App() {
     const marked = markMilestone(voteId, label);
     if (marked) {
       const goal = buckets.find((bucket) => bucket.id === goalId);
-      setMilestoneCommitment(goal ? `Your ${goal.title} side.` : null);
+      setRitual(goal ? { caption: `Your ${goal.title} side.`, variant: 'milestone' } : null);
     }
   }
 
@@ -131,6 +139,86 @@ function App() {
       message: '',
       customMilestones: [],
     });
+  }
+
+  // Fires once, the first time a Doing goal's progress reaches its
+  // amount -- checked from the caller's own freshly-computed vote/
+  // contribution arrays (not by reading `votes`/`contributions` back
+  // out of state, which wouldn't reflect the action that just happened
+  // yet). Returns whether it fired, so callers can skip the ordinary
+  // milestone ritual in favor of this bigger one on the same tick.
+  function checkDoingCompletion(goal, votesAfter, contributionsAfter) {
+    if (!goal || goal.doingCompletedAt || !goal.doingGoalAmount) {
+      return false;
+    }
+    const total = getTotalProgress(goal, votesAfter, contributionsAfter);
+    if (total < goal.doingGoalAmount) {
+      return false;
+    }
+    updateBucket(goal.id, { doingCompletedAt: todayIso() });
+    setRitual({ caption: goal.title, variant: 'completion' });
+    return true;
+  }
+
+  function handleCastDoingVote(goalId) {
+    const vote = castVote(goalId);
+    const goal = buckets.find((bucket) => bucket.id === goalId);
+    if (!goal || !vote) {
+      return;
+    }
+    const completed = checkDoingCompletion(goal, [...votes, vote], contributions);
+    if (!completed && vote.isMilestone) {
+      setRitual({ caption: goal.title, variant: 'milestone' });
+    }
+  }
+
+  function handleAddDoingExtra(goalId, amount, tag) {
+    const record = addContribution(goalId, amount, tag);
+    const goal = buckets.find((bucket) => bucket.id === goalId);
+    if (!goal || !record) {
+      return;
+    }
+    checkDoingCompletion(goal, votes, [...contributions, record]);
+  }
+
+  function handleAddDoingGoal({ bucketId, goalAmount, unitAmount, checklist }) {
+    updateBucket(bucketId, {
+      doingEnabled: true,
+      doingGoalAmount: goalAmount,
+      doingUnitHistory: [{ amount: unitAmount, effectiveFrom: todayIso() }],
+      doingChecklist: checklist,
+      doingCompletedAt: null,
+    });
+  }
+
+  // Regular (non-milestone) items just flip; a milestone item only
+  // fires the ritual on the check-in transition, not on uncheck.
+  function handleToggleChecklistItem(goalId, itemId) {
+    const goal = buckets.find((bucket) => bucket.id === goalId);
+    const item = goal?.doingChecklist.find((entry) => entry.id === itemId);
+    if (!goal || !item) {
+      return;
+    }
+    const nowDone = !item.done;
+    updateBucket(goalId, {
+      doingChecklist: goal.doingChecklist.map((entry) => (entry.id === itemId ? { ...entry, done: nowDone } : entry)),
+    });
+    if (nowDone && item.isMilestone) {
+      setRitual({ caption: goal.title, variant: 'milestone' });
+    }
+  }
+
+  // Appends rather than overwrites -- see lib/doing.js's
+  // getUnitAmountForDate -- so every vote already cast keeps the
+  // contribution it actually earned at the time.
+  function handleUpdateDoingUnit(goalId, newAmount) {
+    const goal = buckets.find((bucket) => bucket.id === goalId);
+    if (!goal || !(newAmount > 0)) {
+      return;
+    }
+    const today = todayIso();
+    const history = goal.doingUnitHistory.filter((entry) => entry.effectiveFrom !== today);
+    updateBucket(goalId, { doingUnitHistory: [...history, { amount: newAmount, effectiveFrom: today }] });
   }
 
   return (
@@ -179,9 +267,15 @@ function App() {
               <StrategyPage
                 buckets={buckets}
                 votes={votes}
+                contributions={contributions}
                 onCastVote={handleCastVote}
                 onMarkMilestone={handleMarkMilestone}
                 onActivateTrait={handleActivateTrait}
+                onCastDoingVote={handleCastDoingVote}
+                onAddDoingExtra={handleAddDoingExtra}
+                onAddDoingGoal={handleAddDoingGoal}
+                onToggleChecklistItem={handleToggleChecklistItem}
+                onUpdateDoingUnit={handleUpdateDoingUnit}
               />
             </div>
 
@@ -252,11 +346,12 @@ function App() {
 
           {createPortal(
             <AnimatePresence>
-              {milestoneCommitment !== null && (
+              {ritual && (
                 <MilestoneRitual
                   key="milestone-ritual"
-                  commitment={milestoneCommitment}
-                  onContinue={() => setMilestoneCommitment(null)}
+                  caption={ritual.caption}
+                  variant={ritual.variant}
+                  onContinue={() => setRitual(null)}
                 />
               )}
             </AnimatePresence>,

@@ -76,6 +76,18 @@ export const defaultBuckets = [
     status: 'planned',
     completedDate: null,
     image: null,
+    // Fictional demo Doing goal, same spirit as the Focused seed below --
+    // far enough back that the grid has real weeks to show.
+    doingEnabled: true,
+    doingGoalAmount: 300000,
+    doingUnitHistory: [{ amount: 500, effectiveFrom: '2026-07-10' }],
+    doingChecklist: [
+      { id: 'ny-passport', label: 'Get passport', isMilestone: true, done: false },
+      { id: 'ny-flights', label: 'Book flights', isMilestone: false, done: false },
+      { id: 'ny-hotel', label: 'Reserve a hotel', isMilestone: false, done: false },
+    ],
+    doingCompletedAt: null,
+    createdAt: '2026-07-10',
   },
   {
     id: 4,
@@ -214,6 +226,27 @@ export function normalizeBucket(bucket, index) {
     // this field existed have no real record of when they started, so
     // "today" (i.e. "we start counting now") is the only honest fallback.
     createdAt: bucket.createdAt || todayIso(),
+
+    // Doing (Have Buckets tracked on Strategy's money-progress side) --
+    // only ever set once a Have Bucket goes through "+ Add a Goal", never
+    // by default. `doingUnitHistory` is `[{ amount, effectiveFrom }]`,
+    // oldest first -- see lib/doing.js for why a raised/lowered unit is
+    // appended rather than overwritten. `doingCompletedAt` is set once,
+    // the first time progress reaches the goal amount, purely so the
+    // completion ritual never fires a second time for the same goal.
+    doingEnabled: safeGoalType === 'have' && Boolean(bucket.doingEnabled),
+    doingGoalAmount: safeGoalType === 'have' && Number(bucket.doingGoalAmount) > 0 ? Number(bucket.doingGoalAmount) : 0,
+    doingUnitHistory:
+      safeGoalType === 'have' && Array.isArray(bucket.doingUnitHistory)
+        ? bucket.doingUnitHistory.filter((entry) => entry && Number(entry.amount) > 0 && entry.effectiveFrom)
+        : [],
+    doingChecklist:
+      safeGoalType === 'have' && Array.isArray(bucket.doingChecklist)
+        ? bucket.doingChecklist
+            .filter((item) => item && item.id && item.label)
+            .map((item) => ({ id: item.id, label: item.label, isMilestone: Boolean(item.isMilestone), done: Boolean(item.done) }))
+        : [],
+    doingCompletedAt: safeGoalType === 'have' ? bucket.doingCompletedAt || null : null,
   };
 }
 
