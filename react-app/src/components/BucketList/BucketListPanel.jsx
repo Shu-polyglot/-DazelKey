@@ -7,7 +7,15 @@ import ExpandedBucketCard from './ExpandedBucketCard';
 import { dashboardEntrance, entranceTransition } from '../../styles/motion';
 import './BucketList.css';
 
-function BucketListPanel({ buckets, onUpdate, onDelete, onComplete }) {
+function BucketListPanel({
+  buckets,
+  onUpdate,
+  onDelete,
+  onComplete,
+  sectionId = 'bucket-list-section',
+  layoutIdPrefix = 'bucket-card-',
+  baseDelay = dashboardEntrance.bucketList,
+}) {
   const [activeFilter, setActiveFilter] = useState('All');
   const [expandedId, setExpandedId] = useState(null);
 
@@ -28,11 +36,11 @@ function BucketListPanel({ buckets, onUpdate, onDelete, onComplete }) {
   const expandedBucket = buckets.find((bucket) => bucket.id === expandedId) || null;
 
   return (
-    <section className="app-section bucket-section" id="bucket-list-section">
+    <section className="app-section bucket-section" id={sectionId}>
       <motion.div
         initial={{ opacity: 0, y: 14, filter: 'blur(6px)' }}
         animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
-        transition={entranceTransition(dashboardEntrance.bucketList)}
+        transition={entranceTransition(baseDelay)}
       >
         <div className="section-heading">
           <span className="section-label">Intentions</span>
@@ -50,13 +58,20 @@ function BucketListPanel({ buckets, onUpdate, onDelete, onComplete }) {
               key="empty"
               initial={{ opacity: 0, y: 14, filter: 'blur(6px)' }}
               animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
-              transition={entranceTransition(dashboardEntrance.bucketList + 0.06)}
+              transition={entranceTransition(baseDelay + 0.06)}
             >
               Your next adventure starts here.
             </motion.div>
           ) : (
             gridBuckets.map((bucket, index) => (
-              <BucketCard key={bucket.id} bucket={bucket} index={index} onOpen={setExpandedId} />
+              <BucketCard
+                key={bucket.id}
+                bucket={bucket}
+                index={index}
+                onOpen={setExpandedId}
+                layoutId={`${layoutIdPrefix}${bucket.id}`}
+                baseDelay={baseDelay}
+              />
             ))
           )}
         </AnimatePresence>
@@ -71,6 +86,7 @@ function BucketListPanel({ buckets, onUpdate, onDelete, onComplete }) {
             <ExpandedBucketCard
               key={expandedBucket.id}
               bucket={expandedBucket}
+              layoutId={`${layoutIdPrefix}${expandedBucket.id}`}
               onClose={() => setExpandedId(null)}
               onUpdate={onUpdate}
               onDelete={(id) => {

@@ -83,3 +83,38 @@
 .profile-page-edit {
   margin-top: var(--space-md);
 }
+
+.profile-tabs {
+  display: flex;
+  border-top: 1px solid var(--color-border);
+  margin-top: var(--space-xl);
+}
+
+.profile-tab {
+  position: relative;
+  flex: 1;
+  appearance: none;
+  background: none;
+  border: none;
+  padding: var(--space-sm) var(--space-xs);
+  font-size: var(--font-size-body-sm);
+  font-weight: var(--font-weight-medium);
+  letter-spacing: var(--tracking-wide);
+  text-transform: uppercase;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.profile-tab.is-active {
+  color: var(--color-text-primary);
+}
+
+.profile-tab-indicator {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: -1px;
+  height: 2px;
+  background: var(--color-text-primary);
+}

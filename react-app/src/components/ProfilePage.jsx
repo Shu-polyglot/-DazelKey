@@ -1,13 +1,22 @@
+import { useState } from 'react';
 import { motion } from 'motion/react';
+import BucketListPanel from './BucketList/BucketListPanel';
+import AchievementGallery from './Achievements/AchievementGallery';
 import { getInitials, getSocialPlatformLabel } from '../lib/profile';
 import { entranceTransition, spring } from '../styles/motion';
 import './ProfilePage.css';
 
+const PROFILE_TABS = [
+  { id: 'buckets', label: 'The Bucket Lists' },
+  { id: 'achievements', label: 'The Achievement' },
+];
+
 // Pure display of the same profile data Header's brand-mark and
 // ProfilePanel already read/write -- editing still happens through that
 // existing modal (passed in via onEditProfile), not rebuilt here.
-function ProfilePage({ profile, onEditProfile }) {
+function ProfilePage({ profile, buckets, onUpdateBucket, onDeleteBucket, onCompleteBucket, onEditProfile }) {
   const hasPhoto = Boolean(profile?.photo);
+  const [activeTab, setActiveTab] = useState('buckets');
 
   return (
     <motion.section
@@ -60,6 +69,42 @@ function ProfilePage({ profile, onEditProfile }) {
           Edit profile
         </motion.button>
       </div>
+
+      <div className="profile-tabs" role="tablist" aria-label="Profile sections">
+        {PROFILE_TABS.map((tab) => (
+          <button
+            key={tab.id}
+            type="button"
+            role="tab"
+            aria-selected={activeTab === tab.id}
+            className={`profile-tab${activeTab === tab.id ? ' is-active' : ''}`}
+            onClick={() => setActiveTab(tab.id)}
+          >
+            {tab.label}
+            {activeTab === tab.id && (
+              <motion.span
+                className="profile-tab-indicator"
+                layoutId="profile-tab-indicator"
+                transition={spring.soft}
+              />
+            )}
+          </button>
+        ))}
+      </div>
+
+      {activeTab === 'buckets' ? (
+        <BucketListPanel
+          buckets={buckets}
+          onUpdate={onUpdateBucket}
+          onDelete={onDeleteBucket}
+          onComplete={onCompleteBucket}
+          sectionId="profile-bucket-list-section"
+          layoutIdPrefix="profile-bucket-card-"
+          baseDelay={0}
+        />
+      ) : (
+        <AchievementGallery buckets={buckets} onUpdate={onUpdateBucket} onDelete={onDeleteBucket} baseDelay={0} />
+      )}
     </motion.section>
   );
 }

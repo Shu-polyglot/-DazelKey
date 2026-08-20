@@ -9,7 +9,14 @@ import './Achievements.css';
 // a distinct `layoutId` (see AchievementGallery) so it doesn't collide
 // with AchievementsShelf's identically-keyed cards, which stay mounted
 // (display:none, not unmounted) on the other tab at the same time.
-function AchievementCard({ bucket, index, onOpen, variant = 'shelf', layoutId }) {
+function AchievementCard({
+  bucket,
+  index,
+  onOpen,
+  variant = 'shelf',
+  layoutId,
+  baseDelay = dashboardEntrance.achievements,
+}) {
   const hasPhoto = Boolean(bucket.image);
   const resolvedLayoutId = layoutId || `achievement-card-${bucket.id}`;
 
@@ -24,7 +31,7 @@ function AchievementCard({ bucket, index, onOpen, variant = 'shelf', layoutId })
       exit={{ opacity: 0, scale: 0.96, transition: { duration: 0.16 } }}
       transition={{
         layout: spring.soft,
-        default: entranceTransition(staggerDelay(dashboardEntrance.achievements, index)),
+        default: entranceTransition(staggerDelay(baseDelay, index)),
       }}
       whileHover={{ y: -6, scale: 1.015, transition: spring.hover }}
       whileTap={{ y: -1, scale: 0.97, transition: spring.press }}

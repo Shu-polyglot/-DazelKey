@@ -3,7 +3,9 @@ import { getStatusLabel, whenLabels, modeLabels } from '../../lib/buckets';
 import { formatDate } from '../../lib/dates';
 import { spring, easing, dashboardEntrance, staggerDelay } from '../../styles/motion';
 
-function BucketCard({ bucket, index = 0, onOpen }) {
+function BucketCard({ bucket, index = 0, onOpen, layoutId, baseDelay = dashboardEntrance.bucketList }) {
+  const resolvedLayoutId = layoutId || `bucket-card-${bucket.id}`;
+
   const meta =
     bucket.status === 'completed'
       ? bucket.completedDate
@@ -16,7 +18,7 @@ function BucketCard({ bucket, index = 0, onOpen }) {
       className="bucket-card"
       data-status={getStatusLabel(bucket)}
       onClick={() => onOpen(bucket.id)}
-      layoutId={`bucket-card-${bucket.id}`}
+      layoutId={resolvedLayoutId}
       layout
       initial={{ opacity: 0, y: 10, scale: 0.97, filter: 'blur(6px)' }}
       animate={{ opacity: 1, y: 0, scale: 1, filter: 'blur(0px)' }}
@@ -25,7 +27,7 @@ function BucketCard({ bucket, index = 0, onOpen }) {
       whileTap={{ y: 0, scale: 0.98, transition: spring.press }}
       transition={{
         layout: { duration: 0.6, ease: easing.emphasized },
-        default: { duration: 0.5, delay: staggerDelay(dashboardEntrance.bucketList, index), ease: easing.emphasized },
+        default: { duration: 0.5, delay: staggerDelay(baseDelay, index), ease: easing.emphasized },
       }}
     >
       <div className="bucket-card-top">

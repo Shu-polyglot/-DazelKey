@@ -105,7 +105,7 @@ function ExpandedCardView({ bucket, onEdit, onDelete, onClose, onComplete }) {
  * the card's on-screen rect into the centered, expanded position (and
  * back again on close) instead of presenting a separate modal.
  */
-function ExpandedBucketCard({ bucket, onClose, onUpdate, onDelete, onComplete }) {
+function ExpandedBucketCard({ bucket, onClose, onUpdate, onDelete, onComplete, layoutId }) {
   const [mode, setMode] = useState('view');
 
   useEffect(() => {
@@ -133,7 +133,7 @@ function ExpandedBucketCard({ bucket, onClose, onUpdate, onDelete, onComplete })
       }}
     >
       <motion.article
-        layoutId={`bucket-card-${bucket.id}`}
+        layoutId={layoutId || `bucket-card-${bucket.id}`}
         className={`expanded-card${mode === 'edit' ? ' is-editing' : ''}`}
         data-status={getStatusLabel(bucket)}
         transition={{ layout: { duration: 0.6, ease: easing.emphasized } }}
