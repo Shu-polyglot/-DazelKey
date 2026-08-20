@@ -7,10 +7,12 @@ import NextUpPanel from './components/NextUpPanel';
 import AchievementsShelf from './components/Achievements/AchievementsShelf';
 import CalendarPanel from './components/Calendar/CalendarPanel';
 import BucketListPanel from './components/BucketList/BucketListPanel';
+import ExploreFeed from './components/Explore/ExploreFeed';
 import ProfilePage from './components/ProfilePage';
 import BucketCreateModal from './components/Modals/BucketCreateModal';
 import BucketDetailsModal from './components/Modals/BucketDetailsModal';
 import ProfilePanel from './components/Modals/ProfilePanel';
+import DMThreadModal from './components/Modals/DMThreadModal';
 import OpeningExperience from './components/Onboarding/OpeningExperience';
 import ArchiveExperience from './components/Archive/ArchiveExperience';
 import WhatsAheadExperience from './components/Archive/WhatsAheadExperience';
@@ -31,6 +33,7 @@ function App() {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [detailsBucketId, setDetailsBucketId] = useState(null);
+  const [dmRecipient, setDmRecipient] = useState(null);
   const [archiveCloseMode, setArchiveCloseMode] = useState('cancel');
   const [isWhatsAheadOpen, setIsWhatsAheadOpen] = useState(false);
   const isStoryOpen = route === 'story';
@@ -58,6 +61,7 @@ function App() {
     setIsAddModalOpen(false);
     setIsProfileOpen(false);
     setDetailsBucketId(null);
+    setDmRecipient(null);
     navigate(nextRoute);
   }
 
@@ -127,6 +131,10 @@ function App() {
               />
             </div>
 
+            <div className={`tab-page${route === 'explore' ? ' is-active' : ''}`} aria-hidden={route !== 'explore'}>
+              <ExploreFeed onOpenDM={setDmRecipient} />
+            </div>
+
             <div className={`tab-page${route === 'achievement' ? ' is-active' : ''}`} aria-hidden={route !== 'achievement'}>
               <OverviewPanel buckets={buckets} onViewRemaining={handleViewRemainingBuckets} />
               <CalendarPanel buckets={buckets} onOpenBucket={setDetailsBucketId} />
@@ -174,6 +182,15 @@ function App() {
                   onClose={() => setDetailsBucketId(null)}
                   onComplete={completeBucket}
                 />
+              )}
+            </AnimatePresence>,
+            document.body,
+          )}
+
+          {createPortal(
+            <AnimatePresence>
+              {dmRecipient && (
+                <DMThreadModal key="dm-thread" recipient={dmRecipient} onClose={() => setDmRecipient(null)} />
               )}
             </AnimatePresence>,
             document.body,

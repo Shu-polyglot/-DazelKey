@@ -8,6 +8,7 @@ import './BottomNav.css';
 // close -- so it's treated as part of that tab for the active indicator.
 const NAV_ITEMS = [
   { route: 'bucket-lists', label: 'The Bucket Lists', matches: ['bucket-lists'] },
+  { route: 'explore', label: 'Explore', matches: ['explore'] },
   { route: 'achievement', label: 'The Achievement', matches: ['achievement', 'story'] },
   { route: 'profile', label: 'Profile', matches: ['profile'] },
 ];
@@ -27,6 +28,18 @@ function BucketListIcon({ active }) {
         strokeWidth="1.6"
         strokeLinejoin="round"
       />
+    </svg>
+  );
+}
+
+// Same magnifying-glass metaphor Instagram's own Explore tab uses --
+// recognizable at a glance next to icons already borrowed from its
+// selected-state language (see the module comment above).
+function ExploreIcon({ active }) {
+  return (
+    <svg viewBox="0 0 24 24" width="23" height="23" aria-hidden="true">
+      <circle cx="10.3" cy="10.3" r="6.1" fill={active ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth="1.7" />
+      <path d="M15 15 L20 20" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" />
     </svg>
   );
 }
@@ -91,11 +104,9 @@ function BottomNav({ active, onNavigate, profile }) {
               </span>
             ) : (
               <span className="bottom-nav-icon">
-                {item.route === 'bucket-lists' ? (
-                  <BucketListIcon active={isActive} />
-                ) : (
-                  <AchievementIcon active={isActive} />
-                )}
+                {item.route === 'bucket-lists' && <BucketListIcon active={isActive} />}
+                {item.route === 'explore' && <ExploreIcon active={isActive} />}
+                {item.route === 'achievement' && <AchievementIcon active={isActive} />}
               </span>
             )}
           </motion.button>

@@ -1,0 +1,156 @@
+/* Vertical feed of other accounts' achievements -- same cinematic
+   photo-card language as Achievement's shelf cards (radius-lg frame,
+   scrim gradient, serif title), just full-width and taller since each
+   post is the only thing in its row instead of one card in a strip. */
+.explore-feed {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xl);
+}
+
+.explore-card-frame {
+  position: relative;
+  aspect-ratio: 4 / 5;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--color-border);
+  background: var(--color-bg-elevated);
+  box-shadow: var(--shadow-medium);
+  overflow: hidden;
+}
+
+.explore-card-photo {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background-size: cover;
+  background-position: center;
+}
+
+.explore-card-scrim {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: linear-gradient(
+    180deg,
+    rgba(var(--color-void-1-rgb), 0.6) 0%,
+    rgba(var(--color-void-1-rgb), 0.05) 24%,
+    rgba(var(--color-void-1-rgb), 0.05) 52%,
+    rgba(var(--color-void-1-rgb), 0.92) 100%
+  );
+}
+
+.explore-card-user {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+  padding: var(--space-md);
+}
+
+.explore-card-avatar {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background-size: cover;
+  background-position: center;
+  background-color: rgba(var(--color-mist-rgb), 0.14);
+  border: 1.5px solid var(--color-border-strong);
+  flex: 0 0 auto;
+}
+
+.explore-card-user-meta {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.explore-card-username {
+  font-size: var(--font-size-body-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-primary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.explore-card-handle {
+  font-size: var(--font-size-caption);
+  color: var(--color-text-muted);
+}
+
+.explore-card-content {
+  position: absolute;
+  z-index: 2;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding: var(--space-lg) var(--space-md) var(--space-md);
+}
+
+.explore-card-title {
+  font-family: var(--font-family-display);
+  font-size: 1.4rem;
+  font-weight: var(--font-weight-regular);
+  line-height: var(--leading-tight);
+  letter-spacing: var(--tracking-tight);
+  color: var(--color-text-primary);
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.explore-card-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: var(--space-sm);
+  margin-top: var(--space-sm);
+  font-size: var(--font-size-caption);
+  letter-spacing: var(--tracking-wide);
+  text-transform: uppercase;
+}
+
+.explore-card-date {
+  color: var(--color-accent-strong);
+}
+
+.explore-card-location {
+  color: var(--color-text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.explore-card-actions {
+  display: flex;
+  gap: var(--space-sm);
+  margin-top: var(--space-sm);
+}
+
+.explore-action-button {
+  appearance: none;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2xs);
+  padding: var(--space-xs) var(--space-md);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-pill);
+  background: rgba(var(--color-mist-rgb), 0.04);
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-body-sm);
+  font-weight: var(--font-weight-medium);
+  cursor: pointer;
+  transition: border-color 0.2s ease, background 0.2s ease, color 0.2s ease;
+}
+
+.explore-action-button:hover {
+  border-color: var(--color-border-strong);
+}
+
+.explore-action-button.is-active {
+  background: rgba(var(--color-glow-rgb), 0.16);
+  border-color: rgba(var(--color-glow-rgb), 0.4);
+  color: var(--color-accent-strong);
+}
