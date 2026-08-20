@@ -1,3 +1,5 @@
+import { todayIso } from './dates';
+
 export const STORAGE_KEY = 'life-os-buckets-v2';
 
 /*
@@ -21,6 +23,21 @@ export const modeOptions = ['solo', 'together'];
 export const modeLabels = {
   solo: 'Solo',
   together: 'Together',
+};
+
+/*
+  A Bucket is either something to Have (an experience, a possession --
+  the original model above) or someone to Become (an identity, tracked by
+  Strategy's daily votes instead of a single completedDate). `commitment`
+  only carries meaning for Become buckets -- the one-sentence, first-person
+  identity statement Strategy's vote button and milestone ritual quote
+  back at the user every time.
+*/
+export const goalTypeOptions = ['have', 'become'];
+
+export const goalTypeLabels = {
+  have: 'Have',
+  become: 'Become',
 };
 
 export const defaultBuckets = [
@@ -145,12 +162,30 @@ export const defaultBuckets = [
     completedDate: null,
     image: null,
   },
+  {
+    id: 12,
+    title: 'Become someone who studies English every day',
+    mode: 'solo',
+    when: 'thisYear',
+    place: 'Home',
+    message: '',
+    status: 'planned',
+    completedDate: null,
+    image: null,
+    goalType: 'become',
+    commitment: 'A person who studies English every day.',
+    customMilestones: ['Take a mock TOEFL test', 'Have a 10-minute conversation in English'],
+    // Fictional demo history, same spirit as the other seed dates above --
+    // far enough back that Strategy's vote grid has real weeks to show.
+    createdAt: '2026-07-10',
+  },
 ];
 
 export function normalizeBucket(bucket, index) {
   const safeStatus = bucket.status === 'completed' ? 'completed' : 'planned';
   const safeMode = modeOptions.includes(bucket.mode) ? bucket.mode : 'solo';
   const safeWhen = whenOptions.includes(bucket.when) ? bucket.when : 'beforeIDie';
+  const safeGoalType = goalTypeOptions.includes(bucket.goalType) ? bucket.goalType : 'have';
 
   return {
     id: bucket.id || index + 1,
@@ -162,6 +197,20 @@ export function normalizeBucket(bucket, index) {
     status: safeStatus,
     completedDate: bucket.completedDate || null,
     image: bucket.image || null,
+    goalType: safeGoalType,
+    commitment: safeGoalType === 'become' ? bucket.commitment || '' : '',
+    // Up to 3 personal milestones the user names for themselves at
+    // creation -- Strategy lets a matching day's vote be hand-marked
+    // special against one of these, separately from the automatic
+    // vote-count thresholds (see useVotes).
+    customMilestones:
+      safeGoalType === 'become' && Array.isArray(bucket.customMilestones)
+        ? bucket.customMilestones.filter(Boolean).slice(0, 3)
+        : [],
+    // Strategy's vote grid windows from this date -- Buckets saved before
+    // this field existed have no real record of when they started, so
+    // "today" (i.e. "we start counting now") is the only honest fallback.
+    createdAt: bucket.createdAt || todayIso(),
   };
 }
 

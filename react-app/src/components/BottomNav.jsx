@@ -8,6 +8,7 @@ import './BottomNav.css';
 // close -- so it's treated as part of that tab for the active indicator.
 const NAV_ITEMS = [
   { route: 'bucket-lists', label: 'The Bucket Lists', matches: ['bucket-lists'] },
+  { route: 'strategy', label: 'Strategy', matches: ['strategy'] },
   { route: 'explore', label: 'Explore', matches: ['explore'] },
   { route: 'achievement', label: 'The Achievement', matches: ['achievement', 'story'] },
   { route: 'profile', label: 'Profile', matches: ['profile'] },
@@ -26,6 +27,32 @@ function BucketListIcon({ active }) {
         fill={active ? 'currentColor' : 'none'}
         stroke="currentColor"
         strokeWidth="1.6"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+
+// An ascending line -- the app's one growth metaphor, distinct from the
+// other three glyphs' silhouettes at a glance -- for the tab that turns
+// Bucket List intentions into daily action.
+function StrategyIcon({ active }) {
+  return (
+    <svg viewBox="0 0 24 24" width="23" height="23" aria-hidden="true">
+      <path
+        d="M4 16.5 L9.7 10.8 L13.5 14.6 L20 8.1"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.8"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M20 8.1 H14.6 M20 8.1 V13.5"
+        fill={active ? 'currentColor' : 'none'}
+        stroke="currentColor"
+        strokeWidth="1.8"
+        strokeLinecap="round"
         strokeLinejoin="round"
       />
     </svg>
@@ -105,6 +132,7 @@ function BottomNav({ active, onNavigate, profile }) {
             ) : (
               <span className="bottom-nav-icon">
                 {item.route === 'bucket-lists' && <BucketListIcon active={isActive} />}
+                {item.route === 'strategy' && <StrategyIcon active={isActive} />}
                 {item.route === 'explore' && <ExploreIcon active={isActive} />}
                 {item.route === 'achievement' && <AchievementIcon active={isActive} />}
               </span>

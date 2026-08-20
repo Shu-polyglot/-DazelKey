@@ -21,3 +21,8 @@ export function formatDate(value) {
 export function toIsoDate(year, month, day) {
   return `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
 }
+
+export function todayIso() {
+  const now = new Date();
+  return toIsoDate(now.getFullYear(), now.getMonth(), now.getDate());
+}

@@ -8,6 +8,7 @@ import AchievementsShelf from './components/Achievements/AchievementsShelf';
 import CalendarPanel from './components/Calendar/CalendarPanel';
 import BucketListPanel from './components/BucketList/BucketListPanel';
 import ExploreFeed from './components/Explore/ExploreFeed';
+import StrategyPage from './components/Strategy/StrategyPage';
 import ProfilePage from './components/ProfilePage';
 import BucketCreateModal from './components/Modals/BucketCreateModal';
 import BucketDetailsModal from './components/Modals/BucketDetailsModal';
@@ -17,9 +18,11 @@ import OpeningExperience from './components/Onboarding/OpeningExperience';
 import ArchiveExperience from './components/Archive/ArchiveExperience';
 import WhatsAheadExperience from './components/Archive/WhatsAheadExperience';
 import TransitionRitual from './components/TransitionRitual';
+import MilestoneRitual from './components/Strategy/MilestoneRitual';
 import BottomNav from './components/BottomNav';
 import { useBuckets } from './hooks/useBuckets';
 import { useProfile } from './hooks/useProfile';
+import { useVotes } from './hooks/useVotes';
 import { useRoute } from './hooks/useRoute';
 import { transitions, easing } from './styles/motion';
 import './App.css';
@@ -27,6 +30,7 @@ import './App.css';
 function App() {
   const { buckets, addBucket, updateBucket, deleteBucket, completeBucket } = useBuckets();
   const { profile, updateProfile, completeProfile } = useProfile();
+  const { votes, castVote, markMilestone } = useVotes();
   const [route, navigate] = useRoute();
   const [hasEntered, setHasEntered] = useState(false);
   const [showEntryRitual, setShowEntryRitual] = useState(false);
@@ -34,6 +38,7 @@ function App() {
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [detailsBucketId, setDetailsBucketId] = useState(null);
   const [dmRecipient, setDmRecipient] = useState(null);
+  const [milestoneCommitment, setMilestoneCommitment] = useState(null);
   const [archiveCloseMode, setArchiveCloseMode] = useState('cancel');
   const [isWhatsAheadOpen, setIsWhatsAheadOpen] = useState(false);
   const isStoryOpen = route === 'story';
@@ -89,6 +94,26 @@ function App() {
     setIsWhatsAheadOpen(true);
   }
 
+  // Both Strategy vote actions can turn out to be a milestone -- an
+  // auto-threshold hit here, a hand-marked custom one below -- and either
+  // way the ritual just needs the goal's own commitment line to quote
+  // back, not to know which kind of milestone this was.
+  function handleCastVote(goalId) {
+    const vote = castVote(goalId);
+    if (vote?.isMilestone) {
+      const goal = buckets.find((bucket) => bucket.id === goalId);
+      setMilestoneCommitment(goal?.commitment || null);
+    }
+  }
+
+  function handleMarkMilestone(goalId, voteId, label) {
+    const marked = markMilestone(voteId, label);
+    if (marked) {
+      const goal = buckets.find((bucket) => bucket.id === goalId);
+      setMilestoneCommitment(goal?.commitment || null);
+    }
+  }
+
   return (
     <>
       <AnimatePresence>
@@ -128,6 +153,15 @@ function App() {
                 onUpdate={updateBucket}
                 onDelete={deleteBucket}
                 onComplete={completeBucket}
+              />
+            </div>
+
+            <div className={`tab-page${route === 'strategy' ? ' is-active' : ''}`} aria-hidden={route !== 'strategy'}>
+              <StrategyPage
+                buckets={buckets}
+                votes={votes}
+                onCastVote={handleCastVote}
+                onMarkMilestone={handleMarkMilestone}
               />
             </div>
 
@@ -191,6 +225,19 @@ function App() {
             <AnimatePresence>
               {dmRecipient && (
                 <DMThreadModal key="dm-thread" recipient={dmRecipient} onClose={() => setDmRecipient(null)} />
+              )}
+            </AnimatePresence>,
+            document.body,
+          )}
+
+          {createPortal(
+            <AnimatePresence>
+              {milestoneCommitment !== null && (
+                <MilestoneRitual
+                  key="milestone-ritual"
+                  commitment={milestoneCommitment}
+                  onContinue={() => setMilestoneCommitment(null)}
+                />
               )}
             </AnimatePresence>,
             document.body,

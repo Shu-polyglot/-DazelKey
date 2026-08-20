@@ -1,0 +1,205 @@
+.strategy-empty {
+  padding: var(--space-2xl) var(--space-md);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  text-align: center;
+  color: var(--color-text-secondary);
+  font-family: var(--font-family-display);
+  font-style: italic;
+  font-size: 1.1rem;
+  background: radial-gradient(circle at 50% 0%, rgba(var(--color-glow-rgb), 0.06), transparent 65%), rgba(var(--color-glow-rgb), 0.02);
+}
+
+.strategy-goal-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+.strategy-goal-card {
+  padding: var(--space-lg);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--color-border);
+  background: radial-gradient(circle at 50% 0%, rgba(var(--color-glow-rgb), 0.07), transparent 60%), var(--color-bg-elevated);
+  box-shadow: var(--shadow-medium);
+}
+
+.strategy-goal-commitment {
+  font-family: var(--font-family-display);
+  font-style: italic;
+  font-size: 1.2rem;
+  line-height: var(--leading-relaxed);
+  color: var(--color-text-primary);
+}
+
+.strategy-goal-title {
+  margin-top: var(--space-sm);
+  font-size: var(--font-size-body-sm);
+  color: var(--color-text-muted);
+}
+
+.strategy-goal-tap-area {
+  cursor: pointer;
+}
+
+.strategy-goal-summary {
+  margin-top: var(--space-lg);
+  font-size: var(--font-size-caption);
+  color: var(--color-text-muted);
+}
+
+.strategy-goal-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: var(--space-md);
+  margin-top: var(--space-lg);
+}
+
+/* Total votes is the one number this card foregrounds -- no streak, no
+   percentage sharing the spotlight (see the requirements this was built
+   against: emotional reward over metric accuracy). */
+.strategy-goal-count {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-2xs);
+}
+
+.strategy-goal-count-number {
+  font-family: var(--font-family-display);
+  font-size: 2rem;
+  font-weight: var(--font-weight-regular);
+  color: var(--color-text-primary);
+}
+
+.strategy-goal-count-label {
+  font-size: var(--font-size-caption);
+  letter-spacing: var(--tracking-wide);
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+}
+
+.strategy-vote-button {
+  max-width: 280px;
+  text-align: center;
+  line-height: var(--leading-normal);
+  white-space: normal;
+}
+
+.strategy-vote-button.is-voted {
+  background: var(--color-accent-subtle);
+  border-color: rgba(var(--color-glow-rgb), 0.35);
+  color: var(--color-accent-strong);
+  cursor: default;
+}
+
+/* GitHub's contribution graph, in this app's own palette (see VoteGrid's
+   header comment) -- weeks as columns, days as rows, scrolled to its
+   right (most recent) edge by default. */
+.vote-grid {
+  margin-top: var(--space-xs);
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.vote-grid::-webkit-scrollbar {
+  height: 6px;
+}
+
+.vote-grid::-webkit-scrollbar-thumb {
+  background: var(--color-border-strong);
+  border-radius: var(--radius-pill);
+}
+
+.vote-grid-columns {
+  display: inline-flex;
+  gap: 3px;
+  padding-bottom: var(--space-2xs);
+}
+
+.vote-grid-week {
+  display: grid;
+  grid-template-rows: repeat(7, 1fr);
+  gap: 3px;
+}
+
+.vote-cell {
+  box-sizing: border-box;
+  width: 14px;
+  height: 14px;
+  border-radius: 3px;
+  background: rgba(var(--color-mist-rgb), 0.06);
+  border: 1px solid var(--color-border);
+}
+
+.vote-cell.is-pad {
+  background: transparent;
+  border-color: transparent;
+}
+
+.vote-cell.is-voted {
+  background: rgba(var(--color-glow-rgb), 0.45);
+  border-color: rgba(var(--color-glow-rgb), 0.55);
+}
+
+/* A special vote -- the milestone ritual fires the moment one of these is
+   recorded. Same cell footprint as a normal vote (no layout shift between
+   grid columns), just visibly lifted: brighter glow-toned fill, a
+   stronger border, and a soft outer glow instead of a bigger box. */
+.vote-cell.is-milestone {
+  background: linear-gradient(180deg, rgba(var(--color-glow-bright-rgb), 0.6), rgba(var(--color-glow-rgb), 0.55));
+  border: 1.5px solid rgba(var(--color-glow-bright-rgb), 0.8);
+  box-shadow: 0 0 6px rgba(var(--color-glow-rgb), 0.5), 0 0 14px rgba(var(--color-glow-rgb), 0.22);
+  transform: scale(1.2);
+}
+
+.strategy-detail-count {
+  margin-top: var(--space-md);
+}
+
+.strategy-milestone-mark {
+  margin-top: var(--space-md);
+  padding-top: var(--space-md);
+  border-top: 1px solid var(--color-border);
+}
+
+.strategy-milestone-mark-label {
+  margin-bottom: var(--space-xs);
+  font-size: var(--font-size-caption);
+  color: var(--color-text-muted);
+}
+
+.strategy-milestone-marked {
+  margin-top: var(--space-md);
+  padding-top: var(--space-md);
+  border-top: 1px solid var(--color-border);
+  font-size: var(--font-size-body-sm);
+  color: var(--color-accent-strong);
+}
+
+.strategy-milestone-list {
+  margin-top: var(--space-lg);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+}
+
+.strategy-milestone-item {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-sm);
+  padding: var(--space-sm);
+  border-radius: var(--radius-sm);
+  background: rgba(var(--color-glow-rgb), 0.08);
+  border: 1px solid rgba(var(--color-glow-rgb), 0.22);
+  font-size: var(--font-size-body-sm);
+  color: var(--color-text-primary);
+}
+
+.strategy-milestone-item-date {
+  font-size: var(--font-size-caption);
+  color: var(--color-text-muted);
+  white-space: nowrap;
+}

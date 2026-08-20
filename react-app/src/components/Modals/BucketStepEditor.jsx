@@ -1,23 +1,45 @@
 import { useEffect, useRef, useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { whenOptions, whenLabels, modeOptions, modeLabels } from '../../lib/buckets';
+import { whenOptions, whenLabels, modeOptions, modeLabels, goalTypeOptions, goalTypeLabels } from '../../lib/buckets';
 import { spring, transitions } from '../../styles/motion';
 import './BucketStepEditor.css';
 
-const STEPS = ['title', 'when', 'mode', 'message'];
+const BASE_STEPS = ['title', 'goalType', 'when', 'mode', 'message'];
+
+// Become buckets get two extra steps -- the identity commitment and (all
+// optional) personal milestones -- slotted in right after the Have/Become
+// choice so they read as part of deciding what kind of Bucket this is,
+// not a bolted-on afterthought.
+function getSteps(goalType) {
+  return goalType === 'become'
+    ? ['title', 'goalType', 'commitment', 'milestones', 'when', 'mode', 'message']
+    : BASE_STEPS;
+}
 
 const STEP_LABELS = {
   title: 'Bucket title',
+  goalType: 'Have or Become',
+  commitment: 'Who you want to become',
+  milestones: 'Personal milestones',
   when: 'When you want it',
   mode: 'Who this is with',
   message: 'A message to your future self',
 };
+
+const MILESTONE_PLACEHOLDERS = [
+  'Take a mock exam',
+  'Run my first 5K',
+  'Show my work to someone',
+];
 
 const BLANK_BUCKET = {
   title: '',
   mode: 'solo',
   when: 'soon',
   message: '',
+  goalType: 'have',
+  commitment: '',
+  customMilestones: [],
 };
 
 const stepVariants = {
@@ -53,10 +75,10 @@ const chipTap = {
   whileTap: { scale: 0.92, transition: spring.press },
 };
 
-function StepDots({ current }) {
+function StepDots({ steps, current }) {
   return (
     <div className="step-editor-dots" role="tablist" aria-label="Edit progress">
-      {STEPS.map((key, index) => (
+      {steps.map((key, index) => (
         <span
           key={key}
           role="tab"
@@ -86,17 +108,25 @@ function BucketStepEditor({ bucket, onCancel, onSave }) {
   const [mode, setMode] = useState(source.mode);
   const [when, setWhen] = useState(source.when);
   const [message, setMessage] = useState(source.message || '');
+  const [goalType, setGoalType] = useState(source.goalType || 'have');
+  const [commitment, setCommitment] = useState(source.commitment || '');
+  const [milestones, setMilestones] = useState(() => {
+    const saved = source.customMilestones || [];
+    return [0, 1, 2].map((index) => saved[index] || '');
+  });
   const [[step, direction], setStep] = useState([0, 0]);
   const advanceTimeout = useRef(null);
 
   useEffect(() => () => clearTimeout(advanceTimeout.current), []);
 
-  const stepKey = STEPS[step];
-  const isLastStep = step === STEPS.length - 1;
+  const steps = getSteps(goalType);
+  const stepKey = steps[step];
+  const isLastStep = step === steps.length - 1;
   const titleEmpty = !title.trim();
+  const commitmentEmpty = goalType === 'become' && !commitment.trim();
 
   function goNext() {
-    setStep(([current]) => [Math.min(current + 1, STEPS.length - 1), 1]);
+    setStep(([current]) => [Math.min(current + 1, getSteps(goalType).length - 1), 1]);
   }
 
   function goBack() {
@@ -111,7 +141,20 @@ function BucketStepEditor({ bucket, onCancel, onSave }) {
     if (stepKey === 'title' && titleEmpty) {
       return;
     }
+    if (stepKey === 'commitment' && commitmentEmpty) {
+      return;
+    }
     goNext();
+  }
+
+  function handleMilestoneChange(index, value) {
+    setMilestones((prev) => prev.map((entry, entryIndex) => (entryIndex === index ? value : entry)));
+  }
+
+  function handleGoalTypePick(option) {
+    setGoalType(option);
+    clearTimeout(advanceTimeout.current);
+    advanceTimeout.current = setTimeout(goNext, 220);
   }
 
   function handleModePick(option) {
@@ -132,12 +175,20 @@ function BucketStepEditor({ bucket, onCancel, onSave }) {
       setStep([0, -1]);
       return;
     }
+    if (commitmentEmpty) {
+      setStep([steps.indexOf('commitment'), -1]);
+      return;
+    }
 
     onSave({
       title: trimmedTitle,
       mode,
       when,
       message: message.trim(),
+      goalType,
+      commitment: goalType === 'become' ? commitment.trim() : '',
+      customMilestones:
+        goalType === 'become' ? milestones.map((entry) => entry.trim()).filter(Boolean) : [],
     });
   }
 
@@ -167,6 +218,69 @@ function BucketStepEditor({ bucket, onCancel, onSave }) {
                 autoFocus
               />
             </label>
+          </div>
+        );
+
+      case 'goalType':
+        return (
+          <div className="step-editor-block">
+            <p className="step-editor-eyebrow">Is this something to have, or someone to become?</p>
+            <div className="step-editor-chip-row" role="group" aria-label="Goal type">
+              {goalTypeOptions.map((option) => (
+                <motion.button
+                  key={option}
+                  type="button"
+                  className={`step-editor-chip${goalType === option ? ' is-active' : ''}`}
+                  onClick={() => handleGoalTypePick(option)}
+                  {...chipTap}
+                >
+                  {goalTypeLabels[option]}
+                </motion.button>
+              ))}
+            </div>
+          </div>
+        );
+
+      case 'commitment':
+        return (
+          <div className="step-editor-block">
+            <p className="step-editor-eyebrow">Who are you becoming? Say it as a person, not a task.</p>
+            <label className="step-editor-field-label" htmlFor="step-commitment-input">
+              <span className="sr-only">Commitment</span>
+              <input
+                id="step-commitment-input"
+                type="text"
+                className="step-editor-field-input"
+                value={commitment}
+                onChange={(event) => setCommitment(event.target.value)}
+                onKeyDown={handleEnterKey}
+                placeholder="A person who studies English every day."
+                autoFocus
+              />
+            </label>
+          </div>
+        );
+
+      case 'milestones':
+        return (
+          <div className="step-editor-block">
+            <p className="step-editor-eyebrow">
+              Any personal milestones along the way? Optional -- skip if none come to mind.
+            </p>
+            <div className="step-editor-milestones">
+              {milestones.map((value, index) => (
+                <input
+                  key={index}
+                  type="text"
+                  className="step-editor-field-input"
+                  value={value}
+                  onChange={(event) => handleMilestoneChange(index, event.target.value)}
+                  onKeyDown={handleEnterKey}
+                  placeholder={`e.g. ${MILESTONE_PLACEHOLDERS[index]}`}
+                  autoFocus={index === 0}
+                />
+              ))}
+            </div>
           </div>
         );
 
@@ -237,7 +351,7 @@ function BucketStepEditor({ bucket, onCancel, onSave }) {
   return (
     <div className="step-editor">
       <div className="step-editor-topbar">
-        <StepDots current={step} />
+        <StepDots steps={steps} current={step} />
         <motion.button
           type="button"
           className="icon-button"
@@ -280,7 +394,7 @@ function BucketStepEditor({ bucket, onCancel, onSave }) {
             type="button"
             className="primary-button"
             onClick={handleNext}
-            disabled={stepKey === 'title' && titleEmpty}
+            disabled={(stepKey === 'title' && titleEmpty) || (stepKey === 'commitment' && commitmentEmpty)}
             {...tapProps}
           >
             Next
