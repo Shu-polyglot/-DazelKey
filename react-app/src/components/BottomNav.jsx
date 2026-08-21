@@ -8,7 +8,7 @@ import './BottomNav.css';
 // close -- so it's treated as part of that tab for the active indicator.
 const NAV_ITEMS = [
   { route: 'bucket-lists', label: 'The Bucket Lists', matches: ['bucket-lists'] },
-  { route: 'strategy', label: 'Strategy', matches: ['strategy'] },
+  { route: 'strategy', label: 'Momentum', matches: ['strategy'] },
   { route: 'explore', label: 'Explore', matches: ['explore'] },
   { route: 'achievement', label: 'The Achievement', matches: ['achievement', 'story'] },
   { route: 'profile', label: 'Profile', matches: ['profile'] },
@@ -36,24 +36,23 @@ function BucketListIcon({ active }) {
   );
 }
 
-// A quiet line chart -- still the ascending-trend read the old
-// arrow-and-bracket glyph carried, just a thinner polyline over its own
-// axis instead of a bold single stroke. The one marker dot (at the
-// chart's newest/highest point) is what carries the outline-to-solid
-// "selected" read here, same convention as every other glyph's fill.
+// A pulse -- an EKG-style trace, not a trend chart -- for the tab that's
+// really about showing up daily rather than a metric going up and to the
+// right. The trailing dot (a live monitor's moving cursor) is what
+// carries the outline-to-solid "selected" read here, same convention as
+// every other glyph's fill.
 function StrategyIcon({ active }) {
   return (
     <svg viewBox="0 0 24 24" width="23" height="23" aria-hidden="true">
-      <path d="M3.5 18.5 H20.5" fill="none" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" />
       <path
-        d="M4.5 15.3 L8.7 11.2 L12 13.4 L15.4 8.6 L19.5 10.9"
+        d="M3 12 H7 L10 20 L14 4 L17 12 H20"
         fill="none"
         stroke="currentColor"
-        strokeWidth="1.5"
+        strokeWidth="1.6"
         strokeLinecap="round"
         strokeLinejoin="round"
       />
-      <circle cx="19.5" cy="10.9" r="1.7" fill={active ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth="1.3" />
+      <circle cx="21" cy="12" r="1.6" fill={active ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth="1.3" />
     </svg>
   );
 }

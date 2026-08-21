@@ -96,7 +96,7 @@ function AddGoalFlow({ eligibleBuckets, onSave, onClose }) {
             <p className="step-editor-eyebrow">Which Bucket List item is this?</p>
             {eligibleBuckets.length === 0 ? (
               <p className="add-goal-empty">
-                Nothing to track yet -- every Have item is either already on Strategy or checked off. Add one from The
+                Nothing to track yet -- every Have item is either already on Momentum or checked off. Add one from The
                 Bucket List first.
               </p>
             ) : (
@@ -229,7 +229,7 @@ function AddGoalFlow({ eligibleBuckets, onSave, onClose }) {
 
           {isLastStep ? (
             <motion.button type="button" className="primary-button" onClick={handleSave} disabled={!bucketId || !goalAmountValid} {...tapProps}>
-              Add to Strategy
+              Add to Momentum
             </motion.button>
           ) : (
             <motion.button

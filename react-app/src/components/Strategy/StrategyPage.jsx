@@ -49,14 +49,14 @@ function StrategyPage({ buckets, votes, contributions, onLogMoney, onAddDoingGoa
       >
         <span className="section-label">Identity</span>
         <div className="section-heading-row">
-          <h2>Strategy</h2>
+          <h2>Momentum</h2>
           <button type="button" className="strategy-history-link" onClick={() => setIsHistoryOpen(true)}>
             History
           </button>
         </div>
       </motion.div>
 
-      <div className="strategy-tabs" role="tablist" aria-label="Strategy view">
+      <div className="strategy-tabs" role="tablist" aria-label="Momentum view">
         {VIEWS.map((tab) => (
           <button
             key={tab.id}
