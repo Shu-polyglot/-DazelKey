@@ -1,3 +1,43 @@
+/* Solo/Together filter chips -- the exact recipe The Bucket List's own
+   filter tabs used before they switched to a when-based horizon (see
+   BucketList.css's .filter-row/.filter-button), duplicated rather than
+   imported so this feature's CSS stays self-contained. */
+.explore-filter-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-xs);
+  margin-bottom: var(--space-lg);
+}
+
+.explore-filter-button {
+  appearance: none;
+  padding: var(--space-2xs) var(--space-sm);
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--color-border);
+  background: rgba(var(--color-mist-rgb), 0.04);
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+}
+
+.explore-filter-button.is-active {
+  background: rgba(var(--color-mist-rgb), 0.1);
+  border-color: var(--color-border-strong);
+  color: var(--color-text-primary);
+}
+
+.explore-empty {
+  padding: var(--space-2xl) var(--space-md);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  text-align: center;
+  color: var(--color-text-secondary);
+  font-family: var(--font-family-display);
+  font-style: italic;
+  font-size: 1.1rem;
+  background: radial-gradient(circle at 50% 0%, rgba(var(--color-glow-rgb), 0.05), transparent 65%), rgba(var(--color-mist-rgb), 0.02);
+}
+
 /* Vertical feed of other accounts' achievements -- same cinematic
    photo-card language as Achievement's shelf cards (radius-lg frame,
    scrim gradient, serif title), just full-width and taller since each

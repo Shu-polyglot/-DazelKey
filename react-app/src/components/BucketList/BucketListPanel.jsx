@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { AnimatePresence, motion } from 'motion/react';
-import ModeFilters from './ModeFilters';
+import WhenFilters from './WhenFilters';
 import BucketCard from './BucketCard';
 import ExpandedBucketCard from './ExpandedBucketCard';
 import { dashboardEntrance, entranceTransition } from '../../styles/motion';
@@ -27,7 +27,7 @@ function BucketListPanel({
   );
 
   const filteredBuckets = useMemo(
-    () => (activeFilter === 'All' ? openBuckets : openBuckets.filter((bucket) => bucket.mode === activeFilter)),
+    () => (activeFilter === 'All' ? openBuckets : openBuckets.filter((bucket) => bucket.when === activeFilter)),
     [openBuckets, activeFilter],
   );
 
@@ -52,7 +52,7 @@ function BucketListPanel({
           <h2>The Bucket List</h2>
         </div>
 
-        <ModeFilters activeFilter={activeFilter} onChange={setActiveFilter} />
+        <WhenFilters activeFilter={activeFilter} onChange={setActiveFilter} />
       </motion.div>
 
       <div className="bucket-list">

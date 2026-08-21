@@ -1,11 +1,19 @@
+import { useMemo, useState } from 'react';
 import { motion } from 'motion/react';
 import ExploreCard from './ExploreCard';
+import ModeFilters from './ModeFilters';
 import { useExploreFeed } from '../../hooks/useExploreFeed';
 import { entranceTransition } from '../../styles/motion';
 import './Explore.css';
 
 function ExploreFeed({ onOpenDM }) {
   const { feed, toggleInspired } = useExploreFeed();
+  const [activeFilter, setActiveFilter] = useState('All');
+
+  const filteredFeed = useMemo(
+    () => (activeFilter === 'All' ? feed : feed.filter((post) => post.mode === activeFilter)),
+    [feed, activeFilter],
+  );
 
   return (
     <section className="app-section" id="explore-section">
@@ -19,11 +27,17 @@ function ExploreFeed({ onOpenDM }) {
         <h2>Explore</h2>
       </motion.div>
 
-      <div className="explore-feed">
-        {feed.map((post, index) => (
-          <ExploreCard key={post.id} post={post} index={index} onToggleInspired={toggleInspired} onOpenDM={onOpenDM} />
-        ))}
-      </div>
+      <ModeFilters activeFilter={activeFilter} onChange={setActiveFilter} />
+
+      {filteredFeed.length === 0 ? (
+        <div className="explore-empty">Nothing here yet -- try a different filter.</div>
+      ) : (
+        <div className="explore-feed">
+          {filteredFeed.map((post, index) => (
+            <ExploreCard key={post.id} post={post} index={index} onToggleInspired={toggleInspired} onOpenDM={onOpenDM} />
+          ))}
+        </div>
+      )}
     </section>
   );
 }
