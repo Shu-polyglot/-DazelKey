@@ -17,7 +17,7 @@ export const whenOptions = ['thisYear', 'beforeIDie'];
 // lands here. 'thisYear' has no fixed label of its own -- see
 // getWhenLabel, the only way any caller should read a `when` label.
 const STATIC_WHEN_LABELS = {
-  beforeIDie: 'Before I die',
+  beforeIDie: 'Lifetime',
 };
 
 // Resolves a `when` value to what a tab/badge should actually show.

@@ -9,9 +9,14 @@
      above the safe area/screen edge, the pill's height, and
      --nav-floating-gap again for the breathing room between content and
      the pill's top edge -- the same three terms BottomNav.css itself
-     positions the pill with, so the two files can't drift apart. */
+     positions the pill with, so the two files can't drift apart -- plus
+     --nav-clearance-buffer on top, since that exact clearance still
+     measured too tight against the pill on real devices. */
   padding: var(--space-2xl) var(--space-md)
-    calc(var(--nav-floating-gap) + var(--nav-height) + var(--nav-floating-gap) + env(safe-area-inset-bottom));
+    calc(
+      var(--nav-floating-gap) + var(--nav-height) + var(--nav-floating-gap) + var(--nav-clearance-buffer) +
+        env(safe-area-inset-bottom)
+    );
 }
 
 /* Both in-page tabs (Bucket Lists / Achievement, the latter opening on

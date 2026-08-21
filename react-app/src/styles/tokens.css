@@ -126,6 +126,11 @@
      and (via App.css's page-shell padding) bar to page content above
      it. One token so BottomNav.css and App.css can't drift apart. */
   --nav-floating-gap: var(--space-lg);
+  /* Extra breathing room below the pill's own clearance in App.css's
+     page-shell padding, so the last card's shadow/tap target never
+     reads as flush against the pill even on real devices where the
+     nav-floating-gap alone measured too tight. */
+  --nav-clearance-buffer: 20px;
 }
 
 @media (max-width: 640px) {
