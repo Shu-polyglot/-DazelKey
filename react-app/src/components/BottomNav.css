@@ -1,29 +1,45 @@
 /* Sits above every full-screen experience (Archive/WhatsAhead, z-index 200)
    so it stays reachable no matter which of the three destinations is
    showing -- but only ever appears once the user has entered the app.
-   min-height (not height) so the bar grows to absorb the home-indicator
-   safe-area inset below its icons instead of squeezing them -- App.css's
-   page-shell padding already budgets for --nav-height *plus*
-   env(safe-area-inset-bottom) as two separate terms, so this keeps the
-   bar's real rendered height matching that same model. */
+
+   A floating pill, not a docked bar: inset from both side edges and
+   lifted off the bottom edge by --nav-floating-gap (itself pushed above
+   the home-indicator safe area by env(safe-area-inset-bottom), so the
+   gap reads the same on notched devices as everywhere else). Height is
+   now a fixed --nav-height rather than a min-height, since there's no
+   safe-area padding left to absorb inside the bar itself -- that's fully
+   handled by the `bottom` offset instead. `width: max-content` sized
+   against the inset left/right bounds is what makes this read as a
+   compact "slender bar" on wide screens instead of a full-width strip
+   with icons stranded in the middle; on narrow ones, max-width clamps it
+   back down to the inset span and .bottom-nav-item's own flex:1 mobile
+   rule (below) fills whatever room that leaves. App.css's page-shell
+   padding budgets for this same --nav-floating-gap twice (bar-to-content
+   above, bar-to-edge below) plus --nav-height plus the safe-area inset,
+   so the last thing on any tab never sits behind (or flush against) the
+   pill. */
 .bottom-nav {
   position: fixed;
-  left: 0;
-  right: 0;
-  bottom: 0;
+  left: var(--nav-floating-gap);
+  right: var(--nav-floating-gap);
+  bottom: calc(var(--nav-floating-gap) + env(safe-area-inset-bottom));
   z-index: 220;
   display: flex;
   justify-content: center;
   align-items: stretch;
   gap: var(--space-2xl);
-  padding: 0 var(--space-md) env(safe-area-inset-bottom);
-  min-height: var(--nav-height);
+  width: max-content;
+  max-width: calc(100% - var(--nav-floating-gap) * 2);
+  margin: 0 auto;
+  padding: 0 var(--space-lg);
+  height: var(--nav-height);
   box-sizing: border-box;
   background: rgba(var(--color-void-2-rgb), 0.86);
   backdrop-filter: blur(var(--blur-md));
   -webkit-backdrop-filter: blur(var(--blur-md));
-  border-top: 1px solid var(--color-border);
-  box-shadow: 0 -16px 40px rgba(var(--color-void-1-rgb), 0.45);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-pill);
+  box-shadow: var(--shadow-medium);
 }
 
 /* Icon-only, no visible label (aria-label carries the accessible name) --
@@ -103,8 +119,11 @@
 }
 
 /* Below the desktop/tablet breakpoint the bar switches from a centered
-   icon cluster to full-bleed equal columns -- Instagram's actual mobile
-   layout -- so every tab gets the widest possible tap area. */
+   icon cluster (content-sized, see .bottom-nav's width: max-content) to
+   equal columns that stretch to fill the pill's full inset width --
+   Instagram's actual mobile layout, just inside a floating pill instead
+   of a docked one -- so every tab still gets the widest possible tap
+   area the pill can offer. */
 @media (max-width: 640px) {
   .bottom-nav {
     justify-content: space-between;

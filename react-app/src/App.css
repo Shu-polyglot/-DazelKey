@@ -3,10 +3,15 @@
   z-index: 1;
   max-width: 1140px;
   margin: 0 auto;
-  /* Bottom padding reserves room for the fixed BottomNav (plus its own
-     safe-area inset) so the last card/button on any tab is never tucked
-     behind it. */
-  padding: var(--space-2xl) var(--space-md) calc(var(--space-3xl) + var(--nav-height) + env(safe-area-inset-bottom));
+  /* Bottom padding reserves room for the floating BottomNav pill so the
+     last card/button on any tab is never tucked behind (or flush
+     against) it: --nav-floating-gap once for the pill's own clearance
+     above the safe area/screen edge, the pill's height, and
+     --nav-floating-gap again for the breathing room between content and
+     the pill's top edge -- the same three terms BottomNav.css itself
+     positions the pill with, so the two files can't drift apart. */
+  padding: var(--space-2xl) var(--space-md)
+    calc(var(--nav-floating-gap) + var(--nav-height) + var(--nav-floating-gap) + env(safe-area-inset-bottom));
 }
 
 /* Both in-page tabs (Bucket Lists / Achievement, the latter opening on

@@ -122,10 +122,15 @@
   /* Persistent chrome                                                  */
   /* ---------------------------------------------------------------- */
   --nav-height: 76px;
+  /* The floating pill's clearance on every side: viewport edge to bar,
+     and (via App.css's page-shell padding) bar to page content above
+     it. One token so BottomNav.css and App.css can't drift apart. */
+  --nav-floating-gap: var(--space-lg);
 }
 
 @media (max-width: 640px) {
   :root {
     --nav-height: 64px;
+    --nav-floating-gap: var(--space-md);
   }
 }
