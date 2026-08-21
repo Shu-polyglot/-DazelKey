@@ -2,6 +2,7 @@ import { useMemo } from 'react';
 import { useLocalStorage } from './useLocalStorage';
 import { STORAGE_KEY, defaultBuckets, normalizeBucket } from '../lib/buckets';
 import { loadMigratedBuckets } from '../lib/migrateBuckets';
+import { todayIso } from '../lib/dates';
 
 export function useBuckets() {
   const [storedBuckets, setStoredBuckets] = useLocalStorage(STORAGE_KEY, () => {
@@ -43,5 +44,29 @@ export function useBuckets() {
     );
   }
 
-  return { buckets, addBucket, updateBucket, deleteBucket, completeBucket };
+  // A standalone completed entry, not tied to any existing Bucket --
+  // used to log a Doing goal's 100%/milestone moment as its own
+  // Achievement (see App.jsx) rather than marking the goal itself
+  // "done" while it's still being tracked in Doing. Lands in the same
+  // array/storage as every other Bucket, so the Achievement shelf,
+  // calendar, and opening banner all pick it up with no extra wiring.
+  function addAchievement(title, photo) {
+    setStoredBuckets((prev) => [
+      normalizeBucket({
+        id: Date.now(),
+        title,
+        status: 'completed',
+        completedDate: todayIso(),
+        image: photo || null,
+        mode: 'solo',
+        when: 'beforeIDie',
+        place: '',
+        message: '',
+        goalType: 'have',
+      }),
+      ...prev,
+    ]);
+  }
+
+  return { buckets, addBucket, updateBucket, deleteBucket, completeBucket, addAchievement };
 }

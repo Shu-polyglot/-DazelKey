@@ -1,0 +1,18 @@
+.achievement-photo-prompt-title {
+  font-size: var(--font-size-label);
+  letter-spacing: var(--tracking-wider);
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+}
+
+.achievement-photo-prompt-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--space-sm);
+  margin-top: var(--space-sm);
+}
+
+.achievement-photo-prompt-skip {
+  margin-top: var(--space-lg);
+}

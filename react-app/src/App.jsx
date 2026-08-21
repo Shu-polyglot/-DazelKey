@@ -20,6 +20,7 @@ import ArchiveExperience from './components/Archive/ArchiveExperience';
 import WhatsAheadExperience from './components/Archive/WhatsAheadExperience';
 import TransitionRitual from './components/TransitionRitual';
 import MilestoneRitual from './components/Strategy/MilestoneRitual';
+import AchievementPhotoPrompt from './components/Achievements/AchievementPhotoPrompt';
 import BottomNav from './components/BottomNav';
 import { useBuckets } from './hooks/useBuckets';
 import { useProfile } from './hooks/useProfile';
@@ -33,7 +34,7 @@ import { transitions, easing } from './styles/motion';
 import './App.css';
 
 function App() {
-  const { buckets, addBucket, updateBucket, deleteBucket, completeBucket } = useBuckets();
+  const { buckets, addBucket, updateBucket, deleteBucket, completeBucket, addAchievement } = useBuckets();
   const { profile, updateProfile, completeProfile } = useProfile();
   const { votes, castVote, markMilestone } = useVotes();
   const { contributions, addContribution } = useContributions();
@@ -45,11 +46,19 @@ function App() {
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [detailsBucketId, setDetailsBucketId] = useState(null);
   const [dmRecipient, setDmRecipient] = useState(null);
-  // { caption, variant: 'milestone' | 'completion' } | null -- one piece
-  // of state drives MilestoneRitual for every trigger across both Strategy
-  // sides (Becoming's vote-count/custom milestones, Doing's same plus its
-  // own bigger "goal amount reached" moment).
+  // { caption, variant: 'milestone' | 'completion', achievementTitle? }
+  // | null -- one piece of state drives MilestoneRitual for every trigger
+  // across both Strategy sides (Becoming's vote-count/custom milestones,
+  // Doing's same plus its own bigger "goal amount reached" moment).
+  // `achievementTitle` is only ever set for the two Doing moments that
+  // are also meant to become an Achievement entry (100% reached, or a
+  // flagged checklist item) -- its presence, not the variant, is what
+  // tells handleRitualContinue whether to chain into the photo prompt.
   const [ritual, setRitual] = useState(null);
+  // The title to use for the Achievement entry once the user's dealt
+  // with the photo prompt -- set the moment the ritual above finishes,
+  // cleared once addAchievement has actually run.
+  const [pendingAchievementTitle, setPendingAchievementTitle] = useState(null);
   const [archiveCloseMode, setArchiveCloseMode] = useState('cancel');
   const [isWhatsAheadOpen, setIsWhatsAheadOpen] = useState(false);
   const isStoryOpen = route === 'story';
@@ -171,7 +180,7 @@ function App() {
       return false;
     }
     updateBucket(goal.id, { doingCompletedAt: todayIso() });
-    setRitual({ caption: goal.title, variant: 'completion' });
+    setRitual({ caption: goal.title, variant: 'completion', achievementTitle: `${goal.title} — goal reached` });
     return true;
   }
 
@@ -219,8 +228,32 @@ function App() {
       doingChecklist: goal.doingChecklist.map((entry) => (entry.id === itemId ? { ...entry, done: nowDone } : entry)),
     });
     if (nowDone && item.isMilestone) {
-      setRitual({ caption: goal.title, variant: 'milestone' });
+      setRitual({ caption: goal.title, variant: 'milestone', achievementTitle: `${goal.title} — ${item.label}` });
     }
+  }
+
+  // The one piece of ritual state doubles as the achievement gate:
+  // achievementTitle only ever exists on the two Doing moments meant to
+  // become an Achievement entry (see checkDoingCompletion and the
+  // milestone branch above), so continuing past any other ritual --
+  // Become's vote milestones, Doing's own auto vote-count milestone --
+  // just clears it, same as before this feature existed.
+  function handleRitualContinue() {
+    const achievementTitle = ritual?.achievementTitle;
+    setRitual(null);
+    if (achievementTitle) {
+      setPendingAchievementTitle(achievementTitle);
+    }
+  }
+
+  // `photo` is null on Skip -- addAchievement treats that exactly like
+  // any other photo-less completed Bucket (see AchievementCard's
+  // hasPhoto check), not a special case.
+  function handleAchievementPhotoDone(photo) {
+    if (pendingAchievementTitle) {
+      addAchievement(pendingAchievementTitle, photo);
+    }
+    setPendingAchievementTitle(null);
   }
 
   // Appends rather than overwrites -- see lib/doing.js's
@@ -372,7 +405,20 @@ function App() {
                   key="milestone-ritual"
                   caption={ritual.caption}
                   variant={ritual.variant}
-                  onContinue={() => setRitual(null)}
+                  onContinue={handleRitualContinue}
+                />
+              )}
+            </AnimatePresence>,
+            document.body,
+          )}
+
+          {createPortal(
+            <AnimatePresence>
+              {pendingAchievementTitle && (
+                <AchievementPhotoPrompt
+                  key="achievement-photo-prompt"
+                  title={pendingAchievementTitle}
+                  onDone={handleAchievementPhotoDone}
                 />
               )}
             </AnimatePresence>,
