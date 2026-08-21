@@ -37,7 +37,7 @@ function DoingHistoryModal({ buckets, votes, contributions, onClose }) {
   return (
     <Modal onClose={onClose} className="detail-modal doing-history-modal">
       <div className="modal-header detail-header">
-        <h3>Doing History</h3>
+        <h3>Realize History</h3>
         <motion.button
           type="button"
           className="icon-button"

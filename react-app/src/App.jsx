@@ -19,7 +19,7 @@ import AchievementBanner from './components/Onboarding/AchievementBanner';
 import ArchiveExperience from './components/Archive/ArchiveExperience';
 import WhatsAheadExperience from './components/Archive/WhatsAheadExperience';
 import TransitionRitual from './components/TransitionRitual';
-import MilestoneRitual from './components/Strategy/MilestoneRitual';
+import MilestoneRitual from './components/shared/MilestoneRitual';
 import AchievementPhotoPrompt from './components/Achievements/AchievementPhotoPrompt';
 import BottomNav from './components/BottomNav';
 import { useBuckets } from './hooks/useBuckets';
@@ -29,7 +29,7 @@ import { useContributions } from './hooks/useContributions';
 import { useRoute } from './hooks/useRoute';
 import { todayIso } from './lib/dates';
 import { getTotalProgress } from './lib/doing';
-import { MAX_BECOME_GOALS, MAX_DOING_GOALS } from './lib/buckets';
+import { MAX_DOING_GOALS } from './lib/buckets';
 import { hasOpeningAchievements } from './data/openingSequence';
 import { transitions, easing } from './styles/motion';
 import './App.css';
@@ -37,7 +37,10 @@ import './App.css';
 function App() {
   const { buckets, addBucket, updateBucket, deleteBucket, completeBucket, addAchievement } = useBuckets();
   const { profile, updateProfile, completeProfile } = useProfile();
-  const { votes, castVote, markMilestone } = useVotes();
+  // Realize's own legacy read: nothing writes new votes here anymore (the
+  // per-card daily vote was retired in favor of Log Money), but a goal
+  // that already had some keeps what it earned -- see lib/doing.js.
+  const { votes } = useVotes();
   const { contributions, addContribution } = useContributions();
   const [route, navigate] = useRoute();
   const [hasEntered, setHasEntered] = useState(false);
@@ -48,11 +51,13 @@ function App() {
   const [detailsBucketId, setDetailsBucketId] = useState(null);
   const [dmRecipient, setDmRecipient] = useState(null);
   // { caption, variant: 'milestone' | 'completion', achievement? } | null
-  // -- one piece of state drives MilestoneRitual for every trigger across
-  // both Strategy sides (Becoming's vote-count/custom milestones, Doing's
-  // same plus its own bigger "goal amount reached" moment).
+  // -- drives MilestoneRitual for Realize's two triggers: a flagged
+  // checklist item going done, and its own bigger "goal amount reached"
+  // moment. Top 3 Priority runs its own, separate ritual state entirely
+  // (see features/topPriority/TopPrioritySection) rather than sharing
+  // this one, since that module is meant to work independent of Strategy.
   // `achievement` ({ title, source, sourceType, sourceGoalId }) is only
-  // ever set for the two Doing moments that are also meant to become an
+  // ever set for the two Realize moments that are also meant to become an
   // Achievement entry (100% reached, or a flagged checklist item) -- its
   // presence, not the variant, is what tells handleRitualContinue whether
   // to chain into the photo prompt.
@@ -128,46 +133,6 @@ function App() {
     setIsWhatsAheadOpen(true);
   }
 
-  // Both Strategy vote actions can turn out to be a milestone -- an
-  // auto-threshold hit here, a hand-marked custom one below -- and either
-  // way the ritual just needs the goal's own commitment sentence to quote
-  // back, not to know which kind of milestone this was.
-  function handleCastVote(goalId) {
-    const vote = castVote(goalId);
-    if (vote?.isMilestone) {
-      const goal = buckets.find((bucket) => bucket.id === goalId);
-      setRitual(goal ? { caption: goal.title, variant: 'milestone' } : null);
-    }
-  }
-
-  function handleMarkMilestone(goalId, voteId, label) {
-    const marked = markMilestone(voteId, label);
-    if (marked) {
-      const goal = buckets.find((bucket) => bucket.id === goalId);
-      setRitual(goal ? { caption: goal.title, variant: 'milestone' } : null);
-    }
-  }
-
-  // Creates a Become Bucket straight from AddBecomeFlow's freeform
-  // identity-commitment sentence -- no trait picking, no wizard beyond
-  // that one flow. The cap is already enforced by StrategyPage hiding
-  // "+ Add a Goal" at MAX_BECOME_GOALS; this is just the safety net.
-  function handleAddBecomeGoal({ commitment, customMilestones }) {
-    const becomeCount = buckets.filter((bucket) => bucket.goalType === 'become').length;
-    if (becomeCount >= MAX_BECOME_GOALS) {
-      return;
-    }
-    addBucket({
-      title: commitment,
-      goalType: 'become',
-      commitment,
-      mode: 'solo',
-      when: 'longTerm',
-      message: '',
-      customMilestones,
-    });
-  }
-
   // Persists the Trait Quiz's scores to the profile the moment someone
   // finishes it (see ProfilePanel/TraitQuiz) -- independent of whatever
   // else is mid-edit in the surrounding profile form's Save/Cancel.
@@ -201,19 +166,9 @@ function App() {
     return true;
   }
 
-  function handleCastDoingVote(goalId) {
-    const vote = castVote(goalId);
-    const goal = buckets.find((bucket) => bucket.id === goalId);
-    if (!goal || !vote) {
-      return;
-    }
-    const completed = checkDoingCompletion(goal, [...votes, vote], contributions);
-    if (!completed && vote.isMilestone) {
-      setRitual({ caption: goal.title, variant: 'milestone' });
-    }
-  }
-
-  function handleAddDoingExtra(goalId, amount, tag) {
+  // Realize's single money-logging action (see StrategyPage/LogMoneyFlow)
+  // -- one contribution, tagged Earned/Saved or neither, toward one goal.
+  function handleLogMoney(goalId, amount, tag) {
     const record = addContribution(goalId, amount, tag);
     const goal = buckets.find((bucket) => bucket.id === goalId);
     if (!goal || !record) {
@@ -225,7 +180,7 @@ function App() {
   // The cap is already enforced by StrategyPage hiding "+ Add a Goal" at
   // MAX_DOING_GOALS (eligibleBuckets itself doesn't shrink for it, since
   // it's a Doing-only limit); this is the safety net.
-  function handleAddDoingGoal({ bucketId, goalAmount, unitAmount, checklist }) {
+  function handleAddDoingGoal({ bucketId, goalAmount, checklist }) {
     const activeDoingCount = buckets.filter((bucket) => bucket.doingEnabled && !bucket.doingCompletedAt).length;
     if (activeDoingCount >= MAX_DOING_GOALS) {
       return;
@@ -233,7 +188,6 @@ function App() {
     updateBucket(bucketId, {
       doingEnabled: true,
       doingGoalAmount: goalAmount,
-      doingUnitHistory: [{ amount: unitAmount, effectiveFrom: todayIso() }],
       doingChecklist: checklist,
       doingCompletedAt: null,
     });
@@ -260,12 +214,9 @@ function App() {
     }
   }
 
-  // The one piece of ritual state doubles as the achievement gate:
-  // `achievement` only ever exists on the two Doing moments meant to
-  // become an Achievement entry (see checkDoingCompletion and the
-  // milestone branch above), so continuing past any other ritual --
-  // Become's vote milestones, Doing's own auto vote-count milestone --
-  // just clears it, same as before this feature existed.
+  // Both of Realize's ritual triggers (checkDoingCompletion and the
+  // flagged-checklist branch above) always attach an `achievement`, so
+  // continuing here always chains into the photo prompt below.
   function handleRitualContinue() {
     const achievement = ritual?.achievement;
     setRitual(null);
@@ -282,19 +233,6 @@ function App() {
       addAchievement(pendingAchievement.title, photo, pendingAchievement);
     }
     setPendingAchievement(null);
-  }
-
-  // Appends rather than overwrites -- see lib/doing.js's
-  // getUnitAmountForDate -- so every vote already cast keeps the
-  // contribution it actually earned at the time.
-  function handleUpdateDoingUnit(goalId, newAmount) {
-    const goal = buckets.find((bucket) => bucket.id === goalId);
-    if (!goal || !(newAmount > 0)) {
-      return;
-    }
-    const today = todayIso();
-    const history = goal.doingUnitHistory.filter((entry) => entry.effectiveFrom !== today);
-    updateBucket(goalId, { doingUnitHistory: [...history, { amount: newAmount, effectiveFrom: today }] });
   }
 
   return (
@@ -350,14 +288,9 @@ function App() {
                 buckets={buckets}
                 votes={votes}
                 contributions={contributions}
-                onCastVote={handleCastVote}
-                onMarkMilestone={handleMarkMilestone}
-                onAddBecomeGoal={handleAddBecomeGoal}
-                onCastDoingVote={handleCastDoingVote}
-                onAddDoingExtra={handleAddDoingExtra}
+                onLogMoney={handleLogMoney}
                 onAddDoingGoal={handleAddDoingGoal}
                 onToggleChecklistItem={handleToggleChecklistItem}
-                onUpdateDoingUnit={handleUpdateDoingUnit}
               />
             </div>
 

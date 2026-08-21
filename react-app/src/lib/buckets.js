@@ -26,32 +26,24 @@ export const modeLabels = {
 };
 
 /*
-  A Bucket is either something to Have (an experience, a possession --
-  the original model above) or someone to Become (an identity, tracked by
-  Strategy's daily votes instead of a single completedDate). Become
-  Buckets are never created through BucketStepEditor -- Strategy creates
-  them directly from a freeform identity-commitment sentence the user
-  writes (see AddBecomeFlow / handleAddBecomeGoal in App.jsx), so a
-  Become Bucket's `title` is that sentence itself. `commitment` mirrors
-  `title` for any older display code that still reads it.
+  Every Bucket is something to Have -- an experience, a possession. Top 3
+  Priority (identity goals, tracked by daily votes) lives entirely in its
+  own store now (see src/features/topPriority) and is never saved as a
+  Bucket at all, so there's no goalType beyond 'have' left here. Kept as
+  a field (rather than removed outright) purely so a bucket saved by an
+  older build of this app -- which may still say 'become' -- normalizes
+  down to 'have' safely instead of crashing.
 */
-export const goalTypeOptions = ['have', 'become'];
+export const goalTypeOptions = ['have'];
 
 export const goalTypeLabels = {
   have: 'Have',
-  become: 'Become',
 };
 
-// How many can be active at once on each side of Strategy -- Becoming
-// stays small on purpose (focus over breadth), Doing tolerates more
-// since its goals are smaller and more mechanical. Enforced both in the
+// How many Realize goals can be tracked at once -- enforced both in the
 // UI (StrategyPage disables "+ Add a Goal" at the cap) and as a safety
 // net in App.jsx's handlers.
-export const MAX_BECOME_GOALS = 3;
 export const MAX_DOING_GOALS = 5;
-
-// Personal milestones a Become goal can carry, named at creation time.
-export const MAX_CUSTOM_MILESTONES = 3;
 
 export const defaultBuckets = [
   {
@@ -187,23 +179,6 @@ export const defaultBuckets = [
     completedDate: null,
     image: null,
   },
-  {
-    id: 12,
-    title: 'Stay consistent with deep work, every single day.',
-    mode: 'solo',
-    when: 'longTerm',
-    place: '',
-    message: '',
-    status: 'planned',
-    completedDate: null,
-    image: null,
-    goalType: 'become',
-    commitment: 'Stay consistent with deep work, every single day.',
-    customMilestones: ['Finish a whole deep-work session without checking my phone', 'Ship something I kept putting off'],
-    // Fictional demo history, same spirit as the other seed dates above --
-    // far enough back that Strategy's vote grid has real weeks to show.
-    createdAt: '2026-07-10',
-  },
 ];
 
 export function normalizeBucket(bucket, index) {
@@ -223,15 +198,6 @@ export function normalizeBucket(bucket, index) {
     completedDate: bucket.completedDate || null,
     image: bucket.image || null,
     goalType: safeGoalType,
-    commitment: safeGoalType === 'become' ? bucket.commitment || '' : '',
-    // Up to MAX_CUSTOM_MILESTONES personal milestones the user names for
-    // themselves at creation -- Strategy lets a matching day's vote be
-    // hand-marked special against one of these, separately from the
-    // automatic vote-count thresholds (see useVotes).
-    customMilestones:
-      safeGoalType === 'become' && Array.isArray(bucket.customMilestones)
-        ? bucket.customMilestones.filter(Boolean).slice(0, MAX_CUSTOM_MILESTONES)
-        : [],
     // Strategy's vote grid windows from this date -- Buckets saved before
     // this field existed have no real record of when they started, so
     // "today" (i.e. "we start counting now") is the only honest fallback.
@@ -278,7 +244,7 @@ const whenPriority = { soon: 0, thisYear: 1, longTerm: 2, beforeIDie: 3 };
   rather than whatever was added most recently.
 */
 export function getNextUpcoming(buckets) {
-  const open = buckets.filter((bucket) => bucket.status !== 'completed' && bucket.goalType !== 'become');
+  const open = buckets.filter((bucket) => bucket.status !== 'completed');
   if (!open.length) {
     return null;
   }

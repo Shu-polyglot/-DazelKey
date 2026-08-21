@@ -1,9 +1,11 @@
 /*
-  Money-progress math for a Doing goal (a Have Bucket tracked on
-  Strategy). Deliberately layered on top of the *existing* vote engine
-  rather than a parallel one: `votes` here is the exact same array
-  useVotes() already produces for Become goals, just read against a
-  goal's own doingUnitHistory instead of counted as a bare tally.
+  Money-progress math for a Realize goal (a Have Bucket tracked on
+  Strategy). Progress is the sum of two sources: `contributions` (every
+  Log Money entry -- the only way new progress gets added today) and
+  `votes` (a frozen, read-only leftover from the retired per-card daily
+  vote -- nothing writes new ones, but a goal that already had some keeps
+  what it earned, resolved against its own doingUnitHistory rather than a
+  bare tally).
 */
 
 // Resolves what one vote was worth on a given date -- not just "the
@@ -23,10 +25,6 @@ export function getUnitAmountForDate(unitHistory, date) {
     }
   }
   return applicable;
-}
-
-export function getCurrentUnitAmount(unitHistory) {
-  return unitHistory.length ? unitHistory[unitHistory.length - 1].amount : 0;
 }
 
 export function getVoteProgress(bucket, votes) {

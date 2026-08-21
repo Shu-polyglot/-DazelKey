@@ -1,7 +1,7 @@
 import { useLocalStorage } from './useLocalStorage';
 import { todayIso } from '../lib/dates';
 
-const STORAGE_KEY = 'lifeos-votes-v1';
+const DEFAULT_STORAGE_KEY = 'lifeos-votes-v1';
 
 // Vote-count thresholds that automatically promote that day's vote to a
 // milestone -- no thresholds beyond this list ever fire again for a goal,
@@ -31,9 +31,14 @@ function autoMilestoneLabel(totalAfterThisVote) {
   user's manual custom-milestone mark (`markMilestone`) flips it -- both
   just patch the existing vote record, no separate milestone store to
   keep in sync.
+
+  `storageKey` defaults to Strategy's own vote store, but any feature
+  that needs this exact same one-vote-per-day/milestone engine against
+  its own goals -- Top 3 Priority, see src/features/topPriority -- can
+  pass its own key instead of reinventing the logic.
 */
-export function useVotes() {
-  const [votes, setVotes] = useLocalStorage(STORAGE_KEY, () => []);
+export function useVotes(storageKey = DEFAULT_STORAGE_KEY) {
+  const [votes, setVotes] = useLocalStorage(storageKey, () => []);
 
   // One vote per goal per day -- the grid's one cell per day -- so this
   // is a no-op if today's vote for this goal already exists. Returns the

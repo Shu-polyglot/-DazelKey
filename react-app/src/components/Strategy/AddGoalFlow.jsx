@@ -6,7 +6,7 @@ import '../Modals/Modals.css';
 import '../Modals/BucketStepEditor.css';
 import './Strategy.css';
 
-const STEPS = ['bucket', 'amount', 'unit', 'checklist'];
+const STEPS = ['bucket', 'amount', 'checklist'];
 
 const stepVariants = {
   enter: (direction) => ({ opacity: 0, x: direction >= 0 ? 32 : -32, scale: 0.97, filter: 'blur(6px)' }),
@@ -23,13 +23,14 @@ const tapProps = {
   The same one-question-at-a-time shell BucketStepEditor established
   (StepDots, one block per step, blur/slide transitions between them,
   reusing its CSS as-is) -- but its own component, since this attaches
-  Strategy tracking to an *existing* Have Bucket rather than creating a
-  new one, and Become's trait activation never needed a wizard at all.
+  Realize tracking to an *existing* Have Bucket rather than creating a
+  new one. Money only ever gets logged afterward through the tab's single
+  Log Money action (see LogMoneyFlow), so this flow just sets up the
+  target amount and optional checklist, nothing about daily pacing.
 */
 function AddGoalFlow({ eligibleBuckets, onSave, onClose }) {
   const [bucketId, setBucketId] = useState(null);
   const [goalAmount, setGoalAmount] = useState('');
-  const [unitAmount, setUnitAmount] = useState('');
   const [checklist, setChecklist] = useState([]);
   const [newItemLabel, setNewItemLabel] = useState('');
   const [newItemIsMilestone, setNewItemIsMilestone] = useState(false);
@@ -38,7 +39,6 @@ function AddGoalFlow({ eligibleBuckets, onSave, onClose }) {
   const stepKey = STEPS[step];
   const isLastStep = step === STEPS.length - 1;
   const goalAmountValid = Number(goalAmount) > 0;
-  const unitAmountValid = Number(unitAmount) > 0;
 
   function goNext() {
     setStep(([current]) => [Math.min(current + 1, STEPS.length - 1), 1]);
@@ -64,9 +64,6 @@ function AddGoalFlow({ eligibleBuckets, onSave, onClose }) {
     if (stepKey === 'amount' && !goalAmountValid) {
       return;
     }
-    if (stepKey === 'unit' && !unitAmountValid) {
-      return;
-    }
     goNext();
   }
 
@@ -85,10 +82,10 @@ function AddGoalFlow({ eligibleBuckets, onSave, onClose }) {
   }
 
   function handleSave() {
-    if (!bucketId || !goalAmountValid || !unitAmountValid) {
+    if (!bucketId || !goalAmountValid) {
       return;
     }
-    onSave({ bucketId, goalAmount: Number(goalAmount), unitAmount: Number(unitAmount), checklist });
+    onSave({ bucketId, goalAmount: Number(goalAmount), checklist });
   }
 
   function renderStep() {
@@ -135,27 +132,6 @@ function AddGoalFlow({ eligibleBuckets, onSave, onClose }) {
                 value={goalAmount}
                 onChange={(event) => setGoalAmount(event.target.value)}
                 placeholder="e.g. 300000"
-                autoFocus
-              />
-            </label>
-          </div>
-        );
-
-      case 'unit':
-        return (
-          <div className="step-editor-block">
-            <p className="step-editor-eyebrow">What's your daily unit? Every vote adds this much.</p>
-            <label className="step-editor-field-label" htmlFor="unit-amount-input">
-              <span className="sr-only">Daily unit</span>
-              <input
-                id="unit-amount-input"
-                type="number"
-                inputMode="numeric"
-                min="1"
-                className="step-editor-field-input"
-                value={unitAmount}
-                onChange={(event) => setUnitAmount(event.target.value)}
-                placeholder="e.g. 500"
                 autoFocus
               />
             </label>
@@ -252,7 +228,7 @@ function AddGoalFlow({ eligibleBuckets, onSave, onClose }) {
           </motion.button>
 
           {isLastStep ? (
-            <motion.button type="button" className="primary-button" onClick={handleSave} disabled={!bucketId || !goalAmountValid || !unitAmountValid} {...tapProps}>
+            <motion.button type="button" className="primary-button" onClick={handleSave} disabled={!bucketId || !goalAmountValid} {...tapProps}>
               Add to Strategy
             </motion.button>
           ) : (
@@ -260,11 +236,7 @@ function AddGoalFlow({ eligibleBuckets, onSave, onClose }) {
               type="button"
               className="primary-button"
               onClick={handleNext}
-              disabled={
-                (stepKey === 'bucket' && !bucketId) ||
-                (stepKey === 'amount' && !goalAmountValid) ||
-                (stepKey === 'unit' && !unitAmountValid)
-              }
+              disabled={(stepKey === 'bucket' && !bucketId) || (stepKey === 'amount' && !goalAmountValid)}
               {...tapProps}
             >
               Next

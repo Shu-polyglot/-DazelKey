@@ -2,11 +2,12 @@
   The 6 dimensions the Trait Quiz scores and the radar chart plots, each
   with a handful of example traits shown as flavor text in the quiz's
   results view. Purely descriptive at this point -- nothing in Strategy
-  reads this data anymore; Become goals are freeform text, not trait
-  picks (see AddBecomeFlow). Kept as plain data, deliberately separate
-  from the quiz/scoring logic, so the roster itself -- names, grouping,
-  order -- can be edited here without touching any logic. English
-  concept words only, on purpose: no translated labels alongside them.
+  or Top 3 Priority reads this data; those goals are freeform text, not
+  trait picks (see features/topPriority/AddPriorityFlow). Kept as plain
+  data, deliberately separate from the quiz/scoring logic, so the roster
+  itself -- names, grouping, order -- can be edited here without touching
+  any logic. English concept words only, on purpose: no translated labels
+  alongside them.
 */
 export const DIMENSIONS = ['Mind', 'Body', 'Craft', 'Will', 'Heart', 'Spirit'];
 
