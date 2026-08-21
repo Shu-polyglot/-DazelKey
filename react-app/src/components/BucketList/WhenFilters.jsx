@@ -1,5 +1,5 @@
 import { motion } from 'motion/react';
-import { whenOptions, whenLabels } from '../../lib/buckets';
+import { whenOptions, getWhenLabel } from '../../lib/buckets';
 import { spring } from '../../styles/motion';
 
 const filters = ['All', ...whenOptions];
@@ -21,7 +21,7 @@ function WhenFilters({ activeFilter, onChange }) {
           whileHover={{ scale: 1.04, transition: spring.hover }}
           whileTap={{ scale: 0.92, transition: spring.press }}
         >
-          {filter === 'All' ? 'All' : whenLabels[filter]}
+          {filter === 'All' ? 'All' : getWhenLabel(filter)}
         </motion.button>
       ))}
     </div>

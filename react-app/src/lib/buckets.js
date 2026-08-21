@@ -9,14 +9,39 @@ export const STORAGE_KEY = 'life-os-buckets-v2';
   `completedDate`, which only ever exists once the experience actually
   happened.
 */
-export const whenOptions = ['soon', 'thisYear', 'longTerm', 'beforeIDie'];
+export const whenOptions = ['thisYear', 'beforeIDie'];
 
-export const whenLabels = {
-  soon: 'Soon',
-  thisYear: 'This year',
-  longTerm: 'Long term',
+// Soon and Long term were folded into these two once they turned out to
+// be a distinction without a difference in practice -- see
+// migrateWhen below for how an item saved under one of those old values
+// lands here. 'thisYear' has no fixed label of its own -- see
+// getWhenLabel, the only way any caller should read a `when` label.
+const STATIC_WHEN_LABELS = {
   beforeIDie: 'Before I die',
 };
+
+// Resolves a `when` value to what a tab/badge should actually show.
+// `thisYear` is deliberately not a static label above -- computing it
+// fresh on every call is what makes the displayed year self-update
+// across a New Year's without touching stored data.
+export function getWhenLabel(when) {
+  if (when === 'thisYear') {
+    return String(new Date().getFullYear());
+  }
+  return STATIC_WHEN_LABELS[when] || '';
+}
+
+// Maps a bucket's stored `when` from the retired 4-category scheme onto
+// today's 2 -- Soon collapses into This year (both meant "not far off"),
+// Long term collapses into Before I die (both meant "no real deadline").
+// Applied by normalizeBucket on every read (see safeWhen below), not as
+// a one-time rewrite of stored data -- same non-destructive pattern this
+// file already uses for other retired fields.
+const WHEN_MIGRATION = { soon: 'thisYear', longTerm: 'beforeIDie' };
+
+function migrateWhen(when) {
+  return WHEN_MIGRATION[when] || when;
+}
 
 export const modeOptions = ['solo', 'together'];
 
@@ -61,7 +86,7 @@ export const defaultBuckets = [
     id: 2,
     title: 'Build my first web app',
     mode: 'solo',
-    when: 'soon',
+    when: 'thisYear',
     place: 'Remote',
     message: '',
     status: 'planned',
@@ -72,7 +97,7 @@ export const defaultBuckets = [
     id: 3,
     title: 'Visit New York',
     mode: 'together',
-    when: 'longTerm',
+    when: 'beforeIDie',
     place: 'New York',
     message: '',
     status: 'planned',
@@ -106,7 +131,7 @@ export const defaultBuckets = [
     id: 5,
     title: 'Build my own product',
     mode: 'solo',
-    when: 'longTerm',
+    when: 'beforeIDie',
     place: 'Remote',
     message: '',
     status: 'planned',
@@ -128,7 +153,7 @@ export const defaultBuckets = [
     id: 7,
     title: 'Learn React',
     mode: 'solo',
-    when: 'soon',
+    when: 'thisYear',
     place: 'Home studio',
     message: 'The first time my interface felt truly my own.',
     status: 'completed',
@@ -150,7 +175,7 @@ export const defaultBuckets = [
     id: 9,
     title: 'Go camping alone',
     mode: 'solo',
-    when: 'soon',
+    when: 'thisYear',
     place: 'National park',
     message: '',
     status: 'planned',
@@ -172,7 +197,7 @@ export const defaultBuckets = [
     id: 11,
     title: 'Run a marathon',
     mode: 'together',
-    when: 'longTerm',
+    when: 'beforeIDie',
     place: 'Tokyo',
     message: '',
     status: 'planned',
@@ -184,7 +209,8 @@ export const defaultBuckets = [
 export function normalizeBucket(bucket, index) {
   const safeStatus = bucket.status === 'completed' ? 'completed' : 'planned';
   const safeMode = modeOptions.includes(bucket.mode) ? bucket.mode : 'solo';
-  const safeWhen = whenOptions.includes(bucket.when) ? bucket.when : 'beforeIDie';
+  const migratedWhen = migrateWhen(bucket.when);
+  const safeWhen = whenOptions.includes(migratedWhen) ? migratedWhen : 'beforeIDie';
   const safeGoalType = goalTypeOptions.includes(bucket.goalType) ? bucket.goalType : 'have';
 
   return {
@@ -235,13 +261,13 @@ export function normalizeBucket(bucket, index) {
   };
 }
 
-const whenPriority = { soon: 0, thisYear: 1, longTerm: 2, beforeIDie: 3 };
+const whenPriority = { thisYear: 0, beforeIDie: 1 };
 
 /*
-  Ranks by horizon first (Soon before This year before Long term before
-  Before I die), then by creation order within the same horizon -- the
-  intention that's been waiting longest at that urgency surfaces first,
-  rather than whatever was added most recently.
+  Ranks by horizon first (This year before Before I die), then by
+  creation order within the same horizon -- the intention that's been
+  waiting longest at that urgency surfaces first, rather than whatever
+  was added most recently.
 */
 export function getNextUpcoming(buckets) {
   const open = buckets.filter((bucket) => bucket.status !== 'completed');

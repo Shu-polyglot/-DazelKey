@@ -1,5 +1,5 @@
 import { motion } from 'motion/react';
-import { getStatusLabel, whenLabels, modeLabels } from '../../lib/buckets';
+import { getStatusLabel, getWhenLabel, modeLabels } from '../../lib/buckets';
 import { formatDate } from '../../lib/dates';
 import { spring, easing, dashboardEntrance, staggerDelay } from '../../styles/motion';
 
@@ -31,7 +31,7 @@ function BucketCard({ bucket, index = 0, onOpen, layoutId, baseDelay = dashboard
       }}
     >
       <div className="bucket-card-top">
-        <p className="bucket-category">{bucket.status === 'completed' ? 'Completed' : whenLabels[bucket.when]}</p>
+        <p className="bucket-category">{bucket.status === 'completed' ? 'Completed' : getWhenLabel(bucket.when)}</p>
         <span className="bucket-status">{getStatusLabel(bucket)}</span>
       </div>
 

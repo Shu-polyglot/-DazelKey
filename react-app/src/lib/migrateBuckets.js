@@ -15,8 +15,11 @@ const MIGRATED_MODE_DEFAULT = 'solo';
   dateType/targetDate -> when: derived from the actual planned date rather
   than defaulted blindly, since the user already told us how urgent they
   considered it. A someday bucket had no real date to reason from, so it
-  maps directly to the deepest horizon -- the old "someday" and the new
-  "beforeIDie" are the same intent under a renamed label.
+  maps directly to the deepest horizon -- the old "someday" and today's
+  "beforeIDie" are the same intent under a renamed label. Only two
+  horizons exist now (see lib/buckets' whenOptions), so a target date
+  either falls within the current calendar year or it doesn't -- no need
+  to route through the retired "soon"/"longTerm" categories first.
 */
 function deriveWhenFromLegacyDate(bucket) {
   if (bucket.dateType !== 'exact' || !bucket.targetDate) {
@@ -28,16 +31,7 @@ function deriveWhenFromLegacyDate(bucket) {
     return 'beforeIDie';
   }
 
-  const now = new Date();
-  const daysAway = (target - now) / (1000 * 60 * 60 * 24);
-
-  if (daysAway <= 90) {
-    return 'soon';
-  }
-  if (target.getFullYear() === now.getFullYear()) {
-    return 'thisYear';
-  }
-  return 'longTerm';
+  return target.getFullYear() === new Date().getFullYear() ? 'thisYear' : 'beforeIDie';
 }
 
 function migrateLegacyBucket(bucket, index) {

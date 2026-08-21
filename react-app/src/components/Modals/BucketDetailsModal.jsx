@@ -4,7 +4,7 @@ import Modal from './Modal';
 import ShareModal from '../Achievements/ShareModal';
 import CompletePrompt from '../shared/CompletePrompt';
 import CompletedPhotoHero from '../shared/CompletedPhotoHero';
-import { getStatusLabel, whenLabels, modeLabels } from '../../lib/buckets';
+import { getStatusLabel, getWhenLabel, modeLabels } from '../../lib/buckets';
 import { formatDate } from '../../lib/dates';
 import { spring } from '../../styles/motion';
 
@@ -26,7 +26,7 @@ function DetailsView({ bucket, onClose, onShare, onComplete }) {
       entries.push(['Completed date', formatDate(bucket.completedDate)]);
     }
   } else {
-    entries.push(['When', whenLabels[bucket.when]]);
+    entries.push(['When', getWhenLabel(bucket.when)]);
   }
 
   if (bucket.place) {

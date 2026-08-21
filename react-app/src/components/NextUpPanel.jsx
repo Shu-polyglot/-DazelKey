@@ -1,5 +1,5 @@
 import { motion } from 'motion/react';
-import { getNextUpcoming, whenLabels } from '../lib/buckets';
+import { getNextUpcoming, getWhenLabel } from '../lib/buckets';
 import { transitions, dashboardEntrance, entranceTransition } from '../styles/motion';
 import './NextUpPanel.css';
 
@@ -26,7 +26,7 @@ function NextUpPanel({ buckets, onOpenBucket }) {
         >
           <h2>{next.title}</h2>
           <p className="next-up-meta">
-            {whenLabels[next.when]}
+            {getWhenLabel(next.when)}
             {next.place ? ` · ${next.place}` : ''}
           </p>
         </motion.button>

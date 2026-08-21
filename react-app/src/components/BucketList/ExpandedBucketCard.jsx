@@ -3,7 +3,7 @@ import { motion } from 'motion/react';
 import BucketStepEditor from '../Modals/BucketStepEditor';
 import CompletePrompt from '../shared/CompletePrompt';
 import CompletedPhotoHero from '../shared/CompletedPhotoHero';
-import { getStatusLabel, whenLabels, modeLabels } from '../../lib/buckets';
+import { getStatusLabel, getWhenLabel, modeLabels } from '../../lib/buckets';
 import { formatDate } from '../../lib/dates';
 import { spring, easing } from '../../styles/motion';
 import '../Modals/Modals.css';
@@ -31,7 +31,7 @@ function getMeta(bucket) {
   if (bucket.status === 'completed') {
     return bucket.completedDate ? formatDate(bucket.completedDate) : 'Completed';
   }
-  return whenLabels[bucket.when];
+  return getWhenLabel(bucket.when);
 }
 
 function ExpandedCardView({ bucket, onEdit, onDelete, onClose, onComplete }) {
@@ -47,7 +47,7 @@ function ExpandedCardView({ bucket, onEdit, onDelete, onClose, onComplete }) {
     <div className="expanded-card-view">
       <div className="expanded-card-top">
         <div className="expanded-card-eyebrow-row">
-          <p className="bucket-category">{bucket.status === 'completed' ? 'Completed' : whenLabels[bucket.when]}</p>
+          <p className="bucket-category">{bucket.status === 'completed' ? 'Completed' : getWhenLabel(bucket.when)}</p>
           <span className="bucket-status">{getStatusLabel(bucket)}</span>
         </div>
         <motion.button

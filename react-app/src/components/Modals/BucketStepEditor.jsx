@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { whenOptions, whenLabels, modeOptions, modeLabels } from '../../lib/buckets';
+import { whenOptions, getWhenLabel, modeOptions, modeLabels } from '../../lib/buckets';
 import { spring, transitions } from '../../styles/motion';
 import './BucketStepEditor.css';
 
@@ -16,7 +16,7 @@ const STEP_LABELS = {
 const BLANK_BUCKET = {
   title: '',
   mode: 'solo',
-  when: 'soon',
+  when: 'thisYear',
   message: '',
 };
 
@@ -187,7 +187,7 @@ function BucketStepEditor({ bucket, onCancel, onSave }) {
                   onClick={() => handleWhenPick(option)}
                   {...chipTap}
                 >
-                  {whenLabels[option]}
+                  {getWhenLabel(option)}
                 </motion.button>
               ))}
             </div>
