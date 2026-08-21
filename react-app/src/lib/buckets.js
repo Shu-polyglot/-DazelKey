@@ -30,11 +30,10 @@ export const modeLabels = {
   the original model above) or someone to Become (an identity, tracked by
   Strategy's daily votes instead of a single completedDate). Become
   Buckets are never created through BucketStepEditor -- Strategy creates
-  them directly by activating a trait from data/traits.js, so a Become
-  Bucket's `title` is always exactly a trait name (see StrategyPage /
-  useActivateTrait-style creation in App.jsx). `commitment` is carried
-  along equal to the trait name for any older display code that still
-  reads it.
+  them directly from a freeform identity-commitment sentence the user
+  writes (see AddBecomeFlow / handleAddBecomeGoal in App.jsx), so a
+  Become Bucket's `title` is that sentence itself. `commitment` mirrors
+  `title` for any older display code that still reads it.
 */
 export const goalTypeOptions = ['have', 'become'];
 
@@ -42,6 +41,17 @@ export const goalTypeLabels = {
   have: 'Have',
   become: 'Become',
 };
+
+// How many can be active at once on each side of Strategy -- Becoming
+// stays small on purpose (focus over breadth), Doing tolerates more
+// since its goals are smaller and more mechanical. Enforced both in the
+// UI (StrategyPage disables "+ Add a Goal" at the cap) and as a safety
+// net in App.jsx's handlers.
+export const MAX_BECOME_GOALS = 3;
+export const MAX_DOING_GOALS = 5;
+
+// Personal milestones a Become goal can carry, named at creation time.
+export const MAX_CUSTOM_MILESTONES = 3;
 
 export const defaultBuckets = [
   {
@@ -179,7 +189,7 @@ export const defaultBuckets = [
   },
   {
     id: 12,
-    title: 'Focused',
+    title: 'Stay consistent with deep work, every single day.',
     mode: 'solo',
     when: 'longTerm',
     place: '',
@@ -188,7 +198,7 @@ export const defaultBuckets = [
     completedDate: null,
     image: null,
     goalType: 'become',
-    commitment: 'Focused',
+    commitment: 'Stay consistent with deep work, every single day.',
     customMilestones: ['Finish a whole deep-work session without checking my phone', 'Ship something I kept putting off'],
     // Fictional demo history, same spirit as the other seed dates above --
     // far enough back that Strategy's vote grid has real weeks to show.
@@ -214,13 +224,13 @@ export function normalizeBucket(bucket, index) {
     image: bucket.image || null,
     goalType: safeGoalType,
     commitment: safeGoalType === 'become' ? bucket.commitment || '' : '',
-    // Up to 3 personal milestones the user names for themselves at
-    // creation -- Strategy lets a matching day's vote be hand-marked
-    // special against one of these, separately from the automatic
-    // vote-count thresholds (see useVotes).
+    // Up to MAX_CUSTOM_MILESTONES personal milestones the user names for
+    // themselves at creation -- Strategy lets a matching day's vote be
+    // hand-marked special against one of these, separately from the
+    // automatic vote-count thresholds (see useVotes).
     customMilestones:
       safeGoalType === 'become' && Array.isArray(bucket.customMilestones)
-        ? bucket.customMilestones.filter(Boolean).slice(0, 3)
+        ? bucket.customMilestones.filter(Boolean).slice(0, MAX_CUSTOM_MILESTONES)
         : [],
     // Strategy's vote grid windows from this date -- Buckets saved before
     // this field existed have no real record of when they started, so

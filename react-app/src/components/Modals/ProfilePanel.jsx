@@ -4,19 +4,21 @@ import { AnimatePresence, motion } from 'motion/react';
 import Modal from './Modal';
 import PhotoCropper from '../shared/PhotoCropper';
 import TraitQuiz from '../Strategy/TraitQuiz';
+import RadarChart from '../Strategy/RadarChart';
 import { spring } from '../../styles/motion';
-import { SOCIAL_PLATFORMS, getSocialPlatform, normalizeSocialUrl } from '../../lib/profile';
+import { SOCIAL_PLATFORMS, getSocialPlatform, normalizeSocialUrl, isTraitQuizStale } from '../../lib/profile';
+import { formatDate } from '../../lib/dates';
+import '../Strategy/Strategy.css';
 import './Modals.css';
 import './ProfilePanel.css';
 
 const MIN_AGE = 1;
 const MAX_AGE = 119;
 
-function ProfilePanel({ profile, buckets, onActivateTrait, onClose, onSave }) {
+function ProfilePanel({ profile, onSaveTraitQuiz, onClose, onSave }) {
   const [isQuizOpen, setIsQuizOpen] = useState(false);
-  const activeTraitNames = new Set(
-    (buckets || []).filter((bucket) => bucket.goalType === 'become').map((bucket) => bucket.title),
-  );
+  const hasTakenQuiz = Boolean(profile?.traitQuizTakenAt);
+  const quizIsStale = isTraitQuizStale(profile);
 
   const [name, setName] = useState(profile?.name || '');
   const [age, setAge] = useState(profile?.age ?? '');
@@ -88,15 +90,29 @@ function ProfilePanel({ profile, buckets, onActivateTrait, onClose, onSave }) {
         <h3>Your profile</h3>
       </div>
 
-      <motion.button
-        type="button"
-        className="secondary-button trait-quiz-entry-button"
-        onClick={() => setIsQuizOpen(true)}
-        whileHover={{ y: -1, transition: spring.hover }}
-        whileTap={{ y: 1, scale: 0.97, transition: spring.press }}
-      >
-        Take the Trait Quiz
-      </motion.button>
+      {/* Who you are, on your own quiet schedule -- fully decoupled from
+          Strategy's daily Become votes (see RadarChart/lib/radar.js). A
+          periodic self-check-in, not a live progress readout. */}
+      <div className="profile-trait-section">
+        {hasTakenQuiz && <RadarChart scores={profile.traitScores} />}
+
+        <motion.button
+          type="button"
+          className="secondary-button trait-quiz-entry-button"
+          onClick={() => setIsQuizOpen(true)}
+          whileHover={{ y: -1, transition: spring.hover }}
+          whileTap={{ y: 1, scale: 0.97, transition: spring.press }}
+        >
+          {hasTakenQuiz ? 'Retake the Trait Quiz' : 'Take the Trait Quiz'}
+        </motion.button>
+
+        {hasTakenQuiz && (
+          <p className="profile-trait-quiz-meta">
+            Last taken {formatDate(profile.traitQuizTakenAt)}
+            {quizIsStale ? ' -- it\'s been a while, maybe check back in?' : ''}
+          </p>
+        )}
+      </div>
 
       <form className="detail-form" onSubmit={handleSubmit} noValidate>
         <button
@@ -224,12 +240,7 @@ function ProfilePanel({ profile, buckets, onActivateTrait, onClose, onSave }) {
       {createPortal(
         <AnimatePresence>
           {isQuizOpen && (
-            <TraitQuiz
-              key="trait-quiz"
-              activeTraitNames={activeTraitNames}
-              onActivateTrait={onActivateTrait}
-              onClose={() => setIsQuizOpen(false)}
-            />
+            <TraitQuiz key="trait-quiz" onComplete={onSaveTraitQuiz} onClose={() => setIsQuizOpen(false)} />
           )}
         </AnimatePresence>,
         document.body,

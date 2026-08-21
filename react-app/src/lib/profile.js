@@ -1,3 +1,5 @@
+import { DIMENSIONS } from '../data/traits';
+
 export function getInitials(name) {
   if (!name) {
     return 'LA';
@@ -50,10 +52,45 @@ function normalizeSocialLink(link, index) {
   };
 }
 
+// One entry per dimension, defaulting to 0 (no score yet) -- the radar
+// chart in Profile always draws all 6 axes regardless of whether the
+// quiz has ever been taken.
+function defaultTraitScores() {
+  return Object.fromEntries(DIMENSIONS.map((dimension) => [dimension, 0]));
+}
+
+function normalizeTraitScores(scores) {
+  const safeScores = defaultTraitScores();
+  DIMENSIONS.forEach((dimension) => {
+    const value = scores?.[dimension];
+    if (typeof value === 'number' && Number.isFinite(value)) {
+      safeScores[dimension] = value;
+    }
+  });
+  return safeScores;
+}
+
+// How long before Profile's quiz section starts gently suggesting a
+// retake -- not enforced, just a quiet nudge (see ProfilePanel).
+export const TRAIT_QUIZ_STALE_DAYS = 90;
+
+export function isTraitQuizStale(profile, days = TRAIT_QUIZ_STALE_DAYS) {
+  if (!profile?.traitQuizTakenAt) {
+    return false;
+  }
+  const takenMs = new Date(`${profile.traitQuizTakenAt}T00:00:00`).getTime();
+  if (Number.isNaN(takenMs)) {
+    return false;
+  }
+  const diffDays = (Date.now() - takenMs) / (1000 * 60 * 60 * 24);
+  return diffDays >= days;
+}
+
 /*
-  Back-compat for profiles saved before bio/role/socialLinks existed --
-  missing fields fall back to safe defaults instead of leaving them
-  undefined, so older localStorage data keeps working unchanged.
+  Back-compat for profiles saved before bio/role/socialLinks/trait-quiz
+  results existed -- missing fields fall back to safe defaults instead
+  of leaving them undefined, so older localStorage data keeps working
+  unchanged.
 */
 export function normalizeProfile(profile) {
   const safeLinks = Array.isArray(profile?.socialLinks)
@@ -68,5 +105,9 @@ export function normalizeProfile(profile) {
     role: profile?.role || '',
     socialLinks: safeLinks,
     completed: Boolean(profile?.completed),
+    // Trait Quiz results -- decoupled from Strategy's Become votes
+    // entirely (see lib/radar.js); this is the only place they live.
+    traitScores: normalizeTraitScores(profile?.traitScores),
+    traitQuizTakenAt: profile?.traitQuizTakenAt || null,
   };
 }

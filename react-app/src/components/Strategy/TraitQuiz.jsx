@@ -1,7 +1,8 @@
 import { useMemo, useState } from 'react';
 import { motion } from 'motion/react';
 import Modal from '../Modals/Modal';
-import TraitPicker from './TraitPicker';
+import RadarChart from './RadarChart';
+import { TRAITS_BY_DIMENSION } from '../../data/traits';
 import { QUIZ_QUESTIONS, QUIZ_SCALE, TOP_DIMENSIONS_COUNT } from '../../data/traitQuiz';
 import { scoreQuiz, getTopDimensions } from '../../lib/traitQuiz';
 import { spring } from '../../styles/motion';
@@ -9,25 +10,22 @@ import '../Modals/Modals.css';
 import './Strategy.css';
 
 /*
-  MBTI-flavored, but the score never becomes a fixed type -- it only
-  proposes which dimension(s) to try first. Every trait chip in the
-  results view still goes through the exact same activation path as
-  Strategy's own "+ Add a Trait" browser, so nothing about how a trait
-  becomes a Become Bucket is quiz-specific.
+  MBTI-flavored, but the score never becomes a fixed type, and it never
+  touches Strategy at all anymore -- this is purely a periodic
+  self-check-in (see ProfilePanel), fully decoupled from Become's daily
+  votes. `onComplete(scores)` hands the raw per-dimension scores back up
+  so the caller can persist them to the profile; this component holds no
+  state beyond the current attempt.
 */
-function TraitQuiz({ activeTraitNames, onActivateTrait, onClose }) {
+function TraitQuiz({ onComplete, onClose }) {
   const [answers, setAnswers] = useState({});
   const [view, setView] = useState('questions');
 
   const answeredCount = Object.keys(answers).length;
   const allAnswered = answeredCount === QUIZ_QUESTIONS.length;
 
-  const topDimensions = useMemo(() => {
-    if (view !== 'results') {
-      return [];
-    }
-    return getTopDimensions(scoreQuiz(answers), TOP_DIMENSIONS_COUNT);
-  }, [view, answers]);
+  const scores = useMemo(() => (view === 'results' ? scoreQuiz(answers) : null), [view, answers]);
+  const topDimensions = useMemo(() => (scores ? getTopDimensions(scores, TOP_DIMENSIONS_COUNT) : []), [scores]);
 
   function handleAnswer(index, value) {
     setAnswers((prev) => ({ ...prev, [index]: value }));
@@ -42,6 +40,13 @@ function TraitQuiz({ activeTraitNames, onActivateTrait, onClose }) {
   function handleRetake() {
     setAnswers({});
     setView('questions');
+  }
+
+  function handleDone() {
+    if (scores) {
+      onComplete(scores);
+    }
+    onClose();
   }
 
   return (
@@ -63,8 +68,8 @@ function TraitQuiz({ activeTraitNames, onActivateTrait, onClose }) {
       {view === 'questions' ? (
         <>
           <p className="trait-quiz-intro">
-            18 quick statements, rated 1 to 5. This only suggests where to start -- nothing here fills in the radar
-            chart by itself; that only grows from actually voting.
+            18 quick statements, rated 1 to 5. This is just for you -- a quiet check-in on who you are right now,
+            separate from anything you're actively working toward.
           </p>
 
           <div className="trait-quiz-questions">
@@ -103,12 +108,24 @@ function TraitQuiz({ activeTraitNames, onActivateTrait, onClose }) {
         </>
       ) : (
         <>
-          <p className="trait-quiz-intro">
-            {topDimensions.join(' and ')} came out strongest. Tap any trait below to start voting for it -- pick as
-            many as you like, or none at all.
-          </p>
+          <p className="trait-quiz-intro">{topDimensions.join(' and ')} came out strongest right now.</p>
 
-          <TraitPicker dimensions={topDimensions} activeTraitNames={activeTraitNames} onActivate={onActivateTrait} />
+          <RadarChart scores={scores} />
+
+          <div className="trait-picker">
+            {topDimensions.map((dimension) => (
+              <div className="trait-picker-group" key={dimension}>
+                <span className="trait-picker-dimension">{dimension}</span>
+                <div className="trait-chip-row">
+                  {TRAITS_BY_DIMENSION[dimension].map((trait) => (
+                    <span key={trait} className="trait-chip is-active">
+                      {trait}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
 
           <div className="modal-actions">
             <motion.button
@@ -123,7 +140,7 @@ function TraitQuiz({ activeTraitNames, onActivateTrait, onClose }) {
             <motion.button
               type="button"
               className="primary-button"
-              onClick={onClose}
+              onClick={handleDone}
               whileHover={{ y: -1, transition: spring.hover }}
               whileTap={{ y: 1, scale: 0.97, transition: spring.press }}
             >

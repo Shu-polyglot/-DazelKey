@@ -3,7 +3,6 @@ import Modal from '../Modals/Modal';
 import VoteGrid from './VoteGrid';
 import { getVoteSummary } from '../../lib/votes';
 import { formatDate } from '../../lib/dates';
-import { getDimensionForTrait } from '../../data/traits';
 import { spring } from '../../styles/motion';
 import '../Modals/Modals.css';
 import './Strategy.css';
@@ -19,13 +18,11 @@ import './Strategy.css';
 function StrategyGoalDetail({ goal, votes, onClose }) {
   const summary = getVoteSummary(votes, goal.createdAt);
   const milestoneVotes = votes.filter((vote) => vote.isMilestone).sort((a, b) => a.date.localeCompare(b.date));
-  const dimension = getDimensionForTrait(goal.title);
 
   return (
     <Modal onClose={onClose} className="detail-modal strategy-detail-modal">
       <div className="modal-header detail-header">
         <div>
-          {dimension && <span className="strategy-goal-dimension">{dimension}</span>}
           <h3>{goal.title}</h3>
         </div>
         <motion.button

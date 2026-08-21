@@ -62,14 +62,6 @@
   box-shadow: var(--shadow-medium);
 }
 
-.strategy-goal-dimension {
-  display: inline-block;
-  font-size: var(--font-size-label);
-  letter-spacing: var(--tracking-wider);
-  text-transform: uppercase;
-  color: var(--color-accent);
-}
-
 .strategy-goal-commitment {
   margin-top: var(--space-2xs);
   font-family: var(--font-family-display);
@@ -245,8 +237,43 @@
   white-space: nowrap;
 }
 
-/* Trait pickers -- the quiz's suggestion screen and Strategy's own
-   "+ Add a Trait" browser share this exact grouped-chip layout. */
+/* Becoming's freeform identity-commitment textarea -- step-editor-field-
+   input's shared style is a centered, underline-only single-line look
+   (right for a number or a word); a multi-sentence goal needs an actual
+   left-aligned box instead, so this overrides it via combined-class
+   specificity rather than relying on stylesheet load order. */
+.step-editor-field-input.add-become-commitment-input {
+  max-width: 420px;
+  min-height: 96px;
+  padding: var(--space-sm);
+  text-align: left;
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-sm);
+  background: rgba(var(--color-void-1-rgb), 0.6);
+  font-size: var(--font-size-body-sm);
+  line-height: var(--leading-relaxed);
+  resize: vertical;
+}
+
+.step-editor-field-input.add-become-commitment-input:focus {
+  outline: none;
+  border-bottom-color: var(--color-border-strong);
+  border-color: var(--color-accent);
+  box-shadow: 0 0 0 3px var(--color-accent-subtle);
+}
+
+/* Quiet, centered note shown in place of "+ Add a Goal" once a side of
+   Strategy has hit its cap -- same tone as strategy-empty, no border. */
+.strategy-goal-limit-note {
+  padding: var(--space-sm) 0;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-body-sm);
+  text-align: center;
+}
+
+/* Grouped-chip layout for the Trait Quiz's results view (Profile) --
+   read-only there (see .trait-chip.is-active below), just a flavor-text
+   readout of the top-scoring dimensions' traits. */
 .trait-picker {
   display: flex;
   flex-direction: column;

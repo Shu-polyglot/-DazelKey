@@ -1,7 +1,19 @@
+.profile-trait-section {
+  margin-bottom: var(--space-lg);
+  padding-bottom: var(--space-lg);
+  border-bottom: 1px solid var(--color-border);
+}
+
 .trait-quiz-entry-button {
   display: block;
   width: 100%;
-  margin-bottom: var(--space-lg);
+}
+
+.profile-trait-quiz-meta {
+  margin-top: var(--space-xs);
+  color: var(--color-text-muted);
+  font-size: var(--font-size-caption);
+  text-align: center;
 }
 
 .profile-photo-button {

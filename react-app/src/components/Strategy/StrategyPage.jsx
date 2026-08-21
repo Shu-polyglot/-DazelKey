@@ -8,10 +8,8 @@ import DoingGoalDetail from './DoingGoalDetail';
 import DoingAddExtraModal from './DoingAddExtraModal';
 import DoingHistoryModal from './DoingHistoryModal';
 import AddGoalFlow from './AddGoalFlow';
-import RadarChart from './RadarChart';
-import TraitPicker from './TraitPicker';
-import Modal from '../Modals/Modal';
-import { DIMENSIONS } from '../../data/traits';
+import AddBecomeFlow from './AddBecomeFlow';
+import { MAX_BECOME_GOALS, MAX_DOING_GOALS } from '../../lib/buckets';
 import { entranceTransition, spring } from '../../styles/motion';
 import '../Modals/Modals.css';
 import './Strategy.css';
@@ -27,7 +25,7 @@ function StrategyPage({
   contributions,
   onCastVote,
   onMarkMilestone,
-  onActivateTrait,
+  onAddBecomeGoal,
   onCastDoingVote,
   onAddDoingExtra,
   onAddDoingGoal,
@@ -45,10 +43,11 @@ function StrategyPage({
   const eligibleBuckets = buckets.filter(
     (bucket) => bucket.goalType === 'have' && bucket.status !== 'completed' && !bucket.doingEnabled,
   );
-  const activeTraitNames = new Set(becomeGoals.map((goal) => goal.title));
+  const atBecomeCap = becomeGoals.length >= MAX_BECOME_GOALS;
+  const atDoingCap = doingGoals.length >= MAX_DOING_GOALS;
 
   const [expandedGoalId, setExpandedGoalId] = useState(null);
-  const [isAddTraitOpen, setIsAddTraitOpen] = useState(false);
+  const [isAddBecomeOpen, setIsAddBecomeOpen] = useState(false);
   const [isAddGoalOpen, setIsAddGoalOpen] = useState(false);
   const [addExtraGoalId, setAddExtraGoalId] = useState(null);
   const [expandedDoingGoalId, setExpandedDoingGoalId] = useState(null);
@@ -93,10 +92,8 @@ function StrategyPage({
 
       {view === 'becoming' ? (
         <>
-          <RadarChart buckets={buckets} votes={votes} />
-
           {becomeGoals.length === 0 ? (
-            <div className="strategy-empty">Activate a trait below to start voting for who you want to become.</div>
+            <div className="strategy-empty">Write your first goal below to start voting for who you're becoming.</div>
           ) : (
             <div className="strategy-goal-list">
               {becomeGoals.map((goal) => (
@@ -112,15 +109,21 @@ function StrategyPage({
             </div>
           )}
 
-          <motion.button
-            type="button"
-            className="secondary-button strategy-add-trait-button"
-            onClick={() => setIsAddTraitOpen(true)}
-            whileHover={{ y: -1, transition: spring.hover }}
-            whileTap={{ y: 1, scale: 0.97, transition: spring.press }}
-          >
-            + Add a Trait
-          </motion.button>
+          {atBecomeCap ? (
+            <p className="strategy-goal-limit-note">
+              You're focusing on {MAX_BECOME_GOALS} at a time -- complete or remove one to add another.
+            </p>
+          ) : (
+            <motion.button
+              type="button"
+              className="secondary-button strategy-add-trait-button"
+              onClick={() => setIsAddBecomeOpen(true)}
+              whileHover={{ y: -1, transition: spring.hover }}
+              whileTap={{ y: 1, scale: 0.97, transition: spring.press }}
+            >
+              + Add a Goal
+            </motion.button>
+          )}
         </>
       ) : (
         <>
@@ -142,15 +145,21 @@ function StrategyPage({
             </div>
           )}
 
-          <motion.button
-            type="button"
-            className="secondary-button strategy-add-trait-button"
-            onClick={() => setIsAddGoalOpen(true)}
-            whileHover={{ y: -1, transition: spring.hover }}
-            whileTap={{ y: 1, scale: 0.97, transition: spring.press }}
-          >
-            + Add a Goal
-          </motion.button>
+          {atDoingCap ? (
+            <p className="strategy-goal-limit-note">
+              You're tracking {MAX_DOING_GOALS} goals at once -- complete or remove one to add another.
+            </p>
+          ) : (
+            <motion.button
+              type="button"
+              className="secondary-button strategy-add-trait-button"
+              onClick={() => setIsAddGoalOpen(true)}
+              whileHover={{ y: -1, transition: spring.hover }}
+              whileTap={{ y: 1, scale: 0.97, transition: spring.press }}
+            >
+              + Add a Goal
+            </motion.button>
+          )}
         </>
       )}
 
@@ -235,23 +244,15 @@ function StrategyPage({
 
       {createPortal(
         <AnimatePresence>
-          {isAddTraitOpen && (
-            <Modal key="add-trait" onClose={() => setIsAddTraitOpen(false)} className="detail-modal">
-              <div className="modal-header detail-header">
-                <h3>Add a Trait</h3>
-                <motion.button
-                  type="button"
-                  className="icon-button"
-                  aria-label="Close"
-                  onClick={() => setIsAddTraitOpen(false)}
-                  whileHover={{ rotate: 90, transition: spring.hover }}
-                  whileTap={{ scale: 0.88, transition: spring.press }}
-                >
-                  ×
-                </motion.button>
-              </div>
-              <TraitPicker dimensions={DIMENSIONS} activeTraitNames={activeTraitNames} onActivate={onActivateTrait} />
-            </Modal>
+          {isAddBecomeOpen && (
+            <AddBecomeFlow
+              key="add-become"
+              onSave={(input) => {
+                onAddBecomeGoal(input);
+                setIsAddBecomeOpen(false);
+              }}
+              onClose={() => setIsAddBecomeOpen(false)}
+            />
           )}
         </AnimatePresence>,
         document.body,

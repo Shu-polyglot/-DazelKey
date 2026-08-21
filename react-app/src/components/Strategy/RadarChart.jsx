@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { motion } from 'motion/react';
 import { DIMENSIONS } from '../../data/traits';
-import { getDimensionVoteTotals, normalizeToPercent } from '../../lib/radar';
+import { getDimensionScores, normalizeScoreToPercent } from '../../lib/radar';
+import { SCORE_MAX } from '../../lib/traitQuiz';
 import { entranceTransition } from '../../styles/motion';
 
 const SIZE = 260;
@@ -27,17 +28,19 @@ function labelAnchor(index) {
 
 /*
   All 6 dimensions always draw as an axis, even at 0 -- an empty axis is
-  still meant to be read ("this side hasn't been touched yet"), not
-  hidden. The filled shape is the only thing that reacts to votes; the
-  grid/spokes are a fixed, quiet reference underneath it. Raw vote counts
-  only show up on hover/tap of that axis, never at rest.
+  still meant to be read ("no score here yet"), not hidden. The filled
+  shape is the only thing that reacts to the Trait Quiz's scores (see
+  lib/radar.js); the grid/spokes are a fixed, quiet reference underneath
+  it. Raw scores only show up on hover/tap of that axis, never at rest.
+  Deliberately decoupled from Become votes -- this is a periodic
+  self-check-in, not a live reflection of daily progress.
 */
-function RadarChart({ buckets, votes }) {
+function RadarChart({ scores }) {
   const [hovered, setHovered] = useState(null);
-  const totals = getDimensionVoteTotals(buckets, votes);
+  const totals = getDimensionScores(scores);
 
   const polygonPoints = DIMENSIONS.map((dimension, index) => {
-    const percent = normalizeToPercent(totals[dimension]);
+    const percent = normalizeScoreToPercent(totals[dimension]);
     const { x, y } = pointAt((percent / 100) * RADIUS, index);
     return `${x},${y}`;
   }).join(' ');
@@ -87,7 +90,7 @@ function RadarChart({ buckets, votes }) {
               </text>
               {isHovered && (
                 <text x={labelPoint.x} y={labelPoint.y + 14} textAnchor={anchor} className="radar-chart-count">
-                  {totals[dimension]} {totals[dimension] === 1 ? 'vote' : 'votes'}
+                  {totals[dimension]}/{SCORE_MAX}
                 </text>
               )}
             </g>

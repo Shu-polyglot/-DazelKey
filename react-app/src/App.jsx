@@ -29,6 +29,7 @@ import { useContributions } from './hooks/useContributions';
 import { useRoute } from './hooks/useRoute';
 import { todayIso } from './lib/dates';
 import { getTotalProgress } from './lib/doing';
+import { MAX_BECOME_GOALS, MAX_DOING_GOALS } from './lib/buckets';
 import { hasOpeningAchievements } from './data/openingSequence';
 import { transitions, easing } from './styles/motion';
 import './App.css';
@@ -129,13 +130,13 @@ function App() {
 
   // Both Strategy vote actions can turn out to be a milestone -- an
   // auto-threshold hit here, a hand-marked custom one below -- and either
-  // way the ritual just needs the goal's own commitment line to quote
+  // way the ritual just needs the goal's own commitment sentence to quote
   // back, not to know which kind of milestone this was.
   function handleCastVote(goalId) {
     const vote = castVote(goalId);
     if (vote?.isMilestone) {
       const goal = buckets.find((bucket) => bucket.id === goalId);
-      setRitual(goal ? { caption: `Your ${goal.title} side.`, variant: 'milestone' } : null);
+      setRitual(goal ? { caption: goal.title, variant: 'milestone' } : null);
     }
   }
 
@@ -143,27 +144,35 @@ function App() {
     const marked = markMilestone(voteId, label);
     if (marked) {
       const goal = buckets.find((bucket) => bucket.id === goalId);
-      setRitual(goal ? { caption: `Your ${goal.title} side.`, variant: 'milestone' } : null);
+      setRitual(goal ? { caption: goal.title, variant: 'milestone' } : null);
     }
   }
 
-  // Activating a trait *is* creating a Become Bucket -- no wizard, one
-  // tap. A trait can only ever be active once; re-suggesting an
-  // already-active one from a retaken quiz is a no-op here.
-  function handleActivateTrait(trait) {
-    const alreadyActive = buckets.some((bucket) => bucket.goalType === 'become' && bucket.title === trait);
-    if (alreadyActive) {
+  // Creates a Become Bucket straight from AddBecomeFlow's freeform
+  // identity-commitment sentence -- no trait picking, no wizard beyond
+  // that one flow. The cap is already enforced by StrategyPage hiding
+  // "+ Add a Goal" at MAX_BECOME_GOALS; this is just the safety net.
+  function handleAddBecomeGoal({ commitment, customMilestones }) {
+    const becomeCount = buckets.filter((bucket) => bucket.goalType === 'become').length;
+    if (becomeCount >= MAX_BECOME_GOALS) {
       return;
     }
     addBucket({
-      title: trait,
+      title: commitment,
       goalType: 'become',
-      commitment: trait,
+      commitment,
       mode: 'solo',
       when: 'longTerm',
       message: '',
-      customMilestones: [],
+      customMilestones,
     });
+  }
+
+  // Persists the Trait Quiz's scores to the profile the moment someone
+  // finishes it (see ProfilePanel/TraitQuiz) -- independent of whatever
+  // else is mid-edit in the surrounding profile form's Save/Cancel.
+  function handleSaveTraitQuiz(scores) {
+    updateProfile({ traitScores: scores, traitQuizTakenAt: todayIso() });
   }
 
   // Fires once, the first time a Doing goal's progress reaches its
@@ -213,7 +222,14 @@ function App() {
     checkDoingCompletion(goal, votes, [...contributions, record]);
   }
 
+  // The cap is already enforced by StrategyPage hiding "+ Add a Goal" at
+  // MAX_DOING_GOALS (eligibleBuckets itself doesn't shrink for it, since
+  // it's a Doing-only limit); this is the safety net.
   function handleAddDoingGoal({ bucketId, goalAmount, unitAmount, checklist }) {
+    const activeDoingCount = buckets.filter((bucket) => bucket.doingEnabled && !bucket.doingCompletedAt).length;
+    if (activeDoingCount >= MAX_DOING_GOALS) {
+      return;
+    }
     updateBucket(bucketId, {
       doingEnabled: true,
       doingGoalAmount: goalAmount,
@@ -336,7 +352,7 @@ function App() {
                 contributions={contributions}
                 onCastVote={handleCastVote}
                 onMarkMilestone={handleMarkMilestone}
-                onActivateTrait={handleActivateTrait}
+                onAddBecomeGoal={handleAddBecomeGoal}
                 onCastDoingVote={handleCastDoingVote}
                 onAddDoingExtra={handleAddDoingExtra}
                 onAddDoingGoal={handleAddDoingGoal}
@@ -443,8 +459,7 @@ function App() {
                 <ProfilePanel
                   key="profile-panel"
                   profile={profile}
-                  buckets={buckets}
-                  onActivateTrait={handleActivateTrait}
+                  onSaveTraitQuiz={handleSaveTraitQuiz}
                   onClose={() => setIsProfileOpen(false)}
                   onSave={(patch) => {
                     updateProfile(patch);

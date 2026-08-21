@@ -1,5 +1,12 @@
 import { DIMENSIONS } from '../data/traits';
-import { QUIZ_QUESTIONS, TOP_DIMENSIONS_COUNT } from '../data/traitQuiz';
+import { QUIZ_QUESTIONS, QUIZ_SCALE, TOP_DIMENSIONS_COUNT } from '../data/traitQuiz';
+
+// 3 questions per dimension, each scored on QUIZ_SCALE -- the bounds
+// every dimension's score falls within, regardless of question count
+// (used to normalize a raw score onto the radar chart's 0-100% axis).
+const QUESTIONS_PER_DIMENSION = QUIZ_QUESTIONS.length / DIMENSIONS.length;
+export const SCORE_MIN = QUESTIONS_PER_DIMENSION * QUIZ_SCALE[0].value;
+export const SCORE_MAX = QUESTIONS_PER_DIMENSION * QUIZ_SCALE[QUIZ_SCALE.length - 1].value;
 
 /*
   `answers` is a plain { [questionIndex]: 1-5 } map. Each dimension's
