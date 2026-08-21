@@ -27,7 +27,7 @@ const experienceVariants = {
  * every step so the transition reads as forward motion through the same
  * scene rather than a hard screen change.
  */
-function OpeningExperience({ profile, buckets, onComplete }) {
+function OpeningExperience({ profile, onComplete }) {
   const [step, setStep] = useState('welcome');
   const [draft, setDraft] = useState({ name: profile?.name || '', age: profile?.age ?? '', photo: profile?.photo ?? null });
 
@@ -66,7 +66,7 @@ function OpeningExperience({ profile, buckets, onComplete }) {
       <CinematicBackground />
 
       <AnimatePresence mode="wait">
-        {step === 'welcome' && <WelcomeStep key="welcome" onEnter={handleEnter} buckets={buckets} />}
+        {step === 'welcome' && <WelcomeStep key="welcome" onEnter={handleEnter} />}
         {step === 'name' && <NameStep key="name" initialValue={draft.name} onSubmit={handleName} />}
         {step === 'age' && <AgeStep key="age" initialValue={draft.age} onSubmit={handleAge} />}
         {step === 'photo' && <PhotoStep key="photo" initialValue={draft.photo} onSubmit={handlePhoto} />}

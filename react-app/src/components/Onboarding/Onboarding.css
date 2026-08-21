@@ -61,135 +61,12 @@
 /* Opening Sequence (Welcome step)                                     */
 /* ------------------------------------------------------------------ */
 
-/*
-  Full-bleed layer for the opening beat -- unlike .opening-content below
-  (a centered card the Name/Age/Photo steps share), this owns the whole
-  frame so cards can land anywhere in it. Positioning lives on the plain
-  .opening-anchor wrapper rather than the motion.div inside it, since
-  Motion drives that div's transform for the fade/settle-in and would
-  otherwise fight a CSS transform used for centering.
-*/
 .opening-sequence {
   position: absolute;
   inset: 0;
   z-index: 1;
 }
 
-.opening-anchor {
-  position: absolute;
-  pointer-events: none;
-}
-
-.opening-anchor--top-left {
-  top: clamp(4rem, 12vh, 7rem);
-  left: clamp(1.5rem, 6vw, 5rem);
-}
-
-.opening-anchor--top-right {
-  top: clamp(4rem, 12vh, 7rem);
-  right: clamp(1.5rem, 6vw, 5rem);
-  text-align: right;
-}
-
-.opening-anchor--top-center {
-  top: clamp(2.5rem, 8vh, 4.5rem);
-  left: 50%;
-  transform: translateX(-50%);
-  text-align: center;
-}
-
-.opening-anchor--bottom-center {
-  bottom: clamp(3.5rem, 10vh, 6rem);
-  left: 50%;
-  transform: translateX(-50%);
-  text-align: center;
-}
-
-.opening-anchor--mid-left {
-  top: 50%;
-  left: clamp(1.5rem, 6vw, 4rem);
-  transform: translateY(-50%);
-}
-
-.opening-anchor--mid-right {
-  top: 50%;
-  right: clamp(1.5rem, 6vw, 4rem);
-  transform: translateY(-50%);
-  text-align: right;
-}
-
-.opening-anchor--bottom-left {
-  bottom: clamp(5rem, 14vh, 8rem);
-  left: clamp(1.5rem, 6vw, 5rem);
-}
-
-.opening-anchor--bottom-right {
-  bottom: clamp(5rem, 14vh, 8rem);
-  right: clamp(1.5rem, 6vw, 5rem);
-  text-align: right;
-}
-
-/*
-  Photo-first cousin of Achievements.css's .achievement-card -- same
-  frame/photo/scrim/caption idea (radius, border, glow wash, bottom-heavy
-  scrim so a caption stays legible over the image) but with the metadata
-  stripped out, since here a card is a life moment appearing in the
-  world, not a dashboard list item.
-*/
-.opening-card-frame {
-  position: relative;
-  aspect-ratio: 4 / 5;
-  border-radius: var(--radius-lg);
-  border: 1px solid var(--color-border-strong);
-  box-shadow: var(--shadow-medium);
-  overflow: hidden;
-}
-
-.opening-card-frame--small {
-  width: clamp(112px, 11vw, 148px);
-}
-
-.opening-card-frame--medium {
-  width: clamp(140px, 14vw, 184px);
-}
-
-.opening-card-photo {
-  position: absolute;
-  inset: 0;
-  z-index: 0;
-  background-size: cover;
-  background-position: center;
-}
-
-.opening-card-scrim {
-  position: absolute;
-  inset: 0;
-  z-index: 1;
-  background: linear-gradient(
-    180deg,
-    rgba(var(--color-void-1-rgb), 0.1) 0%,
-    rgba(var(--color-void-1-rgb), 0.05) 40%,
-    rgba(var(--color-void-1-rgb), 0.85) 100%
-  );
-}
-
-.opening-card-caption {
-  position: absolute;
-  z-index: 2;
-  left: var(--space-sm);
-  right: var(--space-sm);
-  bottom: var(--space-sm);
-  margin: 0;
-  font-family: var(--font-family-display);
-  font-style: italic;
-  font-size: var(--font-size-caption);
-  line-height: var(--leading-relaxed);
-  color: var(--color-text-primary);
-  text-shadow: 0 2px 10px rgba(var(--color-void-1-rgb), 0.7);
-}
-
-/* The one spot every card leaves empty, so the title reads as the
-   thing the whole sequence was resolving toward, not one more fragment. */
 .opening-finale {
   position: absolute;
   inset: 0;
@@ -515,58 +392,7 @@
     height: 132px;
   }
 
-  /* Narrower frame: shrink the cards and pull every anchor in from the
-     edges and off the exact vertical center so nothing can overlap
-     another card or the finale. */
-  .opening-card-frame--small {
-    width: clamp(78px, 24vw, 100px);
-  }
-
-  .opening-card-frame--medium {
-    width: clamp(92px, 28vw, 118px);
-  }
-
-  .opening-card-caption {
-    font-size: 0.65rem;
-  }
-
-  .opening-anchor--top-left,
-  .opening-anchor--top-right,
-  .opening-anchor--top-center {
-    top: clamp(3rem, 9vh, 4.5rem);
-  }
-
-  .opening-anchor--bottom-left,
-  .opening-anchor--bottom-right,
-  .opening-anchor--bottom-center {
-    bottom: clamp(3.5rem, 10vh, 5.5rem);
-  }
-
-  .opening-anchor--top-left,
-  .opening-anchor--mid-left,
-  .opening-anchor--bottom-left {
-    left: clamp(1rem, 5vw, 1.5rem);
-  }
-
-  .opening-anchor--top-right,
-  .opening-anchor--mid-right,
-  .opening-anchor--bottom-right {
-    right: clamp(1rem, 5vw, 1.5rem);
-  }
-
-  .opening-anchor--mid-left,
-  .opening-anchor--mid-right {
-    top: 36%;
-  }
-
   .opening-finale {
     gap: var(--space-md);
-  }
-
-  /* A tight phone frame can't hold every card a larger screen can --
-     keep only the first four (the two top + two bottom corners for any
-     layout of 4+) so nothing crowds or overlaps. */
-  .opening-anchor:nth-of-type(n + 5) {
-    display: none;
   }
 }

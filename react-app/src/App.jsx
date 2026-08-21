@@ -240,7 +240,7 @@ function App() {
     <>
       <AnimatePresence>
         {!hasEntered && !showAchievementBanner && !showEntryRitual && (
-          <OpeningExperience key="onboarding" profile={profile} buckets={buckets} onComplete={handleOnboardingComplete} />
+          <OpeningExperience key="onboarding" profile={profile} onComplete={handleOnboardingComplete} />
         )}
       </AnimatePresence>
 
