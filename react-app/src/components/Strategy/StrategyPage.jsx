@@ -6,6 +6,7 @@ import StrategyGoalDetail from './StrategyGoalDetail';
 import DoingGoalCard from './DoingGoalCard';
 import DoingGoalDetail from './DoingGoalDetail';
 import DoingAddExtraModal from './DoingAddExtraModal';
+import DoingHistoryModal from './DoingHistoryModal';
 import AddGoalFlow from './AddGoalFlow';
 import RadarChart from './RadarChart';
 import TraitPicker from './TraitPicker';
@@ -35,7 +36,12 @@ function StrategyPage({
 }) {
   const [view, setView] = useState('becoming');
   const becomeGoals = buckets.filter((bucket) => bucket.goalType === 'become');
-  const doingGoals = buckets.filter((bucket) => bucket.goalType === 'have' && bucket.doingEnabled);
+  // Drops out once doingCompletedAt is set (100% reached, see App.jsx's
+  // checkDoingCompletion) -- the goal itself lives on in `buckets` for
+  // DoingHistoryModal to look back up, just no longer "in progress"
+  // here. A flagged checklist item going done never sets
+  // doingCompletedAt, so it alone can't remove a goal from this list.
+  const doingGoals = buckets.filter((bucket) => bucket.goalType === 'have' && bucket.doingEnabled && !bucket.doingCompletedAt);
   const eligibleBuckets = buckets.filter(
     (bucket) => bucket.goalType === 'have' && bucket.status !== 'completed' && !bucket.doingEnabled,
   );
@@ -46,6 +52,7 @@ function StrategyPage({
   const [isAddGoalOpen, setIsAddGoalOpen] = useState(false);
   const [addExtraGoalId, setAddExtraGoalId] = useState(null);
   const [expandedDoingGoalId, setExpandedDoingGoalId] = useState(null);
+  const [isHistoryOpen, setIsHistoryOpen] = useState(false);
 
   const expandedGoal = becomeGoals.find((goal) => goal.id === expandedGoalId) || null;
   const expandedDoingGoal = doingGoals.find((goal) => goal.id === expandedDoingGoalId) || null;
@@ -60,7 +67,12 @@ function StrategyPage({
         transition={entranceTransition(0)}
       >
         <span className="section-label">Identity</span>
-        <h2>Strategy</h2>
+        <div className="section-heading-row">
+          <h2>Strategy</h2>
+          <button type="button" className="strategy-history-link" onClick={() => setIsHistoryOpen(true)}>
+            History
+          </button>
+        </div>
       </motion.div>
 
       <div className="strategy-tabs" role="tablist" aria-label="Strategy view">
@@ -200,6 +212,21 @@ function StrategyPage({
                 setIsAddGoalOpen(false);
               }}
               onClose={() => setIsAddGoalOpen(false)}
+            />
+          )}
+        </AnimatePresence>,
+        document.body,
+      )}
+
+      {createPortal(
+        <AnimatePresence>
+          {isHistoryOpen && (
+            <DoingHistoryModal
+              key="doing-history"
+              buckets={buckets}
+              votes={votes}
+              contributions={contributions}
+              onClose={() => setIsHistoryOpen(false)}
             />
           )}
         </AnimatePresence>,

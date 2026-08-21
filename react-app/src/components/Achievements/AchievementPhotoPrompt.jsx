@@ -20,7 +20,7 @@ const overlayVariants = {
 
 /*
  * A quiet coda to a Doing goal's ritual (100% reached, or a flagged
- * milestone checked off) -- see App.jsx's ritual/pendingAchievementTitle
+ * milestone checked off) -- see App.jsx's ritual/pendingAchievement
  * state. Reuses the same photo pipeline as completing a Bucket
  * (CompletePrompt/CameraCapture/lib/photo) rather than a second one, and
  * hands whatever comes out of it (a photo, or null on Skip) straight

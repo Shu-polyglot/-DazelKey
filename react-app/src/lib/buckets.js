@@ -247,6 +247,15 @@ export function normalizeBucket(bucket, index) {
             .map((item) => ({ id: item.id, label: item.label, isMilestone: Boolean(item.isMilestone), done: Boolean(item.done) }))
         : [],
     doingCompletedAt: safeGoalType === 'have' ? bucket.doingCompletedAt || null : null,
+
+    // Provenance for standalone Achievement entries created by
+    // useBuckets' addAchievement (see its own comment) -- lets the
+    // Doing history screen pick out exactly the "goal reached" entries
+    // this flow creates, and trace each one back to the Doing goal it
+    // came from (which is never deleted, just hidden once completed).
+    source: bucket.source || null,
+    sourceType: bucket.sourceType || null,
+    sourceGoalId: bucket.sourceGoalId || null,
   };
 }
 

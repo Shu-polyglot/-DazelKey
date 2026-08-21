@@ -80,3 +80,12 @@
   color: var(--color-text-primary);
 }
 
+/* Lets a heading carry a quiet secondary action (Strategy's History
+   link) beside the title without disturbing section-heading's own
+   label-then-title column layout everywhere else it's used. */
+.section-heading-row {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-sm);
+}
+

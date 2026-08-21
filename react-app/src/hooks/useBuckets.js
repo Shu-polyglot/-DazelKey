@@ -50,7 +50,14 @@ export function useBuckets() {
   // "done" while it's still being tracked in Doing. Lands in the same
   // array/storage as every other Bucket, so the Achievement shelf,
   // calendar, and opening banner all pick it up with no extra wiring.
-  function addAchievement(title, photo) {
+  // `meta` carries provenance for entries created by that Doing flow --
+  // `source`/`sourceType` mark which ritual moment produced this entry,
+  // `sourceGoalId` points back at the Doing goal itself -- so Strategy's
+  // Doing history screen can filter to just the "goal reached" ones and
+  // look up the goal's own data (amount, checklist) without duplicating
+  // any of it here.
+  function addAchievement(title, photo, meta = {}) {
+    const { source = null, sourceType = null, sourceGoalId = null } = meta;
     setStoredBuckets((prev) => [
       normalizeBucket({
         id: Date.now(),
@@ -63,6 +70,9 @@ export function useBuckets() {
         place: '',
         message: '',
         goalType: 'have',
+        source,
+        sourceType,
+        sourceGoalId,
       }),
       ...prev,
     ]);
