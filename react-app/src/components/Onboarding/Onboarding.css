@@ -85,37 +85,46 @@
 /* Achievement banner (between the title and the quote card)          */
 /* ------------------------------------------------------------------ */
 
+/*
+  Deliberately the one full-bleed exception in the app: the hero image
+  IS the top of the screen, not a card floating on a background, so
+  there's no radius/border/frame/padding here the way there is on every
+  other card-shaped surface. See the component doc comment for why.
+*/
 .achievement-banner {
   position: fixed;
   inset: 0;
   z-index: 300;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: var(--space-lg);
-  padding: var(--space-2xl) var(--space-lg);
   touch-action: manipulation;
   user-select: none;
   -webkit-user-select: none;
-  background: radial-gradient(ellipse at 50% 42%, var(--color-bg-elevated) 0%, var(--color-bg) 72%);
+  background: var(--color-bg);
+  overflow: hidden;
 }
 
 .achievement-banner-eyebrow {
+  position: absolute;
+  top: var(--space-xl);
+  left: 0;
+  right: 0;
+  z-index: 3;
+  text-align: center;
   letter-spacing: var(--tracking-wider);
   text-transform: uppercase;
   color: var(--color-text-muted);
   font-size: var(--font-size-label);
-  text-shadow: 0 1px 12px rgba(var(--color-void-1-rgb), 0.6);
+  text-shadow: 0 2px 14px rgba(var(--color-void-1-rgb), 0.85);
 }
 
-.achievement-banner-frame {
+/* The top ~2/3 of the screen, edge to edge -- height lives here (not on
+   the photo itself) so a crossfading photo never changes the hero's
+   size or position, only its opacity. */
+.achievement-banner-hero {
   position: relative;
-  width: min(720px, 86vw);
-  aspect-ratio: 16 / 9;
-  border-radius: var(--radius-lg);
-  border: 1px solid var(--color-border-strong);
-  box-shadow: var(--shadow-medium);
+  flex: 0 0 66.6667%;
+  width: 100%;
   overflow: hidden;
 }
 
@@ -126,31 +135,38 @@
   background-position: center;
 }
 
-.achievement-banner-scrim {
+/* Fully transparent through the top ~half so the photo reads clean,
+   then resolves to the exact page background by the hero's bottom edge
+   -- the seam between hero and the plain area below it should be
+   invisible, not a hard cut. */
+.achievement-banner-gradient {
   position: absolute;
   inset: 0;
   z-index: 1;
   background: linear-gradient(
-    180deg,
-    rgba(var(--color-void-1-rgb), 0.05) 0%,
-    rgba(var(--color-void-1-rgb), 0.1) 45%,
-    rgba(var(--color-void-1-rgb), 0.88) 100%
+    to bottom,
+    rgba(var(--color-void-1-rgb), 0) 0%,
+    rgba(var(--color-void-1-rgb), 0) 52%,
+    rgba(var(--color-void-1-rgb), 0.7) 82%,
+    var(--color-bg) 100%
   );
 }
 
 .achievement-banner-caption {
   position: absolute;
   z-index: 2;
-  left: var(--space-lg);
-  right: var(--space-lg);
-  bottom: var(--space-lg);
+  left: 0;
+  right: 0;
+  bottom: var(--space-2xl);
+  padding: 0 var(--space-xl);
+  text-align: center;
 }
 
 .achievement-banner-title {
   margin: 0;
   font-family: var(--font-family-display);
   font-weight: var(--font-weight-regular);
-  font-size: clamp(1.25rem, 3vw, 1.75rem);
+  font-size: clamp(1.5rem, 4vw, 2.25rem);
   line-height: var(--leading-tight);
   letter-spacing: var(--tracking-tight);
   color: var(--color-text-primary);
@@ -177,8 +193,13 @@
 }
 
 @media (max-width: 640px) {
-  .achievement-banner {
-    padding: var(--space-xl) var(--space-md);
+  .achievement-banner-hero {
+    flex-basis: 60%;
+  }
+
+  .achievement-banner-caption {
+    bottom: var(--space-xl);
+    padding: 0 var(--space-lg);
   }
 
   .achievement-banner-prompt {

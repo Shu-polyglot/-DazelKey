@@ -21,9 +21,13 @@ const overlayVariants = {
 
 /*
  * Netflix's "Trending Now" rail, aimed at the user's own life: the exact
- * same completed+photographed buckets WelcomeStep's corner cards draw
- * from (see pickOpeningAchievements), now given one full-screen slot
- * each and crossfading on its own clock. The rotation and the "press
+ * same completed+photographed buckets WelcomeStep once drew corner
+ * cards from (see pickOpeningAchievements), now given the top two-thirds
+ * of the screen as a full-bleed hero, crossfading on its own clock. This
+ * is deliberately the one place in the app where a photo IS the screen,
+ * not a card floating on it -- no radius/border/frame, edge to edge,
+ * with the bottom gradient doing the work of resolving it back into the
+ * page background rather than a hard cut. The rotation and the "press
  * Enter to continue" advance are deliberately independent -- the banner
  * keeps cycling underneath, on its own timer, while it waits for input.
  * Shown between the title (OpeningExperience) and the quote card
@@ -77,8 +81,11 @@ function AchievementBanner({ buckets, onContinue }) {
     >
       <p className="achievement-banner-eyebrow">Recently Lived</p>
 
-      <div className="achievement-banner-frame">
-        <AnimatePresence mode="wait">
+      <div className="achievement-banner-hero">
+        {/* No `mode="wait"` -- the incoming photo fades in while the
+            outgoing one fades out, a true crossfade with no gap where
+            the fixed-size hero would show nothing underneath. */}
+        <AnimatePresence>
           {current && (
             <motion.div
               key={current.id}
@@ -91,7 +98,7 @@ function AchievementBanner({ buckets, onContinue }) {
             />
           )}
         </AnimatePresence>
-        <div className="achievement-banner-scrim" />
+        <div className="achievement-banner-gradient" />
         {current && (
           <div className="achievement-banner-caption">
             <p className="achievement-banner-title">{current.title}</p>
