@@ -84,6 +84,25 @@
   margin-top: var(--space-md);
 }
 
+/* Quiet by design -- an occasional read, not an action competing with
+   Edit profile for attention. Same recipe as Strategy's History link. */
+.profile-page-about-link {
+  appearance: none;
+  background: none;
+  border: none;
+  padding: 0;
+  margin-top: var(--space-sm);
+  font-size: var(--font-size-caption);
+  letter-spacing: var(--tracking-wide);
+  color: var(--color-text-muted);
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.profile-page-about-link:hover {
+  color: var(--color-text-secondary);
+}
+
 .profile-tabs {
   display: flex;
   border-top: 1px solid var(--color-border);

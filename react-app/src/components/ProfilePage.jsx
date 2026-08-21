@@ -1,7 +1,9 @@
 import { useState } from 'react';
-import { motion } from 'motion/react';
+import { createPortal } from 'react-dom';
+import { AnimatePresence, motion } from 'motion/react';
 import BucketListPanel from './BucketList/BucketListPanel';
 import AchievementGallery from './Achievements/AchievementGallery';
+import AboutManifesto from './shared/AboutManifesto';
 import { getInitials, getSocialPlatformLabel } from '../lib/profile';
 import { entranceTransition, spring } from '../styles/motion';
 import './ProfilePage.css';
@@ -17,6 +19,7 @@ const PROFILE_TABS = [
 function ProfilePage({ profile, buckets, onUpdateBucket, onDeleteBucket, onCompleteBucket, onEditProfile }) {
   const hasPhoto = Boolean(profile?.photo);
   const [activeTab, setActiveTab] = useState('buckets');
+  const [isAboutOpen, setIsAboutOpen] = useState(false);
 
   return (
     <motion.section
@@ -68,6 +71,10 @@ function ProfilePage({ profile, buckets, onUpdateBucket, onDeleteBucket, onCompl
         >
           Edit profile
         </motion.button>
+
+        <button type="button" className="profile-page-about-link" onClick={() => setIsAboutOpen(true)}>
+          About Life OS
+        </button>
       </div>
 
       <div className="profile-tabs" role="tablist" aria-label="Profile sections">
@@ -104,6 +111,14 @@ function ProfilePage({ profile, buckets, onUpdateBucket, onDeleteBucket, onCompl
         />
       ) : (
         <AchievementGallery buckets={buckets} onUpdate={onUpdateBucket} onDelete={onDeleteBucket} baseDelay={0} />
+      )}
+
+      {/* Portaled to document.body -- same page-shell filter-trap reason
+          every other fixed-position full-screen overlay in this app is
+          (see App.jsx's own portal comment). */}
+      {createPortal(
+        <AnimatePresence>{isAboutOpen && <AboutManifesto key="about-manifesto" onClose={() => setIsAboutOpen(false)} />}</AnimatePresence>,
+        document.body,
       )}
     </motion.section>
   );

@@ -1,0 +1,54 @@
+/* Narrower and smaller than a Transition Ritual quote -- these are
+   multi-sentence paragraphs, not a single epigram, so they need room to
+   wrap onto several lines without overwhelming the screen. */
+.about-manifesto-paragraph {
+  max-width: 640px;
+  font-size: clamp(1.15rem, 3vw, 1.6rem);
+  line-height: var(--leading-relaxed);
+}
+
+.about-manifesto-controls {
+  position: absolute;
+  top: var(--space-xl);
+  right: var(--space-xl);
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  z-index: 1;
+}
+
+.about-manifesto-control {
+  appearance: none;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-pill);
+  background: rgba(var(--color-void-2-rgb), 0.5);
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  transition: color 0.2s ease, border-color 0.2s ease;
+}
+
+.about-manifesto-control:hover {
+  color: var(--color-text-primary);
+  border-color: var(--color-border-strong);
+}
+
+.about-manifesto-control:not(.about-manifesto-close) {
+  width: 40px;
+  height: 40px;
+  display: grid;
+  place-items: center;
+}
+
+.about-manifesto-close {
+  padding: var(--space-xs) var(--space-md);
+  font-size: var(--font-size-body-sm);
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-wide);
+}
+
+@media (max-width: 640px) {
+  .about-manifesto-controls {
+    top: var(--space-lg);
+    right: var(--space-lg);
+  }
+}
