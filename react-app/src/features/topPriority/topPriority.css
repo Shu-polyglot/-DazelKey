@@ -311,3 +311,70 @@
 .priority-milestone-form .step-editor-field-input {
   max-width: none;
 }
+
+/* Vote Moment: the light photo/note prompt shown right after a vote
+   (VoteMomentPrompt), and the enlarged view a grid cell opens into when
+   that vote actually has one attached (VoteMomentModal). */
+.vote-moment-prompt-subtitle {
+  margin: calc(-1 * var(--space-sm)) 0 var(--space-md);
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-body-sm);
+}
+
+.achieve-photo-preview.vote-moment-photo-preview {
+  width: 100%;
+  height: 160px;
+  border-radius: var(--radius-md);
+  margin-bottom: var(--space-md);
+}
+
+.vote-moment-comment-label {
+  display: block;
+  margin-top: var(--space-md);
+}
+
+.step-editor-field-input.vote-moment-comment-input {
+  max-width: none;
+  min-height: 56px;
+  padding: var(--space-sm);
+  text-align: left;
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-sm);
+  background: rgba(var(--color-void-1-rgb), 0.6);
+  font-size: var(--font-size-body-sm);
+  line-height: var(--leading-relaxed);
+  resize: vertical;
+}
+
+.step-editor-field-input.vote-moment-comment-input:focus {
+  outline: none;
+  border-color: var(--color-accent);
+  box-shadow: 0 0 0 3px var(--color-accent-subtle);
+}
+
+.vote-moment-modal-date {
+  font-family: var(--font-family-display);
+  font-size: 1.4rem;
+  color: var(--color-text-primary);
+}
+
+.vote-moment-modal-milestone {
+  margin-top: var(--space-2xs);
+  font-size: var(--font-size-caption);
+  color: var(--color-accent-strong);
+}
+
+.vote-moment-modal-photo {
+  width: 100%;
+  max-height: 60vh;
+  object-fit: cover;
+  border-radius: var(--radius-md);
+  margin-top: var(--space-md);
+}
+
+.vote-moment-modal-comment {
+  margin-top: var(--space-md);
+  color: var(--color-text-primary);
+  line-height: var(--leading-relaxed);
+  white-space: pre-wrap;
+}

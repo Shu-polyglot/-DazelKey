@@ -16,7 +16,7 @@ const COMPACT_WEEKS = 10;
   requirements this was built against: emotional reward over metric
   accuracy).
 */
-function PriorityCard({ priority, votes, onCastVote, onMarkMilestone, onOpen }) {
+function PriorityCard({ priority, votes, onCastVote, onMarkMilestone, onOpen, onSelectVote }) {
   const priorityVotes = useMemo(() => votes.filter((vote) => vote.goalId === priority.id), [votes, priority.id]);
   const totalVotes = priorityVotes.length;
   const todaysVote = useMemo(() => priorityVotes.find((vote) => vote.date === todayIso()) || null, [priorityVotes]);
@@ -37,7 +37,12 @@ function PriorityCard({ priority, votes, onCastVote, onMarkMilestone, onOpen }) 
         <p className="priority-summary">
           {summary.voted} of the last {summary.total} day{summary.total === 1 ? '' : 's'}
         </p>
-        <PriorityVoteGrid votes={priorityVotes} createdAt={priority.createdAt} maxWeeks={COMPACT_WEEKS} />
+        <PriorityVoteGrid
+          votes={priorityVotes}
+          createdAt={priority.createdAt}
+          maxWeeks={COMPACT_WEEKS}
+          onSelectVote={onSelectVote}
+        />
       </div>
 
       <div className="priority-footer">

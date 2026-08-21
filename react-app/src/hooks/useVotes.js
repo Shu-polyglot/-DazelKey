@@ -59,10 +59,31 @@ export function useVotes(storageKey = DEFAULT_STORAGE_KEY) {
       date,
       isMilestone: Boolean(milestoneLabel),
       milestoneLabel: milestoneLabel || null,
+      photoUrl: null,
+      comment: null,
     };
 
     setVotes((prev) => [...prev, vote]);
     return vote;
+  }
+
+  // Attaches an optional photo/comment "moment" to an already-cast vote --
+  // e.g. the light prompt Top 3 Priority shows right after a vote (see
+  // VoteMomentPrompt). A no-op past the vote actually existing; either
+  // field may be omitted/null without clearing the other.
+  function attachVoteMedia(voteId, { photoUrl, comment } = {}) {
+    if (!votes.some((vote) => vote.id === voteId)) {
+      return false;
+    }
+
+    setVotes((prev) =>
+      prev.map((vote) =>
+        vote.id === voteId
+          ? { ...vote, photoUrl: photoUrl || vote.photoUrl || null, comment: comment?.trim() || vote.comment || null }
+          : vote,
+      ),
+    );
+    return true;
   }
 
   // Hand-marks an existing (necessarily today's, since only today's vote
@@ -82,5 +103,5 @@ export function useVotes(storageKey = DEFAULT_STORAGE_KEY) {
     return true;
   }
 
-  return { votes, castVote, markMilestone };
+  return { votes, castVote, markMilestone, attachVoteMedia };
 }

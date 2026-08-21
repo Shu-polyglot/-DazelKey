@@ -14,7 +14,7 @@ import '../Modals/Modals.css';
 import './Strategy.css';
 
 const VIEWS = [
-  { id: 'priority', label: 'Top 3 Priority' },
+  { id: 'priority', label: 'Core' },
   { id: 'realize', label: 'Realize' },
 ];
 

@@ -16,7 +16,7 @@ import './topPriority.css';
   first, since neither the card nor the ritual itself keeps a running
   log.
 */
-function PriorityDetail({ priority, votes, onClose }) {
+function PriorityDetail({ priority, votes, onClose, onSelectVote }) {
   const summary = getVoteSummary(votes, priority.createdAt);
   const milestoneVotes = votes.filter((vote) => vote.isMilestone).sort((a, b) => a.date.localeCompare(b.date));
 
@@ -46,7 +46,7 @@ function PriorityDetail({ priority, votes, onClose }) {
       <p className="priority-summary">
         {summary.voted} of the last {summary.total} day{summary.total === 1 ? '' : 's'}
       </p>
-      <PriorityVoteGrid votes={votes} createdAt={priority.createdAt} />
+      <PriorityVoteGrid votes={votes} createdAt={priority.createdAt} onSelectVote={onSelectVote} />
 
       {milestoneVotes.length > 0 && (
         <div className="priority-milestone-list">

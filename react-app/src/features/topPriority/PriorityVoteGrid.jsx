@@ -9,7 +9,7 @@ import { buildWeeks } from '../../lib/votes';
   simply has a shorter grid. `maxWeeks` slices to the most recent N columns
   for the card's compact preview; the full detail view omits it and scrolls.
 */
-function PriorityVoteGrid({ votes, createdAt, maxWeeks }) {
+function PriorityVoteGrid({ votes, createdAt, maxWeeks, onSelectVote }) {
   const scrollRef = useRef(null);
 
   const allWeeks = useMemo(() => buildWeeks(createdAt), [createdAt]);
@@ -42,7 +42,31 @@ function PriorityVoteGrid({ votes, createdAt, maxWeeks }) {
               }
               const vote = votesByDate.get(date);
               const className = `priority-vote-cell${vote ? ' is-voted' : ''}${vote?.isMilestone ? ' is-milestone' : ''}`;
-              return <span className={className} title={date} key={date} />;
+              // Cell appearance never branches on whether a moment (photo/
+              // comment) is attached -- same square either way (see this
+              // component's own comment above) -- only the tap behavior
+              // does, and only when there's actually something to open.
+              const hasMoment = Boolean(vote?.photoUrl || vote?.comment);
+              return (
+                <span
+                  className={className}
+                  title={date}
+                  key={date}
+                  onClick={
+                    hasMoment
+                      ? (event) => {
+                          // The compact card grid sits inside its own
+                          // whole-card tap-to-open area (see PriorityCard) --
+                          // stop the bubble so tapping a cell opens the
+                          // moment instead of also opening the detail modal
+                          // underneath it.
+                          event.stopPropagation();
+                          onSelectVote?.(vote);
+                        }
+                      : undefined
+                  }
+                />
+              );
             })}
           </div>
         ))}
