@@ -4,9 +4,38 @@ import { AnimatePresence, motion } from 'motion/react';
 import BucketListPanel from './BucketList/BucketListPanel';
 import AchievementGallery from './Achievements/AchievementGallery';
 import AboutManifesto from './shared/AboutManifesto';
+import PreviewProfile from './shared/PreviewProfile';
 import { getInitials, getSocialPlatformLabel } from '../lib/profile';
 import { entranceTransition, spring } from '../styles/motion';
 import './ProfilePage.css';
+
+// A generic "share" pictogram (arrow up out of an open tray) in the
+// app's own thin-stroke line style (see BottomNav's icon comment) --
+// the same everywhere-recognizable motif most apps use for "share this",
+// not any one platform's own glyph.
+function ShareIcon() {
+  return (
+    <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+      <path d="M12 3 V15" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
+      <path
+        d="M8 7 L12 3 L16 7"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.6"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M5 12 V18.5 C5 19.6 5.9 20.5 7 20.5 H17 C18.1 20.5 19 19.6 19 18.5 V12"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.6"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
 
 const PROFILE_TABS = [
   { id: 'buckets', label: 'The Bucket Lists' },
@@ -20,6 +49,7 @@ function ProfilePage({ profile, buckets, onUpdateBucket, onDeleteBucket, onCompl
   const hasPhoto = Boolean(profile?.photo);
   const [activeTab, setActiveTab] = useState('buckets');
   const [isAboutOpen, setIsAboutOpen] = useState(false);
+  const [isPreviewOpen, setIsPreviewOpen] = useState(false);
 
   return (
     <motion.section
@@ -62,15 +92,28 @@ function ProfilePage({ profile, buckets, onUpdateBucket, onDeleteBucket, onCompl
           </div>
         )}
 
-        <motion.button
-          type="button"
-          className="secondary-button profile-page-edit"
-          onClick={onEditProfile}
-          whileHover={{ y: -1, transition: spring.hover }}
-          whileTap={{ y: 1, scale: 0.97, transition: spring.press }}
-        >
-          Edit profile
-        </motion.button>
+        <div className="profile-page-actions">
+          <motion.button
+            type="button"
+            className="secondary-button profile-page-edit"
+            onClick={onEditProfile}
+            whileHover={{ y: -1, transition: spring.hover }}
+            whileTap={{ y: 1, scale: 0.97, transition: spring.press }}
+          >
+            Edit profile
+          </motion.button>
+
+          <motion.button
+            type="button"
+            className="icon-button profile-page-share"
+            aria-label="Preview shareable profile"
+            onClick={() => setIsPreviewOpen(true)}
+            whileHover={{ y: -1, transition: spring.hover }}
+            whileTap={{ y: 1, scale: 0.9, transition: spring.press }}
+          >
+            <ShareIcon />
+          </motion.button>
+        </div>
 
         <button type="button" className="profile-page-about-link" onClick={() => setIsAboutOpen(true)}>
           About Life OS
@@ -118,6 +161,15 @@ function ProfilePage({ profile, buckets, onUpdateBucket, onDeleteBucket, onCompl
           (see App.jsx's own portal comment). */}
       {createPortal(
         <AnimatePresence>{isAboutOpen && <AboutManifesto key="about-manifesto" onClose={() => setIsAboutOpen(false)} />}</AnimatePresence>,
+        document.body,
+      )}
+
+      {createPortal(
+        <AnimatePresence>
+          {isPreviewOpen && (
+            <PreviewProfile key="preview-profile" profile={profile} buckets={buckets} onClose={() => setIsPreviewOpen(false)} />
+          )}
+        </AnimatePresence>,
         document.body,
       )}
     </motion.section>

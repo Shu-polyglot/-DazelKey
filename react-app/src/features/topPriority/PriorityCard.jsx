@@ -16,7 +16,7 @@ const COMPACT_WEEKS = 10;
   requirements this was built against: emotional reward over metric
   accuracy).
 */
-function PriorityCard({ priority, votes, onCastVote, onMarkMilestone, onOpen, onSelectVote }) {
+function PriorityCard({ priority, votes, onCastVote, onMarkMilestone, onOpen, onSelectVote, readOnly = false }) {
   const priorityVotes = useMemo(() => votes.filter((vote) => vote.goalId === priority.id), [votes, priority.id]);
   const totalVotes = priorityVotes.length;
   const todaysVote = useMemo(() => priorityVotes.find((vote) => vote.date === todayIso()) || null, [priorityVotes]);
@@ -27,7 +27,7 @@ function PriorityCard({ priority, votes, onCastVote, onMarkMilestone, onOpen, on
   // milestones, but only until it's already special some other way (an
   // auto-threshold hit, or already marked) -- one milestone reason per
   // vote, so the chips disappear once that's settled for today.
-  const canMarkMilestone = votedToday && !todaysVote.isMilestone && priority.customMilestones.length > 0;
+  const canMarkMilestone = !readOnly && votedToday && !todaysVote.isMilestone && priority.customMilestones.length > 0;
 
   return (
     <article className="priority-card">
@@ -51,16 +51,18 @@ function PriorityCard({ priority, votes, onCastVote, onMarkMilestone, onOpen, on
           <span className="priority-count-label">{totalVotes === 1 ? 'vote' : 'votes'}</span>
         </div>
 
-        <motion.button
-          type="button"
-          className={`primary-button priority-vote-button${votedToday ? ' is-voted' : ''}`}
-          onClick={() => onCastVote(priority.id)}
-          disabled={votedToday}
-          whileHover={votedToday ? undefined : { y: -1, transition: spring.hover }}
-          whileTap={votedToday ? undefined : { y: 1, scale: 0.97, transition: spring.press }}
-        >
-          {votedToday ? 'Voted today' : 'Cast a vote for this.'}
-        </motion.button>
+        {!readOnly && (
+          <motion.button
+            type="button"
+            className={`primary-button priority-vote-button${votedToday ? ' is-voted' : ''}`}
+            onClick={() => onCastVote(priority.id)}
+            disabled={votedToday}
+            whileHover={votedToday ? undefined : { y: -1, transition: spring.hover }}
+            whileTap={votedToday ? undefined : { y: 1, scale: 0.97, transition: spring.press }}
+          >
+            {votedToday ? 'Voted today' : 'Cast a vote for this.'}
+          </motion.button>
+        )}
       </div>
 
       {canMarkMilestone && (

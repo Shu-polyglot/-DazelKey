@@ -70,6 +70,30 @@ function normalizeTraitScores(scores) {
   return safeScores;
 }
 
+// The Shareable Profile preview's four sections -- each defaults to
+// off (see normalizeShareSettings) so a profile is never shown/shared
+// wider than the user explicitly opted into.
+export const SHARE_SECTIONS = [
+  { key: 'bucketLists', label: 'Bucket Lists' },
+  { key: 'achievement', label: 'Achievement' },
+  { key: 'core', label: 'Core' },
+  { key: 'traits', label: 'Trait diagnostic' },
+];
+
+function defaultShareSettings() {
+  return Object.fromEntries(SHARE_SECTIONS.map((section) => [section.key, false]));
+}
+
+function normalizeShareSettings(settings) {
+  const safeSettings = defaultShareSettings();
+  SHARE_SECTIONS.forEach((section) => {
+    if (typeof settings?.[section.key] === 'boolean') {
+      safeSettings[section.key] = settings[section.key];
+    }
+  });
+  return safeSettings;
+}
+
 // How long before Profile's quiz section starts gently suggesting a
 // retake -- not enforced, just a quiet nudge (see ProfilePanel).
 export const TRAIT_QUIZ_STALE_DAYS = 90;
@@ -109,5 +133,9 @@ export function normalizeProfile(profile) {
     // entirely (see lib/radar.js); this is the only place they live.
     traitScores: normalizeTraitScores(profile?.traitScores),
     traitQuizTakenAt: profile?.traitQuizTakenAt || null,
+    // Which sections the Shareable Profile preview (see
+    // components/shared/PreviewProfile) shows -- see SHARE_SECTIONS above
+    // for why every one of these defaults to false.
+    shareSettings: normalizeShareSettings(profile?.shareSettings),
   };
 }

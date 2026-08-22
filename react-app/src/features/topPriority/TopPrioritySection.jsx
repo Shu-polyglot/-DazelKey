@@ -26,7 +26,7 @@ import './topPriority.css';
   module/route names stay "topPriority"/"priority" on purpose -- only
   the user-facing label changed.)
 */
-function TopPrioritySection({ onAddAchievement }) {
+function TopPrioritySection({ onAddAchievement, readOnly = false }) {
   const { priorities, addPriority } = useTopPriorities();
   const { votes, castVote, markMilestone, attachVoteMedia } = useVotes(VOTES_STORAGE_KEY);
 
@@ -150,7 +150,11 @@ function TopPrioritySection({ onAddAchievement }) {
   return (
     <>
       {priorities.length === 0 ? (
-        <div className="priority-empty">Write your first priority below to start voting for who you're becoming.</div>
+        <div className="priority-empty">
+          {readOnly
+            ? 'Nothing here yet.'
+            : "Write your first priority below to start voting for who you're becoming."}
+        </div>
       ) : (
         <div className="priority-list">
           {priorities.map((priority) => (
@@ -162,26 +166,28 @@ function TopPrioritySection({ onAddAchievement }) {
               onMarkMilestone={handleMarkMilestone}
               onOpen={() => setExpandedId(priority.id)}
               onSelectVote={setSelectedVote}
+              readOnly={readOnly}
             />
           ))}
         </div>
       )}
 
-      {atCap ? (
-        <p className="priority-limit-note">
-          You're focusing on {MAX_TOP_PRIORITIES} at a time -- complete or remove one to add another.
-        </p>
-      ) : (
-        <motion.button
-          type="button"
-          className="secondary-button priority-add-button"
-          onClick={() => setIsAddOpen(true)}
-          whileHover={{ y: -1, transition: spring.hover }}
-          whileTap={{ y: 1, scale: 0.97, transition: spring.press }}
-        >
-          + Add a Priority
-        </motion.button>
-      )}
+      {!readOnly &&
+        (atCap ? (
+          <p className="priority-limit-note">
+            You're focusing on {MAX_TOP_PRIORITIES} at a time -- complete or remove one to add another.
+          </p>
+        ) : (
+          <motion.button
+            type="button"
+            className="secondary-button priority-add-button"
+            onClick={() => setIsAddOpen(true)}
+            whileHover={{ y: -1, transition: spring.hover }}
+            whileTap={{ y: 1, scale: 0.97, transition: spring.press }}
+          >
+            + Add a Priority
+          </motion.button>
+        ))}
 
       {createPortal(
         <AnimatePresence>

@@ -26,7 +26,7 @@ const tapProps = {
   whileTap: { y: 1, scale: 0.96, transition: spring.press },
 };
 
-function AchievementExpandedView({ bucket, index, onEdit, onDelete, onClose, onShare }) {
+function AchievementExpandedView({ bucket, index, onEdit, onDelete, onClose, onShare, readOnly }) {
   const hasPhoto = Boolean(bucket.image);
 
   function handleDelete() {
@@ -70,12 +70,16 @@ function AchievementExpandedView({ bucket, index, onEdit, onDelete, onClose, onS
         <motion.button type="button" className="secondary-button" onClick={onShare} {...tapProps}>
           ↗ Share
         </motion.button>
-        <motion.button type="button" className="secondary-button" onClick={onEdit} {...tapProps}>
-          Edit
-        </motion.button>
-        <motion.button type="button" className="secondary-button" onClick={handleDelete} {...tapProps}>
-          Delete
-        </motion.button>
+        {!readOnly && (
+          <>
+            <motion.button type="button" className="secondary-button" onClick={onEdit} {...tapProps}>
+              Edit
+            </motion.button>
+            <motion.button type="button" className="secondary-button" onClick={handleDelete} {...tapProps}>
+              Delete
+            </motion.button>
+          </>
+        )}
       </div>
     </div>
   );
@@ -255,7 +259,7 @@ function AchievementExpandedEdit({ bucket, index, onCancel, onSave }) {
  * on-screen elements would share one layoutId at once, which Motion can't
  * resolve.
  */
-function AchievementExpanded({ bucket, index, onClose, onUpdate, onDelete, layoutId }) {
+function AchievementExpanded({ bucket, index, onClose, onUpdate, onDelete, layoutId, readOnly = false }) {
   const [mode, setMode] = useState('view');
   const [isShareOpen, setIsShareOpen] = useState(false);
 
@@ -313,6 +317,7 @@ function AchievementExpanded({ bucket, index, onClose, onUpdate, onDelete, layou
               onDelete={onDelete}
               onClose={onClose}
               onShare={() => setIsShareOpen(true)}
+              readOnly={readOnly}
             />
           )}
         </motion.div>

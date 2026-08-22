@@ -15,6 +15,7 @@ function BucketListPanel({
   sectionId = 'bucket-list-section',
   layoutIdPrefix = 'bucket-card-',
   baseDelay = dashboardEntrance.bucketList,
+  readOnly = false,
 }) {
   const [activeFilter, setActiveFilter] = useState('All');
   const [expandedId, setExpandedId] = useState(null);
@@ -94,11 +95,16 @@ function BucketListPanel({
               layoutId={`${layoutIdPrefix}${expandedBucket.id}`}
               onClose={() => setExpandedId(null)}
               onUpdate={onUpdate}
-              onDelete={(id) => {
-                onDelete(id);
-                setExpandedId(null);
-              }}
+              onDelete={
+                readOnly
+                  ? undefined
+                  : (id) => {
+                      onDelete(id);
+                      setExpandedId(null);
+                    }
+              }
               onComplete={onComplete}
+              readOnly={readOnly}
             />
           )}
         </AnimatePresence>,

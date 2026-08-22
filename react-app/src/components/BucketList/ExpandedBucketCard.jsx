@@ -34,7 +34,7 @@ function getMeta(bucket) {
   return getWhenLabel(bucket.when);
 }
 
-function ExpandedCardView({ bucket, onEdit, onDelete, onClose, onComplete }) {
+function ExpandedCardView({ bucket, onEdit, onDelete, onClose, onComplete, readOnly }) {
   const hasPhotoHero = bucket.status === 'completed' && Boolean(bucket.image);
 
   function handleDelete() {
@@ -85,16 +85,18 @@ function ExpandedCardView({ bucket, onEdit, onDelete, onClose, onComplete }) {
         </p>
       </div>
 
-      {bucket.status !== 'completed' && <CompletePrompt bucketId={bucket.id} onComplete={onComplete} />}
+      {!readOnly && bucket.status !== 'completed' && <CompletePrompt bucketId={bucket.id} onComplete={onComplete} />}
 
-      <div className="expanded-card-actions detail-actions">
-        <motion.button type="button" className="secondary-button" onClick={onEdit} {...tapProps}>
-          Edit
-        </motion.button>
-        <motion.button type="button" className="secondary-button" onClick={handleDelete} {...tapProps}>
-          Delete
-        </motion.button>
-      </div>
+      {!readOnly && (
+        <div className="expanded-card-actions detail-actions">
+          <motion.button type="button" className="secondary-button" onClick={onEdit} {...tapProps}>
+            Edit
+          </motion.button>
+          <motion.button type="button" className="secondary-button" onClick={handleDelete} {...tapProps}>
+            Delete
+          </motion.button>
+        </div>
+      )}
     </div>
   );
 }
@@ -105,7 +107,7 @@ function ExpandedCardView({ bucket, onEdit, onDelete, onClose, onComplete }) {
  * the card's on-screen rect into the centered, expanded position (and
  * back again on close) instead of presenting a separate modal.
  */
-function ExpandedBucketCard({ bucket, onClose, onUpdate, onDelete, onComplete, layoutId }) {
+function ExpandedBucketCard({ bucket, onClose, onUpdate, onDelete, onComplete, layoutId, readOnly = false }) {
   const [mode, setMode] = useState('view');
 
   useEffect(() => {
@@ -155,6 +157,7 @@ function ExpandedBucketCard({ bucket, onClose, onUpdate, onDelete, onComplete, l
               onDelete={onDelete}
               onClose={onClose}
               onComplete={onComplete}
+              readOnly={readOnly}
             />
           )}
         </motion.div>

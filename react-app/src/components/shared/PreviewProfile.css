@@ -1,0 +1,61 @@
+/* A regular scrollable page, not a cinematic ritual -- reuses
+   ProfilePage.css's own avatar/name/bio classes (see the import) so the
+   header reads identically to the real Profile tab. */
+.preview-profile {
+  position: fixed;
+  inset: 0;
+  z-index: 300;
+  overflow-y: auto;
+  background: var(--color-bg);
+  padding: 0 var(--space-lg) calc(var(--space-3xl) + env(safe-area-inset-bottom));
+}
+
+.preview-profile-topbar {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 0 calc(-1 * var(--space-lg));
+  padding: var(--space-md) var(--space-lg);
+  background: rgba(var(--color-void-1-rgb), 0.9);
+  backdrop-filter: blur(var(--blur-md));
+  -webkit-backdrop-filter: blur(var(--blur-md));
+  border-bottom: 1px solid var(--color-border);
+}
+
+.preview-profile-badge {
+  font-size: var(--font-size-label);
+  letter-spacing: var(--tracking-wider);
+  text-transform: uppercase;
+  color: var(--color-accent-strong);
+}
+
+.preview-profile-notice {
+  margin: var(--space-lg) 0;
+  padding: var(--space-sm) var(--space-md);
+  border-radius: var(--radius-md);
+  border: 1px dashed var(--color-border-strong);
+  background: rgba(var(--color-mist-rgb), 0.04);
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-body-sm);
+  text-align: center;
+}
+
+.preview-profile-empty {
+  margin-top: var(--space-xl);
+  padding: var(--space-xl) var(--space-md);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  color: var(--color-text-muted);
+  font-size: var(--font-size-body-sm);
+  text-align: center;
+}
+
+.preview-profile-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}

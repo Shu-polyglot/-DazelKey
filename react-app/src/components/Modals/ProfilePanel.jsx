@@ -3,10 +3,17 @@ import { createPortal } from 'react-dom';
 import { AnimatePresence, motion } from 'motion/react';
 import Modal from './Modal';
 import PhotoCropper from '../shared/PhotoCropper';
+import ToggleSwitch from '../shared/ToggleSwitch';
 import TraitQuiz from '../Strategy/TraitQuiz';
 import RadarChart from '../Strategy/RadarChart';
 import { spring } from '../../styles/motion';
-import { SOCIAL_PLATFORMS, getSocialPlatform, normalizeSocialUrl, isTraitQuizStale } from '../../lib/profile';
+import {
+  SOCIAL_PLATFORMS,
+  SHARE_SECTIONS,
+  getSocialPlatform,
+  normalizeSocialUrl,
+  isTraitQuizStale,
+} from '../../lib/profile';
 import { formatDate } from '../../lib/dates';
 import '../Strategy/Strategy.css';
 import './Modals.css';
@@ -26,8 +33,16 @@ function ProfilePanel({ profile, onSaveTraitQuiz, onClose, onSave }) {
   const [bio, setBio] = useState(profile?.bio || '');
   const [role, setRole] = useState(profile?.role || '');
   const [socialLinks, setSocialLinks] = useState(() => (profile?.socialLinks || []).map((link) => ({ ...link })));
+  // Defaults to whatever normalizeProfile already resolved onto `profile`
+  // (see lib/profile.js) -- every section off until the user turns one on
+  // here, same off-by-default rule PreviewProfile itself relies on.
+  const [shareSettings, setShareSettings] = useState(() => ({ ...profile?.shareSettings }));
   const [cropSource, setCropSource] = useState(null);
   const fileInputRef = useRef(null);
+
+  function toggleShareSection(key) {
+    setShareSettings((prev) => ({ ...prev, [key]: !prev[key] }));
+  }
 
   function handleFile(event) {
     const file = event.target.files?.[0];
@@ -81,6 +96,7 @@ function ProfilePanel({ profile, onSaveTraitQuiz, onClose, onSave }) {
       socialLinks: socialLinks
         .map((link) => ({ ...link, url: normalizeSocialUrl(link.url) }))
         .filter((link) => link.url),
+      shareSettings,
     });
   }
 
@@ -208,6 +224,29 @@ function ProfilePanel({ profile, onSaveTraitQuiz, onClose, onSave }) {
               ))}
             </div>
           )}
+        </div>
+
+        {/* Off by default (see normalizeShareSettings) -- there's no
+            backend yet to actually publish any of this (see
+            PreviewProfile), but the setting itself is real and saved
+            here so flipping a section on ahead of time costs nothing. */}
+        <div className="profile-share-section detail-form-label">
+          <span>Shareable Profile</span>
+          <p className="profile-share-hint">
+            Choose what shows up in your profile preview. Everything starts private.
+          </p>
+          <div className="profile-share-list">
+            {SHARE_SECTIONS.map((section) => (
+              <div className="profile-share-row" key={section.key}>
+                <span>{section.label}</span>
+                <ToggleSwitch
+                  checked={shareSettings[section.key]}
+                  onChange={() => toggleShareSection(section.key)}
+                  label={`Share ${section.label}`}
+                />
+              </div>
+            ))}
+          </div>
         </div>
 
         <div className="modal-actions">

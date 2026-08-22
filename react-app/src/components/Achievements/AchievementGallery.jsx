@@ -16,7 +16,7 @@ const LAYOUT_ID_PREFIX = 'profile-gallery-card-';
   stays mounted on the other tab (display:none, not unmounted) at the
   same time.
 */
-function AchievementGallery({ buckets, onUpdate, onDelete, baseDelay }) {
+function AchievementGallery({ buckets, onUpdate, onDelete, baseDelay, readOnly = false }) {
   const [expandedId, setExpandedId] = useState(null);
 
   const achievements = useMemo(
@@ -74,10 +74,15 @@ function AchievementGallery({ buckets, onUpdate, onDelete, baseDelay }) {
               layoutId={`${LAYOUT_ID_PREFIX}${expanded.bucket.id}`}
               onClose={() => setExpandedId(null)}
               onUpdate={onUpdate}
-              onDelete={(id) => {
-                onDelete(id);
-                setExpandedId(null);
-              }}
+              onDelete={
+                readOnly
+                  ? undefined
+                  : (id) => {
+                      onDelete(id);
+                      setExpandedId(null);
+                    }
+              }
+              readOnly={readOnly}
             />
           )}
         </AnimatePresence>,
