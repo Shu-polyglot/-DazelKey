@@ -71,8 +71,8 @@
   box-shadow: 0 0 0 3px var(--color-accent-subtle);
 }
 
-/* Wraps whichever glyph/avatar the item renders so the tap glow can be
-   positioned relative to it without affecting the button's own layout. */
+/* Wraps whichever glyph/avatar the item renders so the active-tab glow can
+   be positioned relative to it without affecting the button's own layout. */
 .bottom-nav-glow-wrap {
   position: relative;
   display: flex;
@@ -80,41 +80,24 @@
   justify-content: center;
 }
 
-/* A brief, translucent ring that blooms around the tapped icon and fades
-   back out -- purely decorative (aria-hidden, pointer-events: none), and
-   remounted with a fresh key on every tap so repeat taps on the same item
-   restart the animation instead of being ignored. */
-.bottom-nav-glow {
+/* The active tab's colored frame -- persistent (not a fire-and-fade pulse),
+   one instance shared across every item via a single Framer Motion
+   layoutId (see BottomNav.jsx). Re-parenting it under whichever button is
+   active is all that's needed: Motion measures the position/size delta
+   and animates the move/morph itself, sized/shaped here (color comes from
+   JS, per bottomNavTapEffects.js's NAV_ITEM_COLORS). Purely decorative --
+   aria-hidden, pointer-events: none. */
+.bottom-nav-active-glow {
   position: absolute;
   inset: -9px;
   border-radius: var(--radius-pill);
   pointer-events: none;
-  box-shadow:
-    0 0 0 1.5px rgba(var(--color-glow-bright-rgb), 0.5),
-    0 0 12px 3px rgba(var(--color-glow-rgb), 0.4);
-  opacity: 0;
-  animation: bottom-nav-glow-pulse 0.4s ease-out;
-}
-
-@keyframes bottom-nav-glow-pulse {
-  0% {
-    opacity: 0;
-    transform: scale(0.85);
-  }
-  35% {
-    opacity: 1;
-    transform: scale(1.04);
-  }
-  100% {
-    opacity: 0;
-    transform: scale(1.18);
-  }
 }
 
 /* Selected state reads the way Instagram's tab bar does -- the glyph
-   itself switches from outline to solid -- plus a soft accent pill behind
-   it, which is this app's own touch (the same --radius-pill/
-   --color-accent-subtle language its buttons and badges already use). */
+   itself switches from outline to solid. The soft pill behind it is now
+   .bottom-nav-active-glow (colored per-tab, sliding between items) rather
+   than a static background here, so this stays just a sizing box. */
 .bottom-nav-icon {
   display: flex;
   align-items: center;
@@ -122,15 +105,10 @@
   width: 44px;
   height: 32px;
   border-radius: var(--radius-pill);
-  transition: background-color 0.2s ease;
 }
 
 .bottom-nav-item.is-active {
   color: var(--color-accent-strong);
-}
-
-.bottom-nav-item.is-active .bottom-nav-icon {
-  background: var(--color-accent-subtle);
 }
 
 /* Profile tab shows the user's own avatar instead of a glyph -- selection
@@ -177,4 +155,32 @@
     width: auto;
     min-width: 44px;
   }
+}
+
+/* A one-shot, full-screen flash of the tab's name on tap -- fixed to the
+   viewport (rendered as a sibling of <nav>, see BottomNav.jsx, since the
+   pill's own backdrop-filter would otherwise box this in). Non-interactive
+   and above everything else the nav itself sits over. Opacity keyframes
+   and their timing come from JS (NAV_FLASH_TRANSITION in BottomNav.jsx,
+   built off bottomNavTapEffects.js's NAV_NAME_FLASH_MS) -- this rule is
+   just the static look. */
+.bottom-nav-name-flash {
+  position: fixed;
+  inset: 0;
+  z-index: 300;
+  display: grid;
+  place-items: center;
+  padding: 0 var(--space-xl);
+  pointer-events: none;
+  text-align: center;
+  background: radial-gradient(circle at 50% 50%, rgba(var(--color-void-1-rgb), 0.45), transparent 68%);
+  font-family: var(--font-family-display);
+  font-size: var(--font-size-display);
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--leading-tight);
+  letter-spacing: var(--tracking-tight);
+  color: var(--nav-flash-color, var(--color-text-primary));
+  text-shadow:
+    0 0 32px rgba(var(--nav-flash-rgb, var(--color-glow-rgb)), 0.55),
+    0 10px 30px rgba(2, 4, 10, 0.55);
 }
