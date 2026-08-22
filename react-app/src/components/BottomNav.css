@@ -71,6 +71,46 @@
   box-shadow: 0 0 0 3px var(--color-accent-subtle);
 }
 
+/* Wraps whichever glyph/avatar the item renders so the tap glow can be
+   positioned relative to it without affecting the button's own layout. */
+.bottom-nav-glow-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* A brief, translucent ring that blooms around the tapped icon and fades
+   back out -- purely decorative (aria-hidden, pointer-events: none), and
+   remounted with a fresh key on every tap so repeat taps on the same item
+   restart the animation instead of being ignored. */
+.bottom-nav-glow {
+  position: absolute;
+  inset: -9px;
+  border-radius: var(--radius-pill);
+  pointer-events: none;
+  box-shadow:
+    0 0 0 1.5px rgba(var(--color-glow-bright-rgb), 0.5),
+    0 0 12px 3px rgba(var(--color-glow-rgb), 0.4);
+  opacity: 0;
+  animation: bottom-nav-glow-pulse 0.4s ease-out;
+}
+
+@keyframes bottom-nav-glow-pulse {
+  0% {
+    opacity: 0;
+    transform: scale(0.85);
+  }
+  35% {
+    opacity: 1;
+    transform: scale(1.04);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.18);
+  }
+}
+
 /* Selected state reads the way Instagram's tab bar does -- the glyph
    itself switches from outline to solid -- plus a soft accent pill behind
    it, which is this app's own touch (the same --radius-pill/

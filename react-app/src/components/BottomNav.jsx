@@ -1,6 +1,8 @@
+import { useState } from 'react';
 import { motion } from 'motion/react';
 import { spring } from '../styles/motion';
 import { getInitials } from '../lib/profile';
+import { playTapChime } from '../lib/chime';
 import './BottomNav.css';
 
 // The Story has no tab of its own -- it's reached from within The
@@ -13,6 +15,18 @@ const NAV_ITEMS = [
   { route: 'achievement', label: 'The Achievement', matches: ['achievement', 'story'] },
   { route: 'profile', label: 'Profile', matches: ['profile'] },
 ];
+
+// Tap-chime fundamental per nav item, left to right -- a C major scale run
+// (Do-Re-Mi-Fa-Sol) so tapping across the bar audibly climbs the scale.
+// Kept as its own table, keyed by route, so the notes can be retuned
+// without touching NAV_ITEMS' routing/labels.
+const NAV_CHIME_NOTES = {
+  'bucket-lists': 1046.5, // C6
+  strategy: 1174.66, // D6
+  explore: 1318.51, // E6
+  achievement: 1396.91, // F6
+  profile: 1567.98, // G6
+};
 
 // Icon-first glyphs in the app's own thin-stroke line style (matches
 // public/icons.svg's stroke-width/linecap conventions) -- the filled
@@ -96,6 +110,17 @@ function AchievementIcon({ active }) {
 }
 
 function BottomNav({ active, onNavigate, profile }) {
+  // Tracks which item's glow ring is currently playing. The id changes on
+  // every tap (even repeat taps on the same item) so the glow span always
+  // remounts and its CSS animation restarts from the top.
+  const [pulse, setPulse] = useState(null);
+
+  function handleTap(route) {
+    playTapChime(NAV_CHIME_NOTES[route]);
+    setPulse({ route, id: `${route}-${Date.now()}-${Math.random()}` });
+    onNavigate(route);
+  }
+
   return (
     <nav className="bottom-nav" aria-label="Primary">
       {NAV_ITEMS.map((item) => {
@@ -107,24 +132,34 @@ function BottomNav({ active, onNavigate, profile }) {
             className={`bottom-nav-item${isActive ? ' is-active' : ''}`}
             aria-current={isActive ? 'page' : undefined}
             aria-label={item.label}
-            onClick={() => onNavigate(item.route)}
+            onClick={() => handleTap(item.route)}
             whileTap={{ scale: 0.9, transition: spring.press }}
           >
-            {item.route === 'profile' ? (
-              <span
-                className="bottom-nav-avatar"
-                style={profile?.photo ? { backgroundImage: `url(${profile.photo})` } : undefined}
-              >
-                {!profile?.photo && getInitials(profile?.name)}
-              </span>
-            ) : (
-              <span className="bottom-nav-icon">
-                {item.route === 'bucket-lists' && <BucketListIcon active={isActive} />}
-                {item.route === 'strategy' && <StrategyIcon active={isActive} />}
-                {item.route === 'explore' && <ExploreIcon active={isActive} />}
-                {item.route === 'achievement' && <AchievementIcon active={isActive} />}
-              </span>
-            )}
+            <span className="bottom-nav-glow-wrap">
+              {pulse && pulse.route === item.route && (
+                <span
+                  key={pulse.id}
+                  className="bottom-nav-glow"
+                  aria-hidden="true"
+                  onAnimationEnd={() => setPulse(null)}
+                />
+              )}
+              {item.route === 'profile' ? (
+                <span
+                  className="bottom-nav-avatar"
+                  style={profile?.photo ? { backgroundImage: `url(${profile.photo})` } : undefined}
+                >
+                  {!profile?.photo && getInitials(profile?.name)}
+                </span>
+              ) : (
+                <span className="bottom-nav-icon">
+                  {item.route === 'bucket-lists' && <BucketListIcon active={isActive} />}
+                  {item.route === 'strategy' && <StrategyIcon active={isActive} />}
+                  {item.route === 'explore' && <ExploreIcon active={isActive} />}
+                  {item.route === 'achievement' && <AchievementIcon active={isActive} />}
+                </span>
+              )}
+            </span>
           </motion.button>
         );
       })}
