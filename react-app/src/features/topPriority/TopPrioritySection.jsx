@@ -16,13 +16,17 @@ import './topPriority.css';
   Core (formerly "Top 3 Priority"), end to end: its own data store, its
   own vote engine (reusing useVotes' logic against a dedicated storage
   key -- see topPriority.js), its own creation flow, its own milestone
-  ritual. This component needs nothing handed down from Strategy -- no
-  buckets, no callbacks -- so any page/nav can drop it in as-is
-  (`<TopPrioritySection />`) and get the whole feature, list through
-  celebration. (Internal module/route names stay "topPriority"/"priority"
-  on purpose -- only the user-facing label changed.)
+  ritual. This component needs nothing handed down from Strategy to run
+  standalone -- `<TopPrioritySection />` alone still gets the whole
+  feature, list through celebration -- `onAddAchievement` is the one
+  optional exception: pass useBuckets' addAchievement (see App.jsx) and
+  a Core milestone also logs an Achievement, carrying over whatever
+  photo/note that vote has (see logAchievement below); omit it and
+  milestones still work, they just don't get shared anywhere. (Internal
+  module/route names stay "topPriority"/"priority" on purpose -- only
+  the user-facing label changed.)
 */
-function TopPrioritySection() {
+function TopPrioritySection({ onAddAchievement }) {
   const { priorities, addPriority } = useTopPriorities();
   const { votes, castVote, markMilestone, attachVoteMedia } = useVotes(VOTES_STORAGE_KEY);
 
@@ -41,6 +45,13 @@ function TopPrioritySection() {
   // milestone ritual for it has run its course), cleared once the user
   // saves or skips.
   const [pendingVoteId, setPendingVoteId] = useState(null);
+  // { priorityId, priorityTitle, milestoneLabel } | null -- set
+  // alongside `ritual` exactly when the vote that triggered it is a
+  // fresh, auto-thresholded milestone (see handleCastVote), so the
+  // Achievement this milestone becomes isn't logged until the photo/note
+  // prompt above has actually resolved -- otherwise it'd be logged
+  // without whatever photo the user was about to attach.
+  const [pendingMilestone, setPendingMilestone] = useState(null);
   // The vote a grid cell was tapped open into (VoteMomentModal) -- only
   // ever set for a vote that actually has a photo/comment attached (see
   // PriorityVoteGrid's onSelectVote).
@@ -54,9 +65,12 @@ function TopPrioritySection() {
     if (!vote) {
       return;
     }
+    const priority = priorities.find((p) => p.id === priorityId);
     if (vote.isMilestone) {
-      const priority = priorities.find((p) => p.id === priorityId);
       setRitual(priority ? { caption: priority.title, variant: 'milestone', pendingVoteId: vote.id } : null);
+      setPendingMilestone(
+        priority ? { priorityId, priorityTitle: priority.title, milestoneLabel: vote.milestoneLabel } : null,
+      );
     } else {
       setPendingVoteId(vote.id);
     }
@@ -67,8 +81,12 @@ function TopPrioritySection() {
     if (marked) {
       const priority = priorities.find((p) => p.id === priorityId);
       // No pendingVoteId here -- this marks a vote that was already dealt
-      // with (photo/note prompt already shown or skipped) at cast time.
+      // with (photo/note prompt already shown or skipped) at cast time,
+      // so there's no prompt to wait on -- log the Achievement right
+      // away, off whatever photo/comment that vote already carries.
       setRitual(priority ? { caption: priority.title, variant: 'milestone' } : null);
+      const vote = votes.find((v) => v.id === voteId);
+      logAchievement({ priorityId, priorityTitle: priority?.title, milestoneLabel: label }, vote?.photoUrl, vote?.comment);
     }
   }
 
@@ -80,11 +98,46 @@ function TopPrioritySection() {
     }
   }
 
+  // Shared by both VoteMomentPrompt outcomes (Save and Skip) -- whichever
+  // it was, the vote's photo/note state is now final, so this is the
+  // right moment to log the Achievement a pending milestone was waiting
+  // on (see pendingMilestone above).
+  function finishVoteMoment(photoUrl, comment) {
+    if (pendingMilestone) {
+      logAchievement(pendingMilestone, photoUrl, comment);
+      setPendingMilestone(null);
+    }
+    setPendingVoteId(null);
+  }
+
   function handleSaveVoteMoment({ photoUrl, comment }) {
     if (pendingVoteId && (photoUrl || comment)) {
       attachVoteMedia(pendingVoteId, { photoUrl, comment });
     }
-    setPendingVoteId(null);
+    finishVoteMoment(photoUrl, comment);
+  }
+
+  function handleSkipVoteMoment() {
+    finishVoteMoment(null, null);
+  }
+
+  // Mirrors how Realize logs a Doing goal's own milestone/completion
+  // moments (see App.jsx's checkDoingCompletion/handleToggleChecklistItem)
+  // -- lands in the same Achievement store via the same addAchievement,
+  // just translating this module's own vote fields (photoUrl/comment)
+  // into that call's (photo/message) shape. A no-op with no
+  // `onAddAchievement` (see this module's own header comment) -- Core
+  // still works standalone, it just doesn't share milestones anywhere.
+  function logAchievement(milestone, photoUrl, comment) {
+    if (!onAddAchievement || !milestone?.priorityTitle) {
+      return;
+    }
+    onAddAchievement(`${milestone.priorityTitle} — ${milestone.milestoneLabel || 'milestone'}`, photoUrl || null, {
+      source: 'top-priority',
+      sourceType: 'milestone',
+      sourceGoalId: milestone.priorityId,
+      message: comment || '',
+    });
   }
 
   function handleAdd({ commitment, customMilestones }) {
@@ -155,7 +208,7 @@ function TopPrioritySection() {
       {createPortal(
         <AnimatePresence>
           {pendingVoteId && (
-            <VoteMomentPrompt key="vote-moment-prompt" onSave={handleSaveVoteMoment} onSkip={() => setPendingVoteId(null)} />
+            <VoteMomentPrompt key="vote-moment-prompt" onSave={handleSaveVoteMoment} onSkip={handleSkipVoteMoment} />
           )}
         </AnimatePresence>,
         document.body,

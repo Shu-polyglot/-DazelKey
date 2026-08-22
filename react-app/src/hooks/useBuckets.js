@@ -57,7 +57,7 @@ export function useBuckets() {
   // look up the goal's own data (amount, checklist) without duplicating
   // any of it here.
   function addAchievement(title, photo, meta = {}) {
-    const { source = null, sourceType = null, sourceGoalId = null } = meta;
+    const { source = null, sourceType = null, sourceGoalId = null, message = '' } = meta;
     setStoredBuckets((prev) => [
       normalizeBucket({
         id: Date.now(),
@@ -68,7 +68,7 @@ export function useBuckets() {
         mode: 'solo',
         when: 'beforeIDie',
         place: '',
-        message: '',
+        message,
         goalType: 'have',
         source,
         sourceType,

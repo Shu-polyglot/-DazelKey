@@ -18,7 +18,7 @@ const VIEWS = [
   { id: 'realize', label: 'Realize' },
 ];
 
-function StrategyPage({ buckets, votes, contributions, onLogMoney, onAddDoingGoal, onToggleChecklistItem }) {
+function StrategyPage({ buckets, votes, contributions, onLogMoney, onAddDoingGoal, onToggleChecklistItem, onAddAchievement }) {
   const [view, setView] = useState('priority');
   // Drops out once doingCompletedAt is set (100% reached, see App.jsx's
   // checkDoingCompletion) -- the goal itself lives on in `buckets` for
@@ -73,7 +73,7 @@ function StrategyPage({ buckets, votes, contributions, onLogMoney, onAddDoingGoa
       </div>
 
       {view === 'priority' ? (
-        <TopPrioritySection />
+        <TopPrioritySection onAddAchievement={onAddAchievement} />
       ) : (
         <>
           {doingGoals.length === 0 ? (

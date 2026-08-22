@@ -291,6 +291,7 @@ function App() {
                 onLogMoney={handleLogMoney}
                 onAddDoingGoal={handleAddDoingGoal}
                 onToggleChecklistItem={handleToggleChecklistItem}
+                onAddAchievement={addAchievement}
               />
             </div>
 
