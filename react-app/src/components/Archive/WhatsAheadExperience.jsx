@@ -6,13 +6,12 @@ import BucketDetailsModal from '../Modals/BucketDetailsModal';
 import { whenOptions } from '../../lib/buckets';
 import { easing } from '../../styles/motion';
 import '../BucketList/BucketList.css';
-import './Story.css';
 import './Archive.css';
 import './WhatsAhead.css';
 
 /*
   The counterpart to the Life Archive: same cinematic backdrop and
-  typographic voice (reuses Archive/Story's own classes rather than
+  typographic voice (reuses Archive.css's own bridge classes rather than
   redeclaring them), but reading forward instead of back. Bucket Details
   is opened with its own local state here -- not App.jsx's -- because this
   view is a fixed-position sibling of .page-shell, not a descendant of it;

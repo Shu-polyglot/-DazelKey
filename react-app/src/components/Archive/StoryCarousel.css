@@ -1,0 +1,273 @@
+/* ------------------------------------------------------------------ */
+/* Stage: featured card + overlapping thumbnail stack + text overlay   */
+/* ------------------------------------------------------------------ */
+
+.story-carousel {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.story-carousel-stage {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+  padding: calc(var(--space-2xl) + env(safe-area-inset-top)) var(--space-xl) 0;
+}
+
+/* Both the featured card and every thumbnail are this same shape --
+   position/size/radius are what Motion's shared `layoutId` layout
+   animation actually morphs between the two. */
+.story-carousel-card {
+  position: absolute;
+  overflow: hidden;
+  appearance: none;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-strong);
+  padding: 0;
+  background: none;
+  cursor: pointer;
+}
+
+.story-carousel-card.is-featured {
+  inset: 0 calc(var(--space-3xl) + var(--space-lg)) calc(var(--space-3xl) + var(--space-lg)) 0;
+  z-index: 2;
+  cursor: default;
+}
+
+.story-carousel-media {
+  position: absolute;
+  inset: -4%;
+  background-size: cover;
+  background-position: center;
+}
+
+.story-carousel-scrim {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    180deg,
+    rgba(var(--color-void-1-rgb), 0.05) 0%,
+    transparent 35%,
+    transparent 55%,
+    rgba(var(--color-void-1-rgb), 0.92) 100%
+  );
+  pointer-events: none;
+}
+
+/* The thumbnail stack -- anchored to the stage's own bottom-right corner;
+   slot 0 (frontmost, biggest, no offset) sits right at -- and partly over
+   -- the featured card's own corner notch above, which is what reads as
+   "thumbnails overlapping the main card". Later slots shrink, dim, and
+   shift up-left (via `right`/`bottom`, not `transform`: this element also
+   carries `layoutId`, and Motion writes its own inline `transform` for the
+   layout FLIP -- a stylesheet `transform` here would just get clobbered by
+   that) so they recede into the stack instead of sliding off toward the
+   corner. The up-left shift has to outrun the per-slot size shrink, or a
+   smaller slot ends up fully eclipsed by the bigger one in front of it
+   instead of visibly peeking out from behind it. */
+.story-carousel-card.is-thumbnail {
+  right: calc(var(--slot) * 26px);
+  bottom: calc(var(--slot) * 26px);
+  width: calc(120px - var(--slot) * 8px);
+  height: calc(152px - var(--slot) * 10px);
+  z-index: calc(4 - var(--slot));
+  opacity: calc(1 - var(--slot) * 0.14);
+  box-shadow: var(--shadow-medium);
+}
+
+.story-carousel-card.is-thumbnail:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+/* ------------------------------------------------------------------ */
+/* Text -- deliberately NOT inside .story-carousel-card (see            */
+/* StoryCarousel.jsx's StoryCardText) -- occupies the same footprint as  */
+/* the featured card so it reads as "inside" it without following the   */
+/* card's own position/size animation.                                  */
+/* ------------------------------------------------------------------ */
+
+.story-carousel-text {
+  position: absolute;
+  inset: 0 calc(var(--space-3xl) + var(--space-lg)) calc(var(--space-3xl) + var(--space-lg)) 0;
+  z-index: 3;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  align-items: flex-start;
+  padding: var(--space-lg);
+  text-align: left;
+}
+
+.story-carousel-eyebrow {
+  display: block;
+  font-size: var(--font-size-label);
+  letter-spacing: var(--tracking-wider);
+  text-transform: uppercase;
+  color: var(--color-accent-strong);
+  margin-bottom: var(--space-sm);
+}
+
+.story-carousel-headline {
+  font-family: var(--font-family-display);
+  font-weight: var(--font-weight-regular);
+  font-size: clamp(1.75rem, 3.4vw, 2.75rem);
+  line-height: var(--leading-tight);
+  letter-spacing: var(--tracking-tight);
+  color: var(--color-text-primary);
+  text-shadow: 0 2px 30px rgba(0, 0, 0, 0.4);
+  margin: 0 0 var(--space-md);
+}
+
+.story-carousel-caption {
+  font-family: var(--font-family-display);
+  font-style: italic;
+  font-size: clamp(0.9rem, 1.3vw, 1.05rem);
+  line-height: var(--leading-relaxed);
+  color: var(--color-text-secondary);
+  max-width: 46ch;
+  margin: 0 0 var(--space-md);
+}
+
+.story-carousel-text.is-now .story-carousel-caption {
+  font-style: normal;
+}
+
+.story-carousel-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-sm);
+  font-size: var(--font-size-caption);
+  letter-spacing: var(--tracking-wide);
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+  margin-bottom: var(--space-md);
+}
+
+.story-carousel-meta span:not(:last-child)::after {
+  content: '·';
+  margin-left: var(--space-sm);
+  opacity: 0.6;
+}
+
+.story-carousel-cta {
+  appearance: none;
+  padding: var(--space-sm) var(--space-lg);
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-pill);
+  background: rgba(var(--color-mist-rgb), 0.06);
+  color: var(--color-text-primary);
+  letter-spacing: var(--tracking-wide);
+  text-transform: uppercase;
+  font-size: var(--font-size-body-sm);
+  cursor: pointer;
+}
+
+/* ------------------------------------------------------------------ */
+/* Controls: prev/next arrows + pagination                             */
+/* ------------------------------------------------------------------ */
+
+.story-carousel-controls {
+  position: relative;
+  z-index: 5;
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-lg);
+  /* Clears the persistent, floating BottomNav that sits above this
+     full-screen experience -- same convention as Story.css used. */
+  padding: var(--space-md) var(--space-lg) calc(var(--space-lg) + var(--nav-height) + env(safe-area-inset-bottom));
+}
+
+.story-carousel-arrow {
+  flex: 0 0 auto;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 1px solid var(--color-border);
+  background: rgba(var(--color-void-2-rgb), 0.6);
+  color: var(--color-text-primary);
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  transition: border-color 0.2s ease, background 0.2s ease, opacity 0.2s ease;
+}
+
+.story-carousel-arrow:hover {
+  border-color: var(--color-border-strong);
+  background: rgba(var(--color-void-2-rgb), 0.85);
+}
+
+.story-carousel-arrow:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+.story-carousel-arrow:disabled {
+  opacity: 0.32;
+  cursor: default;
+  pointer-events: none;
+}
+
+.story-carousel-pagination {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.story-carousel-dot {
+  appearance: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  width: 6px;
+  height: 6px;
+  border-radius: var(--radius-pill);
+  background: rgba(var(--color-mist-rgb), 0.28);
+  transition: width 0.2s ease, background-color 0.2s ease;
+}
+
+.story-carousel-dot:hover {
+  background: rgba(var(--color-mist-rgb), 0.5);
+}
+
+.story-carousel-dot.is-active {
+  width: 20px;
+  background: var(--color-text-primary);
+}
+
+.story-carousel-dot:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+@media (max-width: 640px) {
+  .story-carousel-stage {
+    padding: calc(var(--space-xl) + env(safe-area-inset-top)) var(--space-md) 0;
+  }
+
+  .story-carousel-card.is-featured {
+    inset: 0 calc(var(--space-2xl) + var(--space-sm)) calc(var(--space-2xl) + var(--space-sm)) 0;
+  }
+
+  .story-carousel-text {
+    inset: 0 calc(var(--space-2xl) + var(--space-sm)) calc(var(--space-2xl) + var(--space-sm)) 0;
+    padding: var(--space-md);
+  }
+
+  .story-carousel-card.is-thumbnail {
+    right: calc(var(--slot) * 19px);
+    bottom: calc(var(--slot) * 19px);
+    width: calc(88px - var(--slot) * 6px);
+    height: calc(112px - var(--slot) * 8px);
+  }
+
+  .story-carousel-controls {
+    padding: var(--space-sm) var(--space-md) calc(var(--space-md) + var(--nav-height) + env(safe-area-inset-bottom));
+  }
+}
