@@ -45,13 +45,16 @@ function CompletePrompt({ bucketId, onComplete }) {
     processPhotoFile(blob);
   }
 
-  function handleComplete() {
+  // The tap's own coordinates become AchievementBurst's origin (see
+  // App.jsx's handleCompleteBucket) -- passed as a plain {x, y}, not the
+  // event itself, since nothing downstream needs anything else about it.
+  function handleComplete(event) {
     if (!completeDate) {
       alert('Choose the date this experience happened.');
       return;
     }
 
-    onComplete(bucketId, completeDate, photo);
+    onComplete(bucketId, completeDate, photo, { x: event.clientX, y: event.clientY });
   }
 
   return (

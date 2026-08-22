@@ -1,0 +1,82 @@
+/* Fixed, full-viewport, and entirely non-interactive -- this celebration
+   sits over whatever screen the user is already on and never blocks it.
+   No dim/scrim over the page itself, per spec: the only darkening here is
+   the achievement card's own internal photo scrim (matches
+   AchievementCard's existing treatment). */
+.achievement-burst {
+  position: fixed;
+  inset: 0;
+  z-index: 400;
+  pointer-events: none;
+}
+
+.achievement-burst-canvas {
+  position: absolute;
+  inset: 0;
+}
+
+.achievement-burst-card {
+  position: absolute;
+  width: 220px;
+}
+
+.achievement-burst-card-frame {
+  position: relative;
+  aspect-ratio: 4 / 5;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--color-border);
+  background: radial-gradient(circle at 50% 0%, rgba(var(--color-glow-rgb), 0.1), transparent 60%), var(--color-bg-elevated);
+  box-shadow: var(--shadow-medium), 0 0 32px rgba(var(--color-glow-rgb), 0.35);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: var(--space-md);
+}
+
+.achievement-burst-card-photo {
+  position: absolute;
+  inset: 0;
+  background-size: cover;
+  background-position: center;
+}
+
+.achievement-burst-card-glow {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at 50% 30%, rgba(var(--color-glow-bright-rgb), 0.35), transparent 65%),
+    linear-gradient(160deg, #10192c 0%, #05070d 80%);
+}
+
+.achievement-burst-card-scrim {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, transparent 40%, rgba(var(--color-void-1-rgb), 0.85) 100%);
+}
+
+.achievement-burst-card-eyebrow {
+  position: relative;
+  z-index: 1;
+  font-size: var(--font-size-label);
+  letter-spacing: var(--tracking-wider);
+  text-transform: uppercase;
+  color: var(--color-accent-strong);
+  margin-bottom: var(--space-2xs);
+}
+
+.achievement-burst-card-title {
+  position: relative;
+  z-index: 1;
+  font-family: var(--font-family-display);
+  font-size: 1.05rem;
+  line-height: var(--leading-tight);
+  color: var(--color-text-primary);
+  margin: 0;
+}
+
+@media (max-width: 640px) {
+  .achievement-burst-card {
+    width: 180px;
+  }
+}

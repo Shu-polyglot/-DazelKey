@@ -20,6 +20,7 @@ import ArchiveExperience from './components/Archive/ArchiveExperience';
 import WhatsAheadExperience from './components/Archive/WhatsAheadExperience';
 import TransitionRitual from './components/TransitionRitual';
 import MilestoneRitual from './components/shared/MilestoneRitual';
+import AchievementBurst from './components/shared/AchievementBurst';
 import AchievementPhotoPrompt from './components/Achievements/AchievementPhotoPrompt';
 import BottomNav from './components/BottomNav';
 import { useBuckets } from './hooks/useBuckets';
@@ -66,6 +67,14 @@ function App() {
   // set the moment the ritual above finishes, cleared once addAchievement
   // has actually run.
   const [pendingAchievement, setPendingAchievement] = useState(null);
+  // { origin: {x,y} | null, achievement: {image, title} } | null -- drives
+  // AchievementBurst, the lightweight same-screen particle celebration for
+  // the moment an Achievement card is generated. Deliberately separate
+  // from `ritual`/`pendingAchievement` above (MilestoneRitual's full-screen
+  // takeover): this fires either instead of that (a plain Bucket
+  // completion has no ritual at all) or right after it closes (Realize's
+  // 100%-goal-reached path), never replacing or altering that sequence.
+  const [burst, setBurst] = useState(null);
   const [archiveCloseMode, setArchiveCloseMode] = useState('cancel');
   const [isWhatsAheadOpen, setIsWhatsAheadOpen] = useState(false);
   const isStoryOpen = route === 'story';
@@ -166,6 +175,16 @@ function App() {
     return true;
   }
 
+  // Wraps completeBucket with the one side effect it doesn't own itself:
+  // firing AchievementBurst from the exact tap that completed it. A plain
+  // Bucket completion has no ritual/takeover of its own (unlike Realize's
+  // two triggers below), so this is the only celebration on this path.
+  function handleCompleteBucket(id, chosenDate, photo, origin) {
+    const bucket = buckets.find((entry) => entry.id === id);
+    completeBucket(id, chosenDate, photo);
+    setBurst({ origin, achievement: { image: photo || bucket?.image || null, title: bucket?.title || '' } });
+  }
+
   // Realize's single money-logging action (see StrategyPage/LogMoneyFlow)
   // -- one contribution, tagged Earned/Saved or neither, toward one goal.
   function handleLogMoney(goalId, amount, tag) {
@@ -231,6 +250,15 @@ function App() {
   function handleAchievementPhotoDone(photo) {
     if (pendingAchievement) {
       addAchievement(pendingAchievement.title, photo, pendingAchievement);
+      // AchievementBurst only for the goal-reached moment (spec's second
+      // trigger is specifically "a Doing goal hits 100%"), not the smaller
+      // flagged-checklist-item milestone this same photo prompt also
+      // serves. No tap coordinate to use as origin here -- this prompt was
+      // itself full-screen, so there's no "where on the underlying page"
+      // to point back to; AchievementBurst defaults to screen center.
+      if (pendingAchievement.sourceType === 'goal') {
+        setBurst({ origin: null, achievement: { image: photo, title: pendingAchievement.title } });
+      }
     }
     setPendingAchievement(null);
   }
@@ -279,7 +307,7 @@ function App() {
                 buckets={buckets}
                 onUpdate={updateBucket}
                 onDelete={deleteBucket}
-                onComplete={completeBucket}
+                onComplete={handleCompleteBucket}
               />
             </div>
 
@@ -316,7 +344,7 @@ function App() {
                 buckets={buckets}
                 onUpdateBucket={updateBucket}
                 onDeleteBucket={deleteBucket}
-                onCompleteBucket={completeBucket}
+                onCompleteBucket={handleCompleteBucket}
                 onEditProfile={() => setIsProfileOpen(true)}
               />
             </div>
@@ -344,7 +372,7 @@ function App() {
                   key={detailsBucket.id}
                   bucket={detailsBucket}
                   onClose={() => setDetailsBucketId(null)}
-                  onComplete={completeBucket}
+                  onComplete={handleCompleteBucket}
                 />
               )}
             </AnimatePresence>,
@@ -426,12 +454,16 @@ function App() {
             key="whats-ahead"
             buckets={buckets}
             onClose={() => setIsWhatsAheadOpen(false)}
-            onComplete={completeBucket}
+            onComplete={handleCompleteBucket}
           />
         )}
       </AnimatePresence>
 
       {hasEntered && <BottomNav active={route} onNavigate={handleNavigate} profile={profile} />}
+
+      {burst && (
+        <AchievementBurst origin={burst.origin} achievement={burst.achievement} onDone={() => setBurst(null)} />
+      )}
     </>
   );
 }
