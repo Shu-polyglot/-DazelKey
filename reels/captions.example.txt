@@ -1,0 +1,12 @@
+# Example --captions-file for scripts/build-reel.sh.
+# One caption per line: start|end|text (seconds, in the OUTPUT/post-speed-
+# ramp timeline -- see reels/README.md). Lines starting with # are ignored.
+#
+# These three line up with the default scene order (boot -> add a Bucket
+# -> complete it -> Log Money -> Share card) assuming the wizard-input
+# stretch (scene 03) is the only one passed to --fast-ranges. Adjust the
+# numbers to match your own recording's manifest.json.
+
+0.0|3.0|Some things you want are too big for a to-do list.
+9.0|13.0|Watch it become real, one contribution at a time.
+17.0|21.0|This is your story now.

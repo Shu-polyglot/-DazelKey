@@ -1,0 +1,14 @@
+{
+  "name": "life-os-reels",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "description": "Reel-recording tooling (see reels/README.md) -- separate from react-app, which is the actual app.",
+  "scripts": {
+    "record-reel": "node scripts/record-reel.js",
+    "build-reel": "bash scripts/build-reel.sh"
+  },
+  "devDependencies": {
+    "playwright": "^1.48.0"
+  }
+}

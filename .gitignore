@@ -1,0 +1,9 @@
+node_modules
+.DS_Store
+
+# Reel captures/output are large binaries generated locally -- see
+# reels/README.md for how to produce them.
+reels/raw/*
+reels/output/*
+!reels/raw/.gitkeep
+!reels/output/.gitkeep
