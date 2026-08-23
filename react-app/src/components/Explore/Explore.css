@@ -1,4 +1,4 @@
-/* Solo/Together filter chips -- the exact recipe The Bucket List's own
+/* Friends/Everyone filter chips -- the exact recipe The Bucket List's own
    filter tabs used before they switched to a when-based horizon (see
    BucketList.css's .filter-row/.filter-button), duplicated rather than
    imported so this feature's CSS stays self-contained. */
@@ -88,6 +88,32 @@
   padding: var(--space-md);
 }
 
+/* Local-only friend toggle -- see useFriends -- so it reuses the same
+   pill/is-active recipe as .explore-action-button rather than a new one. */
+.explore-card-friend-button {
+  appearance: none;
+  flex: 0 0 auto;
+  padding: var(--space-3xs) var(--space-sm);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-pill);
+  background: rgba(var(--color-void-1-rgb), 0.4);
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-caption);
+  font-weight: var(--font-weight-medium);
+  cursor: pointer;
+  transition: border-color 0.2s ease, background 0.2s ease, color 0.2s ease;
+}
+
+.explore-card-friend-button:hover {
+  border-color: var(--color-border-strong);
+}
+
+.explore-card-friend-button.is-active {
+  background: rgba(var(--color-glow-rgb), 0.16);
+  border-color: rgba(var(--color-glow-rgb), 0.4);
+  color: var(--color-accent-strong);
+}
+
 .explore-card-avatar {
   width: 38px;
   height: 38px;
@@ -102,6 +128,7 @@
 .explore-card-user-meta {
   display: flex;
   flex-direction: column;
+  flex: 1 1 auto;
   min-width: 0;
 }
 
@@ -150,6 +177,27 @@
   font-size: var(--font-size-caption);
   letter-spacing: var(--tracking-wide);
   text-transform: uppercase;
+}
+
+.explore-card-meta-left {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-xs);
+  min-width: 0;
+}
+
+/* Was the top-level filter before the Friends/Everyone view axis took
+   that role over -- Solo/Together now lives here, as a read-only badge
+   on the post itself instead of gating the feed. */
+.explore-card-mode-badge {
+  flex: 0 0 auto;
+  padding: var(--space-3xs) var(--space-xs);
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--color-border-strong);
+  background: rgba(var(--color-mist-rgb), 0.1);
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-label);
+  letter-spacing: var(--tracking-wider);
 }
 
 .explore-card-date {

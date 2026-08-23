@@ -5,10 +5,11 @@ import { spring } from '../../styles/motion';
 const filters = ['All', ...whenOptions];
 
 // The Bucket List's own filter axis: when you want it to happen, not who
-// it's with (that moved to Explore -- see Explore/ModeFilters). Reuses
-// `when`, the horizon already set per-item at creation, so there's no new
-// field to maintain here -- same chip markup/behavior the old Solo/
-// Together tabs used, just driven by a different options list.
+// it's with (that badge lives on Explore's cards now -- see
+// Explore/ExploreCard's mode badge). Reuses `when`, the horizon already
+// set per-item at creation, so there's no new field to maintain here --
+// same chip markup/behavior the old Solo/Together tabs used, just driven
+// by a different options list.
 function WhenFilters({ activeFilter, onChange }) {
   return (
     <div className="filter-row" aria-label="Filter by when you want to make it happen">

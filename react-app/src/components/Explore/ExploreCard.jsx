@@ -34,8 +34,8 @@ function MessageIcon() {
   );
 }
 
-function ExploreCard({ post, index = 0, onToggleInspired, onOpenDM }) {
-  const meta = [modeLabels[post.mode], post.place].filter(Boolean).join(' · ');
+function ExploreCard({ post, index = 0, onToggleInspired, onOpenDM, isFriend, onToggleFriend }) {
+  const meta = post.place;
 
   return (
     <motion.article
@@ -54,12 +54,27 @@ function ExploreCard({ post, index = 0, onToggleInspired, onOpenDM }) {
             <span className="explore-card-username">{post.user.name}</span>
             <span className="explore-card-handle">{post.user.handle}</span>
           </div>
+          <motion.button
+            type="button"
+            className={`explore-card-friend-button${isFriend ? ' is-active' : ''}`}
+            aria-pressed={isFriend}
+            onClick={() => onToggleFriend(post.user.handle)}
+            whileHover={{ y: -1, transition: spring.hover }}
+            whileTap={{ y: 1, scale: 0.96, transition: spring.press }}
+          >
+            {isFriend ? 'Friend' : 'Add as Friend'}
+          </motion.button>
         </div>
 
         <div className="explore-card-content">
           <h3 className="explore-card-title">{post.title}</h3>
           <div className="explore-card-meta">
-            <span className="explore-card-date">{formatDate(post.completedDate)}</span>
+            <div className="explore-card-meta-left">
+              <span className={`explore-card-mode-badge explore-card-mode-badge--${post.mode}`}>
+                {modeLabels[post.mode]}
+              </span>
+              <span className="explore-card-date">{formatDate(post.completedDate)}</span>
+            </div>
             {meta && <span className="explore-card-location">{meta}</span>}
           </div>
         </div>

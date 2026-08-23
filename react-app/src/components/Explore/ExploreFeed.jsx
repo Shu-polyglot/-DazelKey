@@ -1,19 +1,23 @@
 import { useMemo, useState } from 'react';
 import { motion } from 'motion/react';
 import ExploreCard from './ExploreCard';
-import ModeFilters from './ModeFilters';
+import ViewFilters from './ViewFilters';
 import { useExploreFeed } from '../../hooks/useExploreFeed';
+import { useFriends } from '../../hooks/useFriends';
 import { entranceTransition } from '../../styles/motion';
 import './Explore.css';
 
 function ExploreFeed({ onOpenDM }) {
   const { feed, toggleInspired } = useExploreFeed();
-  const [activeFilter, setActiveFilter] = useState('All');
+  const { isFriend, toggleFriend } = useFriends();
+  const [activeFilter, setActiveFilter] = useState('Everyone');
 
   const filteredFeed = useMemo(
-    () => (activeFilter === 'All' ? feed : feed.filter((post) => post.mode === activeFilter)),
-    [feed, activeFilter],
+    () => (activeFilter === 'Everyone' ? feed : feed.filter((post) => isFriend(post.user.handle))),
+    [feed, activeFilter, isFriend],
   );
+
+  const isFriendsEmpty = activeFilter === 'Friends' && filteredFeed.length === 0;
 
   return (
     <section className="app-section" id="explore-section">
@@ -27,14 +31,26 @@ function ExploreFeed({ onOpenDM }) {
         <h2>Explore</h2>
       </motion.div>
 
-      <ModeFilters activeFilter={activeFilter} onChange={setActiveFilter} />
+      <ViewFilters activeFilter={activeFilter} onChange={setActiveFilter} />
 
       {filteredFeed.length === 0 ? (
-        <div className="explore-empty">Nothing here yet -- try a different filter.</div>
+        <div className="explore-empty">
+          {isFriendsEmpty
+            ? "No friends here yet -- add someone from Everyone, and their bucket comes to you."
+            : 'Nothing here yet -- try a different filter.'}
+        </div>
       ) : (
         <div className="explore-feed">
           {filteredFeed.map((post, index) => (
-            <ExploreCard key={post.id} post={post} index={index} onToggleInspired={toggleInspired} onOpenDM={onOpenDM} />
+            <ExploreCard
+              key={post.id}
+              post={post}
+              index={index}
+              onToggleInspired={toggleInspired}
+              onOpenDM={onOpenDM}
+              isFriend={isFriend(post.user.handle)}
+              onToggleFriend={toggleFriend}
+            />
           ))}
         </div>
       )}
