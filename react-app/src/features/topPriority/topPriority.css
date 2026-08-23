@@ -230,7 +230,7 @@
   white-space: nowrap;
 }
 
-/* Quiet, centered note shown in place of "+ Add a Priority" once the
+/* Quiet, centered note shown in place of the heading's add icon once the
    list has hit its cap. */
 .priority-limit-note {
   padding: var(--space-sm) 0;
@@ -239,8 +239,39 @@
   text-align: center;
 }
 
-.priority-add-button {
-  margin-top: var(--space-lg);
+/* Core's own sub-heading -- section-heading-row (App.css) handles the
+   flex/gap, this just sizes the title and the round add-icon beside it. */
+.priority-heading-row {
+  justify-content: space-between;
+  margin-bottom: var(--space-md);
+}
+
+.priority-heading-row h3 {
+  font-family: var(--font-family-display);
+  font-weight: var(--font-weight-regular);
+  font-size: var(--font-size-h3);
+  color: var(--color-text-primary);
+}
+
+.priority-add-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 1px solid var(--color-border);
+  background: rgba(var(--color-mist-rgb), 0.04);
+  color: var(--color-text-primary);
+  font-size: 1.3rem;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: border-color 0.2s ease, background 0.2s ease;
+}
+
+.priority-add-icon:hover {
+  border-color: var(--color-border-strong);
+  background: rgba(var(--color-mist-rgb), 0.1);
 }
 
 .priority-empty-note {

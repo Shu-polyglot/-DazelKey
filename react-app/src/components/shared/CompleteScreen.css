@@ -1,0 +1,131 @@
+/* Fixed, full-viewport takeover -- sits above BottomNav (z-index 300) so
+   the pill nav doesn't poke through, same tier AchievementBurst used to
+   occupy. Self-contained (doesn't share TransitionRitual.css's class)
+   so its z-index/background stay independent of that family's own. */
+.complete-screen {
+  position: fixed;
+  inset: 0;
+  z-index: 400;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-2xl) var(--space-lg);
+  touch-action: manipulation;
+  user-select: none;
+  -webkit-user-select: none;
+  background: radial-gradient(ellipse at 50% 42%, var(--color-bg-elevated) 0%, var(--color-bg) 72%);
+}
+
+.complete-screen-card {
+  width: min(78vw, 320px);
+}
+
+.complete-screen-frame {
+  position: relative;
+  aspect-ratio: 3 / 4;
+  border-radius: var(--radius-xl);
+  border: 1px solid var(--color-border);
+  background: var(--color-bg-elevated);
+  box-shadow: var(--shadow-strong), 0 0 48px rgba(var(--color-glow-rgb), 0.28);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: var(--space-lg);
+}
+
+.complete-screen-photo {
+  position: absolute;
+  inset: 0;
+  background-size: cover;
+  background-position: center;
+}
+
+.complete-screen-glow {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at 50% 28%, rgba(var(--color-glow-bright-rgb), 0.32), transparent 65%),
+    linear-gradient(160deg, #10192c 0%, #05070d 80%);
+}
+
+.complete-screen-scrim {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, transparent 34%, rgba(var(--color-void-1-rgb), 0.9) 100%);
+}
+
+.complete-screen-content {
+  position: relative;
+  z-index: 1;
+}
+
+.complete-screen-eyebrow {
+  display: block;
+  font-size: var(--font-size-label);
+  letter-spacing: var(--tracking-wider);
+  text-transform: uppercase;
+  color: var(--color-accent-strong);
+  margin-bottom: var(--space-xs);
+}
+
+.complete-screen-title {
+  margin: 0 0 var(--space-sm);
+  font-family: var(--font-family-display);
+  font-weight: var(--font-weight-regular);
+  font-size: clamp(1.5rem, 5vw, 2rem);
+  line-height: var(--leading-tight);
+  color: var(--color-text-primary);
+}
+
+.complete-screen-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6em;
+  font-size: var(--font-size-caption);
+  letter-spacing: var(--tracking-wide);
+  text-transform: uppercase;
+  color: var(--color-text-secondary);
+}
+
+.complete-screen-meta span:not(:last-child)::after {
+  content: '·';
+  margin-left: 0.6em;
+  opacity: 0.6;
+}
+
+.complete-screen-memory {
+  margin: var(--space-sm) 0 0;
+  font-family: var(--font-family-display);
+  font-style: italic;
+  font-size: var(--font-size-body-sm);
+  line-height: var(--leading-relaxed);
+  color: var(--color-text-secondary);
+}
+
+.complete-screen-prompt {
+  position: absolute;
+  bottom: var(--space-2xl);
+  left: 0;
+  right: 0;
+  text-align: center;
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-wider);
+  font-size: var(--font-size-label);
+  color: var(--color-text-muted);
+}
+
+@media (max-width: 640px) {
+  .complete-screen {
+    padding: var(--space-xl) var(--space-md);
+  }
+
+  .complete-screen-card {
+    width: min(84vw, 300px);
+  }
+
+  .complete-screen-prompt {
+    bottom: var(--space-xl);
+  }
+}

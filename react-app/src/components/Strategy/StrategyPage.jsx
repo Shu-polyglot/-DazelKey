@@ -13,13 +13,7 @@ import { entranceTransition, spring } from '../../styles/motion';
 import '../Modals/Modals.css';
 import './Strategy.css';
 
-const VIEWS = [
-  { id: 'priority', label: 'Core' },
-  { id: 'realize', label: 'Realize' },
-];
-
 function StrategyPage({ buckets, votes, contributions, onLogMoney, onAddDoingGoal, onToggleChecklistItem, onAddAchievement }) {
-  const [view, setView] = useState('priority');
   // Drops out once doingCompletedAt is set (100% reached, see App.jsx's
   // checkDoingCompletion) -- the goal itself lives on in `buckets` for
   // DoingHistoryModal to look back up, just no longer "in progress"
@@ -56,65 +50,53 @@ function StrategyPage({ buckets, votes, contributions, onLogMoney, onAddDoingGoa
         </div>
       </motion.div>
 
-      <div className="strategy-tabs" role="tablist" aria-label="Momentum view">
-        {VIEWS.map((tab) => (
-          <button
-            key={tab.id}
-            type="button"
-            role="tab"
-            aria-selected={view === tab.id}
-            className={`strategy-tab${view === tab.id ? ' is-active' : ''}`}
-            onClick={() => setView(tab.id)}
-          >
-            {tab.label}
-            {view === tab.id && <motion.span className="strategy-tab-indicator" layoutId="strategy-tab-indicator" transition={spring.soft} />}
-          </button>
-        ))}
-      </div>
+      <TopPrioritySection onAddAchievement={onAddAchievement} />
 
-      {view === 'priority' ? (
-        <TopPrioritySection onAddAchievement={onAddAchievement} />
-      ) : (
-        <>
-          {doingGoals.length === 0 ? (
-            <div className="strategy-empty">Add a goal below to start tracking it in money.</div>
-          ) : (
-            <>
-              <motion.button
-                type="button"
-                className="primary-button strategy-log-money-button"
-                onClick={() => setIsLogMoneyOpen(true)}
-                whileHover={{ y: -1, transition: spring.hover }}
-                whileTap={{ y: 1, scale: 0.97, transition: spring.press }}
-              >
-                Log Money
-              </motion.button>
-
-              <div className="strategy-goal-list">
-                {doingGoals.map((goal) => (
-                  <DoingGoalCard key={goal.id} goal={goal} total={goal.total} onOpen={() => setExpandedDoingGoalId(goal.id)} />
-                ))}
-              </div>
-            </>
-          )}
-
-          {atDoingCap ? (
-            <p className="strategy-goal-limit-note">
-              You're tracking {MAX_DOING_GOALS} goals at once -- complete or remove one to add another.
-            </p>
-          ) : (
+      <div className="strategy-subsection">
+        <div className="section-heading-row realize-heading-row">
+          <h3>Realize</h3>
+          {!atDoingCap && (
             <motion.button
               type="button"
-              className="secondary-button strategy-add-trait-button"
+              className="realize-add-icon"
+              aria-label="Add a Goal"
               onClick={() => setIsAddGoalOpen(true)}
+              whileHover={{ y: -1, transition: spring.hover }}
+              whileTap={{ y: 1, scale: 0.94, transition: spring.press }}
+            >
+              +
+            </motion.button>
+          )}
+        </div>
+
+        {doingGoals.length === 0 ? (
+          <div className="strategy-empty">Add a goal below to start tracking it in money.</div>
+        ) : (
+          <>
+            <motion.button
+              type="button"
+              className="primary-button strategy-log-money-button"
+              onClick={() => setIsLogMoneyOpen(true)}
               whileHover={{ y: -1, transition: spring.hover }}
               whileTap={{ y: 1, scale: 0.97, transition: spring.press }}
             >
-              + Add a Goal
+              Log Money
             </motion.button>
-          )}
-        </>
-      )}
+
+            <div className="strategy-goal-list">
+              {doingGoals.map((goal) => (
+                <DoingGoalCard key={goal.id} goal={goal} total={goal.total} onOpen={() => setExpandedDoingGoalId(goal.id)} />
+              ))}
+            </div>
+          </>
+        )}
+
+        {atDoingCap && (
+          <p className="strategy-goal-limit-note">
+            You're tracking {MAX_DOING_GOALS} goals at once -- complete or remove one to add another.
+          </p>
+        )}
+      </div>
 
       {/* Portaled to escape page-shell's filter-trap, same as every other
           detail modal in this app (see BucketListPanel/AchievementGallery). */}

@@ -149,6 +149,22 @@ function TopPrioritySection({ onAddAchievement, readOnly = false }) {
 
   return (
     <>
+      <div className="section-heading-row priority-heading-row">
+        <h3>Core</h3>
+        {!readOnly && !atCap && (
+          <motion.button
+            type="button"
+            className="priority-add-icon"
+            aria-label="Add a Priority"
+            onClick={() => setIsAddOpen(true)}
+            whileHover={{ y: -1, transition: spring.hover }}
+            whileTap={{ y: 1, scale: 0.94, transition: spring.press }}
+          >
+            +
+          </motion.button>
+        )}
+      </div>
+
       {priorities.length === 0 ? (
         <div className="priority-empty">
           {readOnly
@@ -172,22 +188,11 @@ function TopPrioritySection({ onAddAchievement, readOnly = false }) {
         </div>
       )}
 
-      {!readOnly &&
-        (atCap ? (
-          <p className="priority-limit-note">
-            You're focusing on {MAX_TOP_PRIORITIES} at a time -- complete or remove one to add another.
-          </p>
-        ) : (
-          <motion.button
-            type="button"
-            className="secondary-button priority-add-button"
-            onClick={() => setIsAddOpen(true)}
-            whileHover={{ y: -1, transition: spring.hover }}
-            whileTap={{ y: 1, scale: 0.97, transition: spring.press }}
-          >
-            + Add a Priority
-          </motion.button>
-        ))}
+      {!readOnly && atCap && (
+        <p className="priority-limit-note">
+          You're focusing on {MAX_TOP_PRIORITIES} at a time -- complete or remove one to add another.
+        </p>
+      )}
 
       {createPortal(
         <AnimatePresence>

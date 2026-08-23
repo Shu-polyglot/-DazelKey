@@ -1,40 +1,46 @@
-/* Top 3 Priority / Realize toggle -- same underline-tab recipe
-   ProfilePage's own tab switcher uses, kept as a separate copy here so
-   Strategy.css stays self-contained rather than importing across
-   features. */
-.strategy-tabs {
-  display: flex;
-  border-bottom: 1px solid var(--color-border);
-  margin-bottom: var(--space-xl);
+/* Realize sits stacked below Core -- just breathing room from the
+   section above, everything else (heading, list, empty state) already
+   carries its own spacing. */
+.strategy-subsection {
+  margin-top: var(--space-2xl);
 }
 
-.strategy-tab {
-  position: relative;
-  flex: 1;
-  appearance: none;
-  background: none;
-  border: none;
-  padding: var(--space-sm) var(--space-xs);
-  font-size: var(--font-size-body-sm);
-  font-weight: var(--font-weight-medium);
-  letter-spacing: var(--tracking-wide);
-  text-transform: uppercase;
-  color: var(--color-text-secondary);
-  cursor: pointer;
-  transition: color 0.2s ease;
+/* Realize's own sub-heading -- section-heading-row (App.css) handles the
+   flex/gap, this just sizes the title and the round add-icon beside it.
+   Mirrors topPriority.css's identical .priority-heading-row/-add-icon
+   pair -- a deliberate duplicate, not a shared import (see that file's
+   own header comment on why). */
+.realize-heading-row {
+  justify-content: space-between;
+  margin-bottom: var(--space-md);
 }
 
-.strategy-tab.is-active {
+.realize-heading-row h3 {
+  font-family: var(--font-family-display);
+  font-weight: var(--font-weight-regular);
+  font-size: var(--font-size-h3);
   color: var(--color-text-primary);
 }
 
-.strategy-tab-indicator {
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: -1px;
-  height: 2px;
-  background: var(--color-text-primary);
+.realize-add-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 1px solid var(--color-border);
+  background: rgba(var(--color-mist-rgb), 0.04);
+  color: var(--color-text-primary);
+  font-size: 1.3rem;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: border-color 0.2s ease, background 0.2s ease;
+}
+
+.realize-add-icon:hover {
+  border-color: var(--color-border-strong);
+  background: rgba(var(--color-mist-rgb), 0.1);
 }
 
 .strategy-empty {
@@ -88,8 +94,8 @@
   margin-left: auto;
 }
 
-/* Quiet, centered note shown in place of "+ Add a Goal" once Realize has
-   hit its cap -- same tone as strategy-empty, no border. */
+/* Quiet, centered note shown in place of the heading's add icon once
+   Realize has hit its cap -- same tone as strategy-empty, no border. */
 .strategy-goal-limit-note {
   padding: var(--space-sm) 0;
   color: var(--color-text-muted);
@@ -150,12 +156,8 @@
   cursor: default;
 }
 
-.strategy-add-trait-button {
-  margin-top: var(--space-lg);
-}
-
 /* Deliberately quiet -- a coda for looking back, not a call to action
-   competing with the tabs or "+ Add a Goal" below. */
+   competing with Core/Realize's own add icons below. */
 .strategy-history-link {
   appearance: none;
   background: none;
