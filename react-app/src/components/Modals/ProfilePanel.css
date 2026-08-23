@@ -1,3 +1,29 @@
+.profile-panel-header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-sm);
+}
+
+.profile-replay-tutorial-link {
+  appearance: none;
+  flex: none;
+  border: none;
+  background: none;
+  padding: 0;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-caption);
+  letter-spacing: var(--tracking-wide);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.profile-replay-tutorial-link:hover {
+  color: var(--color-text-secondary);
+}
+
 .profile-trait-section {
   margin-bottom: var(--space-lg);
   padding-bottom: var(--space-lg);

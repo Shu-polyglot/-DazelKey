@@ -16,6 +16,7 @@ import ProfilePanel from './components/Modals/ProfilePanel';
 import DMThreadModal from './components/Modals/DMThreadModal';
 import OpeningExperience from './components/Onboarding/OpeningExperience';
 import AchievementBanner from './components/Onboarding/AchievementBanner';
+import OnboardingTutorial from './components/Onboarding/OnboardingTutorial';
 import ArchiveExperience from './components/Archive/ArchiveExperience';
 import WhatsAheadExperience from './components/Archive/WhatsAheadExperience';
 import TransitionRitual from './components/TransitionRitual';
@@ -25,6 +26,7 @@ import AchievementPhotoPrompt from './components/Achievements/AchievementPhotoPr
 import BottomNav from './components/BottomNav';
 import { useBuckets } from './hooks/useBuckets';
 import { useProfile } from './hooks/useProfile';
+import { useOnboardingTutorial } from './hooks/useOnboardingTutorial';
 import { useVotes } from './hooks/useVotes';
 import { useContributions } from './hooks/useContributions';
 import { useRoute } from './hooks/useRoute';
@@ -38,6 +40,7 @@ import './App.css';
 function App() {
   const { buckets, addBucket, updateBucket, deleteBucket, completeBucket, addAchievement } = useBuckets();
   const { profile, updateProfile, completeProfile } = useProfile();
+  const { hasSeenTutorial, markTutorialSeen } = useOnboardingTutorial();
   // Realize's own legacy read: nothing writes new votes here anymore (the
   // per-card daily vote was retired in favor of Log Money), but a goal
   // that already had some keeps what it earned -- see lib/doing.js.
@@ -47,6 +50,8 @@ function App() {
   const [hasEntered, setHasEntered] = useState(false);
   const [showAchievementBanner, setShowAchievementBanner] = useState(false);
   const [showEntryRitual, setShowEntryRitual] = useState(false);
+  const [showTutorial, setShowTutorial] = useState(false);
+  const [isReplayTutorialOpen, setIsReplayTutorialOpen] = useState(false);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [detailsBucketId, setDetailsBucketId] = useState(null);
@@ -101,8 +106,22 @@ function App() {
     setShowEntryRitual(true);
   }
 
+  // First-run tutorial slots in right after the quote card and before the
+  // dashboard -- a returning user (hasSeenTutorial already true) skips
+  // straight past it, same as the entry ritual before it skips the name/
+  // age/photo steps for a completed profile.
   function handleEntryRitualContinue() {
     setShowEntryRitual(false);
+    if (hasSeenTutorial) {
+      setHasEntered(true);
+    } else {
+      setShowTutorial(true);
+    }
+  }
+
+  function handleTutorialFinish() {
+    markTutorialSeen();
+    setShowTutorial(false);
     setHasEntered(true);
   }
 
@@ -289,6 +308,16 @@ function App() {
         {showEntryRitual && <TransitionRitual key="entry-ritual" onContinue={handleEntryRitualContinue} />}
       </AnimatePresence>
 
+      <AnimatePresence>
+        {showTutorial && <OnboardingTutorial key="onboarding-tutorial" onClose={handleTutorialFinish} />}
+      </AnimatePresence>
+
+      <AnimatePresence>
+        {isReplayTutorialOpen && (
+          <OnboardingTutorial key="replay-tutorial" onClose={() => setIsReplayTutorialOpen(false)} />
+        )}
+      </AnimatePresence>
+
       {hasEntered && (
         <motion.div
           className="page-shell"
@@ -435,6 +464,7 @@ function App() {
                     updateProfile(patch);
                     setIsProfileOpen(false);
                   }}
+                  onReplayTutorial={() => setIsReplayTutorialOpen(true)}
                 />
               )}
             </AnimatePresence>,
