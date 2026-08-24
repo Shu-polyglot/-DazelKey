@@ -9,9 +9,46 @@ import AddGoalFlow from './AddGoalFlow';
 import TopPrioritySection from '../../features/topPriority/TopPrioritySection';
 import { MAX_DOING_GOALS } from '../../lib/buckets';
 import { getTotalProgress } from '../../lib/doing';
-import { entranceTransition, spring } from '../../styles/motion';
+import { entranceTransition, spring, transitions } from '../../styles/motion';
 import '../Modals/Modals.css';
 import './Strategy.css';
+
+// Thin-stroke swap glyph (see BottomNav's own icon-comment for this
+// app's line-icon conventions) -- the one always-visible affordance for
+// momentum-view-toggle, since its meaning ("tap to switch") has to read
+// the same whichever of the two views is currently showing.
+function SwapIcon() {
+  return (
+    <svg viewBox="0 0 24 24" width="15" height="15" aria-hidden="true">
+      <path
+        d="M4 8 H17 M17 8 L13 4 M17 8 L13 12"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.6"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M20 16 H7 M7 16 L11 12 M7 16 L11 20"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.6"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+
+// Fade + a small vertical settle + blur -- the same enter/exit shape as
+// every other content swap in this app (dashboard sections' own entrance,
+// BucketStepEditor's step panels), just without that wizard's horizontal
+// slide since Core/Realize aren't an ordered sequence to move "through".
+const viewVariants = {
+  enter: { opacity: 0, y: 8, filter: 'blur(4px)' },
+  center: { opacity: 1, y: 0, filter: 'blur(0px)', transition: transitions.emphasis },
+  exit: { opacity: 0, y: -8, filter: 'blur(4px)', transition: transitions.exit },
+};
 
 function StrategyPage({ buckets, votes, contributions, onLogMoney, onAddDoingGoal, onToggleChecklistItem, onAddAchievement }) {
   // Drops out once doingCompletedAt is set (100% reached, see App.jsx's
@@ -29,9 +66,18 @@ function StrategyPage({ buckets, votes, contributions, onLogMoney, onAddDoingGoa
   const [isLogMoneyOpen, setIsLogMoneyOpen] = useState(false);
   const [expandedDoingGoalId, setExpandedDoingGoalId] = useState(null);
   const [isHistoryOpen, setIsHistoryOpen] = useState(false);
+  // Core and Realize used to sit stacked, both always on screen -- now
+  // only one shows at a time (see momentum-view-toggle below), purely a
+  // display-layer choice: neither section's own state/data above this
+  // line changed, so switching back and forth never loses anything.
+  const [activeView, setActiveView] = useState('core');
 
   const expandedDoingGoal = doingGoals.find((goal) => goal.id === expandedDoingGoalId) || null;
   const logMoneyGoals = doingGoals.map((goal) => ({ id: goal.id, title: goal.title, target: goal.doingGoalAmount, current: goal.total }));
+
+  function toggleView() {
+    setActiveView((prev) => (prev === 'core' ? 'realize' : 'core'));
+  }
 
   return (
     <section className="app-section" id="strategy-section">
@@ -50,53 +96,78 @@ function StrategyPage({ buckets, votes, contributions, onLogMoney, onAddDoingGoa
         </div>
       </motion.div>
 
-      <TopPrioritySection onAddAchievement={onAddAchievement} />
+      {/* Fixed in place above whichever view is showing -- switching
+          never moves this button, only the label/destination it names.
+          Deliberately one button, not a Core/Realize chip pair: the
+          label always names where a tap goes next, so it reads as a
+          single toggle rather than two tabs. */}
+      <motion.button
+        type="button"
+        className="momentum-view-toggle"
+        onClick={toggleView}
+        aria-label={`Switch to ${activeView === 'core' ? 'Realize' : 'Core'}`}
+        whileHover={{ y: -1, transition: spring.hover }}
+        whileTap={{ y: 1, scale: 0.96, transition: spring.press }}
+      >
+        <SwapIcon />
+        {activeView === 'core' ? 'Realize' : 'Core'}
+      </motion.button>
 
-      <div className="strategy-subsection">
-        <div className="section-heading-row realize-heading-row">
-          <h3>Realize</h3>
-          {!atDoingCap && (
-            <motion.button
-              type="button"
-              className="realize-add-icon"
-              aria-label="Add a Goal"
-              onClick={() => setIsAddGoalOpen(true)}
-              whileHover={{ y: -1, transition: spring.hover }}
-              whileTap={{ y: 1, scale: 0.94, transition: spring.press }}
-            >
-              +
-            </motion.button>
-          )}
-        </div>
-
-        {doingGoals.length === 0 ? (
-          <div className="strategy-empty">Add a goal below to start tracking it in money.</div>
+      <AnimatePresence mode="wait">
+        {activeView === 'core' ? (
+          <motion.div key="core" variants={viewVariants} initial="enter" animate="center" exit="exit">
+            <TopPrioritySection onAddAchievement={onAddAchievement} />
+          </motion.div>
         ) : (
-          <>
-            <motion.button
-              type="button"
-              className="primary-button strategy-log-money-button"
-              onClick={() => setIsLogMoneyOpen(true)}
-              whileHover={{ y: -1, transition: spring.hover }}
-              whileTap={{ y: 1, scale: 0.97, transition: spring.press }}
-            >
-              Log Money
-            </motion.button>
+          <motion.div key="realize" variants={viewVariants} initial="enter" animate="center" exit="exit">
+            <div className="strategy-subsection">
+              <div className="section-heading-row realize-heading-row">
+                <h3>Realize</h3>
+                {!atDoingCap && (
+                  <motion.button
+                    type="button"
+                    className="realize-add-icon"
+                    aria-label="Add a Goal"
+                    onClick={() => setIsAddGoalOpen(true)}
+                    whileHover={{ y: -1, transition: spring.hover }}
+                    whileTap={{ y: 1, scale: 0.94, transition: spring.press }}
+                  >
+                    +
+                  </motion.button>
+                )}
+              </div>
 
-            <div className="strategy-goal-list">
-              {doingGoals.map((goal) => (
-                <DoingGoalCard key={goal.id} goal={goal} total={goal.total} onOpen={() => setExpandedDoingGoalId(goal.id)} />
-              ))}
+              {doingGoals.length === 0 ? (
+                <div className="strategy-empty">Add a goal below to start tracking it in money.</div>
+              ) : (
+                <>
+                  <motion.button
+                    type="button"
+                    className="primary-button strategy-log-money-button"
+                    onClick={() => setIsLogMoneyOpen(true)}
+                    whileHover={{ y: -1, transition: spring.hover }}
+                    whileTap={{ y: 1, scale: 0.97, transition: spring.press }}
+                  >
+                    Log Money
+                  </motion.button>
+
+                  <div className="strategy-goal-list">
+                    {doingGoals.map((goal) => (
+                      <DoingGoalCard key={goal.id} goal={goal} total={goal.total} onOpen={() => setExpandedDoingGoalId(goal.id)} />
+                    ))}
+                  </div>
+                </>
+              )}
+
+              {atDoingCap && (
+                <p className="strategy-goal-limit-note">
+                  You're tracking {MAX_DOING_GOALS} goals at once -- complete or remove one to add another.
+                </p>
+              )}
             </div>
-          </>
+          </motion.div>
         )}
-
-        {atDoingCap && (
-          <p className="strategy-goal-limit-note">
-            You're tracking {MAX_DOING_GOALS} goals at once -- complete or remove one to add another.
-          </p>
-        )}
-      </div>
+      </AnimatePresence>
 
       {/* Portaled to escape page-shell's filter-trap, same as every other
           detail modal in this app (see BucketListPanel/AchievementGallery). */}
