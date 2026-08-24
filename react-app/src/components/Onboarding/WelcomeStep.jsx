@@ -11,7 +11,7 @@ const TITLE_DELAY = 0.6;
 const CTA_DELAY = TITLE_DELAY + 1.4;
 
 /**
- * The opening beat of Life OS: the sea/sun backdrop keeps rolling while
+ * The opening beat of DazelKey: the sea/sun backdrop keeps rolling while
  * the title settles into the center of the frame, unhurried, with Enter
  * following a beat behind it.
  */
@@ -31,7 +31,7 @@ function WelcomeStep({ onEnter }) {
           animate={{ opacity: 1, y: 0, scale: 1, filter: 'blur(0px)' }}
           transition={{ duration: 1.5, delay: TITLE_DELAY, ease: easing.emphasized }}
         >
-          Life OS
+          DazelKey
         </motion.h1>
 
         <motion.button

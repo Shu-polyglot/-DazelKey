@@ -10,8 +10,10 @@ import { todayIso } from '../../lib/dates';
   that exact engine -- one-vote-per-day, auto-threshold milestones, hand-
   marked custom ones -- without a second implementation of it.
 */
-const STORAGE_KEY = 'lifeos-top-priorities-v1';
-export const VOTES_STORAGE_KEY = 'lifeos-top-priority-votes-v1';
+const STORAGE_KEY = 'dazelkey-top-priorities-v1';
+const LEGACY_STORAGE_KEY = 'lifeos-top-priorities-v1';
+export const VOTES_STORAGE_KEY = 'dazelkey-top-priority-votes-v1';
+export const LEGACY_VOTES_STORAGE_KEY = 'lifeos-top-priority-votes-v1';
 
 export const MAX_TOP_PRIORITIES = 3;
 export const MAX_PRIORITY_MILESTONES = 3;
@@ -28,7 +30,7 @@ function normalizePriority(priority, index) {
 }
 
 export function useTopPriorities() {
-  const [stored, setStored] = useLocalStorage(STORAGE_KEY, () => []);
+  const [stored, setStored] = useLocalStorage(STORAGE_KEY, () => [], LEGACY_STORAGE_KEY);
   const priorities = Array.isArray(stored) ? stored.map(normalizePriority) : [];
 
   // Safety net alongside the UI's own cap check (see TopPrioritySection

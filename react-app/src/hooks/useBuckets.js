@@ -4,11 +4,19 @@ import { STORAGE_KEY, defaultBuckets, normalizeBucket } from '../lib/buckets';
 import { loadMigratedBuckets } from '../lib/migrateBuckets';
 import { todayIso } from '../lib/dates';
 
+// Pre-rename (Life OS) name for this exact same v2 shape -- see
+// useLocalStorage's legacyKey param.
+const LEGACY_STORAGE_KEY = 'life-os-buckets-v2';
+
 export function useBuckets() {
-  const [storedBuckets, setStoredBuckets] = useLocalStorage(STORAGE_KEY, () => {
-    const migrated = loadMigratedBuckets();
-    return migrated && migrated.length ? migrated : defaultBuckets.map(normalizeBucket);
-  });
+  const [storedBuckets, setStoredBuckets] = useLocalStorage(
+    STORAGE_KEY,
+    () => {
+      const migrated = loadMigratedBuckets();
+      return migrated && migrated.length ? migrated : defaultBuckets.map(normalizeBucket);
+    },
+    LEGACY_STORAGE_KEY,
+  );
 
   const buckets = useMemo(
     () => (Array.isArray(storedBuckets) ? storedBuckets.map(normalizeBucket) : []),

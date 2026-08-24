@@ -8,7 +8,7 @@ import VoteMomentPrompt from './VoteMomentPrompt';
 import VoteMomentModal from './VoteMomentModal';
 import MilestoneRitual from '../../components/shared/MilestoneRitual';
 import { useVotes } from '../../hooks/useVotes';
-import { useTopPriorities, VOTES_STORAGE_KEY, MAX_TOP_PRIORITIES } from './topPriority';
+import { useTopPriorities, VOTES_STORAGE_KEY, LEGACY_VOTES_STORAGE_KEY, MAX_TOP_PRIORITIES } from './topPriority';
 import { spring } from '../../styles/motion';
 import './topPriority.css';
 
@@ -28,7 +28,7 @@ import './topPriority.css';
 */
 function TopPrioritySection({ onAddAchievement, readOnly = false }) {
   const { priorities, addPriority } = useTopPriorities();
-  const { votes, castVote, markMilestone, attachVoteMedia } = useVotes(VOTES_STORAGE_KEY);
+  const { votes, castVote, markMilestone, attachVoteMedia } = useVotes(VOTES_STORAGE_KEY, LEGACY_VOTES_STORAGE_KEY);
 
   const [expandedId, setExpandedId] = useState(null);
   const [isAddOpen, setIsAddOpen] = useState(false);

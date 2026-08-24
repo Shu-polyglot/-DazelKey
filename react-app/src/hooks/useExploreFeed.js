@@ -2,7 +2,8 @@ import { useMemo } from 'react';
 import { useLocalStorage } from './useLocalStorage';
 import { exploreFeedSeed } from '../data/exploreFeed';
 
-const STORAGE_KEY = 'lifeos-explore-inspired-v1';
+const STORAGE_KEY = 'dazelkey-explore-inspired-v1';
+const LEGACY_STORAGE_KEY = 'lifeos-explore-inspired-v1';
 
 /*
   Feed data is seeded locally for now, but shaped as a fetch-then-render
@@ -12,7 +13,7 @@ const STORAGE_KEY = 'lifeos-explore-inspired-v1';
   everything else about a post comes straight from the seed.
 */
 export function useExploreFeed() {
-  const [inspiredIds, setInspiredIds] = useLocalStorage(STORAGE_KEY, () => []);
+  const [inspiredIds, setInspiredIds] = useLocalStorage(STORAGE_KEY, () => [], LEGACY_STORAGE_KEY);
 
   const feed = useMemo(
     () =>

@@ -42,7 +42,7 @@ function PhotoStep({ initialValue = null, onSubmit }) {
       exit="exit"
       variants={containerVariants}
     >
-      <p className="opening-eyebrow">Life OS wants to know</p>
+      <p className="opening-eyebrow">DazelKey wants to know</p>
       <h2 className="opening-question">Add a photo of yourself</h2>
 
       <button

@@ -1,4 +1,4 @@
-// Records a vertical (9:16) walkthrough of Life OS's "showcase" flow --
+// Records a vertical (9:16) walkthrough of DazelKey's "showcase" flow --
 // boot -> add a Bucket -> complete it -> Log Money -> Share card -- as a
 // single .webm, using Playwright's built-in video capture. Nothing here
 // touches the app's own source; it only drives a browser against a dev
@@ -26,7 +26,7 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = path.resolve(__dirname, '..');
 const RAW_DIR = path.join(REPO_ROOT, 'reels', 'raw');
 
-const BASE_URL = process.env.REEL_BASE_URL || 'http://localhost:5173/bucket-list-app/';
+const BASE_URL = process.env.REEL_BASE_URL || 'http://localhost:5173/dazelkey/';
 
 // The exact copy the wizard uses as its own placeholder (see
 // BucketStepEditor's title-step placeholder) -- reusing it keeps the
@@ -38,7 +38,7 @@ const BUCKET_MESSAGE = "Don't forget how badly you wanted this.";
   Pre-seeds localStorage before the app's first script runs (via
   page.addInitScript), so the recording:
   - skips the name/age/photo setup wizard (profile.completed) and the
-    first-run onboarding tutorial added separately (lifeos-onboarding-
+    first-run onboarding tutorial added separately (dazelkey-onboarding-
     complete-v1) -- neither belongs in a feature-showcase reel
   - already has one active Realize/Doing goal, since Log Money's button
     only renders once a goal exists (see StrategyPage) and setting one
@@ -48,9 +48,9 @@ const BUCKET_MESSAGE = "Don't forget how badly you wanted this.";
 */
 function seedLocalStorage(seed) {
   try {
-    localStorage.setItem('lifeos-profile-v1', JSON.stringify(seed.profile));
-    localStorage.setItem('lifeos-onboarding-complete-v1', 'true');
-    localStorage.setItem('life-os-buckets-v2', JSON.stringify(seed.buckets));
+    localStorage.setItem('dazelkey-profile-v1', JSON.stringify(seed.profile));
+    localStorage.setItem('dazelkey-onboarding-complete-v1', 'true');
+    localStorage.setItem('dazelkey-buckets-v2', JSON.stringify(seed.buckets));
   } catch (error) {
     console.warn('[record-reel] seed script could not write localStorage:', error);
   }

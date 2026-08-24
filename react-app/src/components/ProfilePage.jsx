@@ -116,7 +116,7 @@ function ProfilePage({ profile, buckets, onUpdateBucket, onDeleteBucket, onCompl
         </div>
 
         <button type="button" className="profile-page-about-link" onClick={() => setIsAboutOpen(true)}>
-          About Life OS
+          About DazelKey
         </button>
       </div>
 

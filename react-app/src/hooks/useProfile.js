@@ -2,7 +2,8 @@ import { useMemo } from 'react';
 import { useLocalStorage } from './useLocalStorage';
 import { normalizeProfile } from '../lib/profile';
 
-const STORAGE_KEY = 'lifeos-profile-v1';
+const STORAGE_KEY = 'dazelkey-profile-v1';
+const LEGACY_STORAGE_KEY = 'lifeos-profile-v1';
 
 const defaultProfile = {
   name: '',
@@ -15,7 +16,7 @@ const defaultProfile = {
 };
 
 export function useProfile() {
-  const [storedProfile, setStoredProfile] = useLocalStorage(STORAGE_KEY, () => defaultProfile);
+  const [storedProfile, setStoredProfile] = useLocalStorage(STORAGE_KEY, () => defaultProfile, LEGACY_STORAGE_KEY);
 
   const profile = useMemo(() => normalizeProfile(storedProfile ?? defaultProfile), [storedProfile]);
 

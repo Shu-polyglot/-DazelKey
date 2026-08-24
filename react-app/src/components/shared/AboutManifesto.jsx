@@ -52,12 +52,12 @@ function SpeakerIcon({ muted }) {
 }
 
 /*
-  Profile's "About Life OS" entry point, opened as often as anyone
+  Profile's "About DazelKey" entry point, opened as often as anyone
   likes -- reads the app's own design manifesto (data/manifesto) one
   paragraph at a time, narrated by useNarration, in the same full-screen
   cinematic shell TransitionRitual/MilestoneRitual already use (see the
   shared CSS import). Playback starts the moment this mounts, which only
-  ever happens as the direct result of the "About Life OS" tap in
+  ever happens as the direct result of the "About DazelKey" tap in
   ProfilePage -- keeping SpeechSynthesis's first call inside that same
   user-gesture turn is what lets it actually play on browsers (notably
   Safari/iOS) that gate audio behind one.

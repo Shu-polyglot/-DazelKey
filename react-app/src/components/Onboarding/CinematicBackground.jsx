@@ -4,7 +4,7 @@ import { easing } from '../../styles/motion';
 
 /**
  * Atmospheric backdrop for the opening experience -- a looping night-sea
- * video (moon, stars, water) standing in for the Life OS world the user is
+ * video (moon, stars, water) standing in for the DazelKey world the user is
  * about to enter. One persistent instance carries across every onboarding
  * step (see OpeningExperience), so it plays continuously rather than
  * restarting per step. A thin black/navy wash + vignette, both built from

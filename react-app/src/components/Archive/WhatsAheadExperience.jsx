@@ -43,7 +43,7 @@ function WhatsAheadExperience({ buckets, onClose, onComplete }) {
     >
       <CinematicBackground />
 
-      <button type="button" className="archive-close" aria-label="Back to Life OS" onClick={onClose}>
+      <button type="button" className="archive-close" aria-label="Back to DazelKey" onClick={onClose}>
         ×
       </button>
 

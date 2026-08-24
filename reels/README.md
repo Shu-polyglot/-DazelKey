@@ -1,6 +1,6 @@
 # Reels
 
-Records Life OS's "showcase" flow with Playwright and turns it into a
+Records DazelKey's "showcase" flow with Playwright and turns it into a
 vertical (1080x1920) MP4 sized for Instagram Reels / TikTok, entirely
 with local, free tooling. Lives outside `react-app/` on purpose -- nothing
 here is part of the app itself, and nothing here touches its source.

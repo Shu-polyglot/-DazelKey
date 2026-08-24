@@ -31,7 +31,7 @@ function NameStep({ initialValue = '', onSubmit }) {
       exit="exit"
       variants={containerVariants}
     >
-      <p className="opening-eyebrow">Life OS wants to know</p>
+      <p className="opening-eyebrow">DazelKey wants to know</p>
       <h2 className="opening-question">What’s your name?</h2>
 
       <div className={`opening-input-row${error ? ' has-error' : ''}`}>

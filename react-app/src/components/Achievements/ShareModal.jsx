@@ -69,7 +69,7 @@ function ShareModal({ bucket, onClose }) {
 
   const slug = slugify(bucket.title);
   const shareUrl = `${window.location.origin}${window.location.pathname}#achievement-${bucket.id}`;
-  const shareText = `${bucket.title} — an achievement from my Life OS.`;
+  const shareText = `${bucket.title} — an achievement from my DazelKey.`;
 
   async function handleSaveImage() {
     if (busy) return;

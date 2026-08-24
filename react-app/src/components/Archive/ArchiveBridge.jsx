@@ -23,7 +23,7 @@ function ArchiveBridge({ onReturnToDashboard, onExploreAhead }) {
           whileHover={{ y: -2, transition: spring.hover }}
           whileTap={{ y: 1, scale: 0.97, transition: spring.press }}
         >
-          Return to Life OS
+          Return to DazelKey
         </motion.button>
         <motion.button
           type="button"

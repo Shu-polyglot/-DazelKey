@@ -1,6 +1,6 @@
 import { todayIso } from './dates';
 
-export const STORAGE_KEY = 'life-os-buckets-v2';
+export const STORAGE_KEY = 'dazelkey-buckets-v2';
 
 /*
   A Bucket is a future intention, not a scheduled task. There is

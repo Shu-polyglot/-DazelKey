@@ -330,7 +330,7 @@ function App() {
           transition={isOverlayOpen ? { duration: 0.55, ease: easing.exit } : { duration: 0.5, ease: easing.emphasized }}
         >
           <Header
-            title="Life OS"
+            title="DazelKey"
             profile={profile}
             onAddBucket={() => setIsAddModalOpen(true)}
             onOpenProfile={() => setIsProfileOpen(true)}

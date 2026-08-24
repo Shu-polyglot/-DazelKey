@@ -1,7 +1,8 @@
 import { useLocalStorage } from './useLocalStorage';
 import { todayIso } from '../lib/dates';
 
-const STORAGE_KEY = 'lifeos-contributions-v1';
+const STORAGE_KEY = 'dazelkey-contributions-v1';
+const LEGACY_STORAGE_KEY = 'lifeos-contributions-v1';
 
 /*
   "Add extra" records -- a lightweight, separate store from useVotes on
@@ -13,7 +14,7 @@ const STORAGE_KEY = 'lifeos-contributions-v1';
   that doesn't apply to them.
 */
 export function useContributions() {
-  const [contributions, setContributions] = useLocalStorage(STORAGE_KEY, () => []);
+  const [contributions, setContributions] = useLocalStorage(STORAGE_KEY, () => [], LEGACY_STORAGE_KEY);
 
   // Returns the record actually added (or null if the amount was
   // invalid) -- mirrors useVotes' castVote, so callers can react to a

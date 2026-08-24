@@ -31,7 +31,7 @@ const ShareCard = forwardRef(function ShareCard({ bucket }, ref) {
 
         <div className="share-card-brand">
           <span className="share-card-brand-mark" />
-          <span>Life OS</span>
+          <span>DazelKey</span>
         </div>
       </div>
     </div>

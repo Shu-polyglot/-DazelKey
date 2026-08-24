@@ -1,7 +1,8 @@
 import { useLocalStorage } from './useLocalStorage';
 import { todayIso } from '../lib/dates';
 
-const DEFAULT_STORAGE_KEY = 'lifeos-votes-v1';
+const DEFAULT_STORAGE_KEY = 'dazelkey-votes-v1';
+const DEFAULT_LEGACY_STORAGE_KEY = 'lifeos-votes-v1';
 
 // Vote-count thresholds that automatically promote that day's vote to a
 // milestone -- no thresholds beyond this list ever fire again for a goal,
@@ -37,8 +38,8 @@ function autoMilestoneLabel(totalAfterThisVote) {
   its own goals -- Top 3 Priority, see src/features/topPriority -- can
   pass its own key instead of reinventing the logic.
 */
-export function useVotes(storageKey = DEFAULT_STORAGE_KEY) {
-  const [votes, setVotes] = useLocalStorage(storageKey, () => []);
+export function useVotes(storageKey = DEFAULT_STORAGE_KEY, legacyStorageKey = DEFAULT_LEGACY_STORAGE_KEY) {
+  const [votes, setVotes] = useLocalStorage(storageKey, () => [], legacyStorageKey);
 
   // One vote per goal per day -- the grid's one cell per day -- so this
   // is a no-op if today's vote for this goal already exists. Returns the

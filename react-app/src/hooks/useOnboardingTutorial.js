@@ -1,6 +1,7 @@
 import { useLocalStorage } from './useLocalStorage';
 
-const STORAGE_KEY = 'lifeos-onboarding-complete-v1';
+const STORAGE_KEY = 'dazelkey-onboarding-complete-v1';
+const LEGACY_STORAGE_KEY = 'lifeos-onboarding-complete-v1';
 
 /*
   Whether the first-run tutorial (see Onboarding/OnboardingTutorial) has
@@ -10,7 +11,7 @@ const STORAGE_KEY = 'lifeos-onboarding-complete-v1';
   not a reset of the first-run state.
 */
 export function useOnboardingTutorial() {
-  const [hasSeenTutorial, setHasSeenTutorial] = useLocalStorage(STORAGE_KEY, () => false);
+  const [hasSeenTutorial, setHasSeenTutorial] = useLocalStorage(STORAGE_KEY, () => false, LEGACY_STORAGE_KEY);
 
   function markTutorialSeen() {
     setHasSeenTutorial(true);

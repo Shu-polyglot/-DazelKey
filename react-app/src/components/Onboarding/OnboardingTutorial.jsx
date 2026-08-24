@@ -67,7 +67,7 @@ function ExploreGlyph() {
 // placeholder) rather than reading like release notes.
 const SLIDES = [
   {
-    eyebrow: 'LIFE OS',
+    eyebrow: 'DAZELKEY',
     title: 'Some wants are too big for a to-do list.',
     body: "This is where you keep the ones you're building a life around — and the proof, once you've lived them.",
     Glyph: null,
@@ -216,7 +216,7 @@ function OnboardingTutorial({ onClose }) {
         </div>
 
         <motion.button type="button" className="onboarding-tutorial-next" onClick={handleNext} {...tapProps}>
-          {isLast ? 'Enter Life OS' : 'Next'}
+          {isLast ? 'Enter DazelKey' : 'Next'}
         </motion.button>
       </div>
     </motion.div>
