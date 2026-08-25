@@ -95,6 +95,55 @@
   letter-spacing: var(--tracking-wide);
 }
 
+/* "20XX is Y% done." -- one dot per week of the year (see
+   YearProgressWidget/getYearWeekProgress), sitting between the tagline
+   and the goal list. Same card recipe as .priority-card (border/radius/
+   glow-gradient/shadow) so it reads as one more card on this page, not
+   a separate visual language -- concept-only reference to the source
+   idea (Pattrn's dot-year card), not its black-card look. Static, no
+   tap target. */
+.year-progress-widget {
+  margin-bottom: var(--space-md);
+  padding: var(--space-lg);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--color-border);
+  background: radial-gradient(circle at 50% 0%, rgba(var(--color-glow-rgb), 0.07), transparent 60%), var(--color-bg-elevated);
+  box-shadow: var(--shadow-medium);
+}
+
+.year-progress-heading {
+  margin-bottom: var(--space-md);
+  font-family: var(--font-family-display);
+  font-weight: var(--font-weight-regular);
+  font-size: var(--font-size-h3);
+  color: var(--color-text-primary);
+}
+
+.year-progress-dots {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2xs);
+}
+
+/* Same "GitHub contribution-graph square" recipe .priority-vote-cell
+   already uses elsewhere on this page, just its own class -- a
+   deliberate duplicate (see this file's own header comment), not
+   reused directly, since .priority-vote-cell also carries habit-log
+   tap/badge behavior this widget has none of. */
+.year-progress-dot {
+  box-sizing: border-box;
+  width: 12px;
+  height: 12px;
+  border-radius: 3px;
+  background: rgba(var(--color-mist-rgb), 0.08);
+  border: 1px solid var(--color-border);
+}
+
+.year-progress-dot.is-elapsed {
+  background: var(--color-text-primary);
+  border-color: var(--color-text-primary);
+}
+
 /* Quiet, centered note shown in place of the heading's add icon once the
    list has hit its cap, and also reused as GoalDetail's "no habits yet"
    placeholder. */

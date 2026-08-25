@@ -2,6 +2,7 @@ import { Fragment, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { AnimatePresence, motion } from 'motion/react';
 import GoalCard from './GoalCard';
+import YearProgressWidget from './YearProgressWidget';
 import GoalCardMenu from './GoalCardMenu';
 import GoalEditModal from './GoalEditModal';
 import GoalDetail from './GoalDetail';
@@ -134,6 +135,8 @@ function TopPrioritySection({ readOnly = false, variant = 'embedded' }) {
   return (
     <Wrapper {...wrapperProps}>
       {heading}
+
+      {variant === 'page' && <YearProgressWidget />}
 
       {priorities.length === 0 ? (
         <div className="priority-empty">
