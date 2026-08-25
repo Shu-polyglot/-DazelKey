@@ -2,9 +2,11 @@
    (see BucketListPanel's `variant="embedded"`) -- mirrors Strategy.css's
    .realize-heading-row / topPriority.css's .priority-heading-row, a
    deliberate duplicate rather than a shared import (same reasoning as
-   those two). No add-icon here: adding a bucket list item is still done
-   from the header's own "+ Add to The Bucket List" button. */
+   those two). Carries its own round add-icon (`onAdd`, only passed by
+   StrategyPage) since adding a bucket list item is Momentum's own
+   affordance now, not the shared header's. */
 .bucket-heading-row {
+  justify-content: space-between;
   margin-bottom: var(--space-md);
 }
 
@@ -13,6 +15,27 @@
   font-weight: var(--font-weight-regular);
   font-size: var(--font-size-h3);
   color: var(--color-text-primary);
+}
+
+.bucket-add-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 1px solid var(--color-border);
+  background: rgba(var(--color-mist-rgb), 0.04);
+  color: var(--color-text-primary);
+  font-size: 1.3rem;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: border-color 0.2s ease, background 0.2s ease;
+}
+
+.bucket-add-icon:hover {
+  border-color: var(--color-border-strong);
+  background: rgba(var(--color-mist-rgb), 0.1);
 }
 
 .filter-row {

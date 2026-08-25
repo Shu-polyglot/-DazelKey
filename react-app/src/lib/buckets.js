@@ -130,26 +130,6 @@ export function normalizeBucket(bucket, index) {
   };
 }
 
-const whenPriority = { thisYear: 0, beforeIDie: 1 };
-
-/*
-  Ranks by horizon first (This year before Before I die), then by
-  creation order within the same horizon -- the intention that's been
-  waiting longest at that urgency surfaces first, rather than whatever
-  was added most recently.
-*/
-export function getNextUpcoming(buckets) {
-  const open = buckets.filter((bucket) => bucket.status !== 'completed');
-  if (!open.length) {
-    return null;
-  }
-
-  return open.slice().sort((a, b) => {
-    const priorityDiff = whenPriority[a.when] - whenPriority[b.when];
-    return priorityDiff !== 0 ? priorityDiff : a.id - b.id;
-  })[0];
-}
-
 export function getStatusLabel(bucket) {
   return bucket.status === 'completed' ? 'Completed' : 'Planned';
 }

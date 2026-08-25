@@ -74,9 +74,9 @@ function normalizeHabit(habit) {
     // Set once a habit with at least one log gets "removed" through the
     // edit screen (see GoalEditModal/TopPrioritySection's
     // handleRemoveHabit) -- an archived habit drops out of every active
-    // list (HabitWeekGrid, AddHabitForm, GoalCard's own habits) but its
-    // id and name stay resolvable, so its past logs keep reading
-    // correctly wherever they're looked back on (HabitRecordsTimeline).
+    // list (AddHabitForm, GoalCard's own HabitTodayGrid) but its id and
+    // name stay resolvable, so its past logs keep reading correctly
+    // wherever they're looked back on (HabitRecordsTimeline).
     // A habit with zero logs when removed skips this state entirely and
     // is hard-deleted instead -- there's nothing of it to protect.
     archivedAt: habit.archivedAt || null,

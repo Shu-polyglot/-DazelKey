@@ -58,8 +58,6 @@ function ProfilePage({ profile, buckets, onUpdateBucket, onDeleteBucket, onCompl
       animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
       transition={entranceTransition(0.12)}
     >
-      <p className="panel-label">Profile</p>
-
       <div className="profile-page-body">
         <div
           className="profile-avatar"

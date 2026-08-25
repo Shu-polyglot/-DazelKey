@@ -1,9 +1,14 @@
 import { motion } from 'motion/react';
-import { spring, dashboardEntrance, entranceTransition } from '../styles/motion';
+import { dashboardEntrance, entranceTransition } from '../styles/motion';
 import dazelkeyLockup from '../assets/logo/dazelkey-lockup-compact.png';
 import './Header.css';
 
-function Header({ title, onAddBucket }) {
+// "+ Add to The Bucket List" used to live here, shown on every tab --
+// it's now Momentum's own affordance instead (see BucketListPanel's
+// `bucket-add-icon`, embedded next to its "The Bucket List" heading
+// when StrategyPage passes it an `onAdd`), so this header is just the
+// logo again.
+function Header({ title }) {
   return (
     <motion.header
       className="topbar"
@@ -16,16 +21,6 @@ function Header({ title, onAddBucket }) {
           <img src={dazelkeyLockup} alt={title} className="brand-logo dazelkey-mark-inverted" />
         </h1>
       </div>
-
-      <motion.button
-        type="button"
-        className="glass-button"
-        onClick={onAddBucket}
-        whileHover={{ y: -2, transition: spring.hover }}
-        whileTap={{ y: 1, scale: 0.96, transition: spring.press }}
-      >
-        + Add to The Bucket List
-      </motion.button>
     </motion.header>
   );
 }

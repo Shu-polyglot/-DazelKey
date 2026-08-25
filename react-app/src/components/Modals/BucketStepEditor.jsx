@@ -1,16 +1,14 @@
 import { useEffect, useRef, useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { whenOptions, getWhenLabel, modeOptions, modeLabels } from '../../lib/buckets';
+import { whenOptions, getWhenLabel } from '../../lib/buckets';
 import { spring, transitions } from '../../styles/motion';
 import './BucketStepEditor.css';
 
-const STEPS = ['title', 'when', 'mode', 'message'];
+const STEPS = ['title', 'when'];
 
 const STEP_LABELS = {
   title: 'Bucket title',
   when: 'When you want it',
-  mode: 'Who this is with',
-  message: 'A message to your future self',
 };
 
 const BLANK_BUCKET = {
@@ -70,13 +68,15 @@ function StepDots({ current }) {
 }
 
 /**
- * One step-at-a-time surface for defining a future life experience --
- * title (the experience and where it happens, combined), how far away it
- * feels, who it's with, and an optional note to whoever you'll be when it
- * happens. Used both to create a new Bucket (no `bucket` prop) and to
- * edit an existing one. Existing Buckets may still carry a `place` value
- * from before this field was folded into the title; it's preserved on
- * save (via updateBucket's merge) even though it's no longer editable here.
+ * One question-at-a-time surface for defining a future life experience --
+ * just its title (the experience and where it happens, combined) and how
+ * far away it feels. Used both to create a new Bucket (no `bucket` prop)
+ * and to edit an existing one. Older Buckets may still carry `mode`/
+ * `message`/`place` values from before this form was trimmed down to two
+ * steps; those are preserved on save (via updateBucket's merge, and
+ * BLANK_BUCKET's own defaults for new ones) and still shown wherever a
+ * Bucket displays itself, even though none of them are editable here
+ * anymore.
  *
  * Do-only: Become Buckets (traits) are never created or edited here --
  * see StrategyPage / TraitQuiz, which activate a trait directly with no
@@ -118,12 +118,6 @@ function BucketStepEditor({ bucket, onCancel, onSave }) {
     goNext();
   }
 
-  function handleModePick(option) {
-    setMode(option);
-    clearTimeout(advanceTimeout.current);
-    advanceTimeout.current = setTimeout(goNext, 220);
-  }
-
   function handleWhenPick(option) {
     setWhen(option);
     clearTimeout(advanceTimeout.current);
@@ -157,7 +151,7 @@ function BucketStepEditor({ bucket, onCancel, onSave }) {
       case 'title':
         return (
           <div className="step-editor-block">
-            <p className="step-editor-eyebrow">What do you want to make happen — and where?</p>
+            <p className="step-editor-eyebrow">What's on your bucket list?</p>
             <label className="step-editor-title-label" htmlFor="step-title-input">
               <span className="sr-only">Title</span>
               <input
@@ -191,45 +185,6 @@ function BucketStepEditor({ bucket, onCancel, onSave }) {
                 </motion.button>
               ))}
             </div>
-          </div>
-        );
-
-      case 'mode':
-        return (
-          <div className="step-editor-block">
-            <p className="step-editor-eyebrow">Who is this with?</p>
-            <div className="step-editor-chip-row" role="group" aria-label="Mode">
-              {modeOptions.map((option) => (
-                <motion.button
-                  key={option}
-                  type="button"
-                  className={`step-editor-chip${mode === option ? ' is-active' : ''}`}
-                  onClick={() => handleModePick(option)}
-                  {...chipTap}
-                >
-                  {modeLabels[option]}
-                </motion.button>
-              ))}
-            </div>
-          </div>
-        );
-
-      case 'message':
-        return (
-          <div className="step-editor-block">
-            <p className="step-editor-eyebrow">A message to the you who achieves this</p>
-            <label className="step-editor-field-label" htmlFor="step-message-input">
-              <span className="sr-only">Message</span>
-              <textarea
-                id="step-message-input"
-                className="step-editor-note-input"
-                rows={5}
-                value={message}
-                onChange={(event) => setMessage(event.target.value)}
-                placeholder="Don’t forget how badly you wanted this."
-                autoFocus
-              />
-            </label>
           </div>
         );
 

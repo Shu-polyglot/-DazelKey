@@ -6,6 +6,16 @@
   and that includes its CSS.
 */
 
+/* GoalDetail's own header -- the "Core" eyebrow above the goal's
+   title, same section-label token every other page-level heading in
+   this app uses (see App.css), just with its own margin since it's
+   sitting inside .modal-header's title stack instead of that shared
+   .section-heading layout. */
+.detail-header .section-label {
+  display: block;
+  margin-bottom: var(--space-2xs);
+}
+
 .priority-empty {
   padding: var(--space-2xl) var(--space-md);
   border: 1px solid var(--color-border);
@@ -59,27 +69,15 @@
   color: var(--color-text-muted);
 }
 
-/* The card's own cumulative-acts sentence, tucked right under the
-   commitment title -- deliberately snugger than .priority-summary's
-   own spacing (that one sits where the habit grid would otherwise
-   start; this one is part of the title's own reading group) and
-   quieter than the title itself, so the number never competes with
-   the commitment it's in service of. */
-.priority-record-count {
-  margin-top: var(--space-2xs);
-  font-size: var(--font-size-caption);
-  color: var(--color-text-muted);
-}
-
 /* Marks the seam between the goal (big, above) and the small daily
    acts toward it (quieter, below) on the list card specifically --
    same hairline-plus-breathing-room recipe Realize's own
    .doing-checklist already uses for an identical "here's the next
    tier down" moment. Scoped to .priority-card (not the bare
-   .habit-week-grid/.priority-summary classes) so GoalDetail's modal --
-   which has its own header treatment, not .priority-commitment -- is
-   untouched. */
-.priority-card .habit-week-grid,
+   .habit-today-grid/.priority-summary classes) so GoalDetail's own
+   header -- unrelated markup entirely, see .detail-header below --
+   is untouched. */
+.priority-card .habit-today-grid,
 .priority-card .priority-summary {
   margin-top: var(--space-lg);
   padding-top: var(--space-md);
@@ -123,6 +121,17 @@
   color: var(--color-text-primary);
 }
 
+/* Core-as-page no longer shows its own "Core" title (see
+   TopPrioritySection's `heading`, variant="page" branch) -- just the
+   add icon remains in what used to be the title's row, so it keeps the
+   same top-right spot the title used to share it with instead of
+   collapsing to the row's start. */
+.priority-heading-row-solo {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: var(--space-md);
+}
+
 .priority-add-icon {
   width: 32px;
   height: 32px;
@@ -144,50 +153,27 @@
   background: rgba(var(--color-mist-rgb), 0.1);
 }
 
-/* GoalDetail's Heatmap/Records Timeline switch -- a deliberate,
-   pixel-for-pixel duplicate of Strategy.css's .momentum-view-toggle
-   (same recipe, same reasoning as every other rule on this page: Core
-   stays droppable with zero Strategy dependency). */
-.priority-view-toggle {
-  appearance: none;
-  display: inline-flex;
-  align-items: center;
-  gap: var(--space-2xs);
-  margin-bottom: var(--space-lg);
-  padding: var(--space-2xs) var(--space-md);
-  border-radius: var(--radius-pill);
-  border: 1px solid var(--color-border-strong);
-  background: rgba(var(--color-glow-rgb), 0.08);
-  color: var(--color-accent-strong);
-  font-size: var(--font-size-body-sm);
-  font-weight: var(--font-weight-medium);
-  cursor: pointer;
-  transition: border-color 0.2s ease, background 0.2s ease;
-}
-
-.priority-view-toggle:hover {
-  border-color: rgba(var(--color-glow-rgb), 0.4);
-  background: rgba(var(--color-glow-rgb), 0.14);
-}
-
-/* Records Timeline -- a plain chronological list, each row a single
-   logged day. Kept close in weight to .priority-card/.doing-history-
-   item (this app's other "quiet record row" recipes) rather than
-   borrowing Story's own full-bleed card treatment, which is styled for
-   a different, Bucket-specific narrative context. */
+/* Records Timeline -- now GoalDetail's only content (see that file's
+   own comment) rather than one of two views behind a toggle, so each
+   entry gets more room than the compact row it used to be: a bigger
+   thumbnail, more padding, and a journal note that's actually
+   readable in place (wraps up to a couple lines) instead of a single
+   truncated line -- still the same .priority-card/.doing-history-item
+   "quiet record row" weight this app already uses elsewhere, just
+   sized for being the main event instead of a footnote. */
 .habit-records-timeline {
   display: flex;
   flex-direction: column;
-  gap: var(--space-xs);
+  gap: var(--space-sm);
 }
 
 .habit-record-row {
   appearance: none;
   width: 100%;
   display: flex;
-  align-items: center;
-  gap: var(--space-sm);
-  padding: var(--space-sm);
+  align-items: flex-start;
+  gap: var(--space-md);
+  padding: var(--space-md);
   border-radius: var(--radius-md);
   border: 1px solid var(--color-border);
   background: rgba(var(--color-mist-rgb), 0.04);
@@ -204,8 +190,8 @@
 
 .habit-record-thumb {
   flex: none;
-  width: 44px;
-  height: 44px;
+  width: 68px;
+  height: 68px;
   border-radius: var(--radius-sm);
   background-color: rgba(var(--color-mist-rgb), 0.08);
   background-size: cover;
@@ -213,7 +199,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1rem;
+  font-size: 1.4rem;
 }
 
 .habit-record-thumb.has-photo {
@@ -224,7 +210,8 @@
   min-width: 0;
   display: flex;
   flex-direction: column;
-  gap: var(--space-3xs);
+  gap: var(--space-2xs);
+  padding-top: var(--space-3xs);
 }
 
 .habit-record-date {
@@ -233,16 +220,21 @@
 }
 
 .habit-record-habit {
-  font-size: var(--font-size-body-sm);
+  font-size: var(--font-size-body);
   color: var(--color-text-primary);
 }
 
+/* Up to two lines before it clips -- long enough to actually read a
+   note at a glance, short enough that one long entry can't push every
+   row below it out of view. */
 .habit-record-journal {
-  font-size: var(--font-size-caption);
+  font-size: var(--font-size-body-sm);
   color: var(--color-text-secondary);
+  line-height: var(--leading-normal);
   overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
 }
 
 /* Add a Priority wizard */
@@ -335,92 +327,6 @@
   border-color: rgba(var(--color-glow-rgb), 0.55);
 }
 
-/* HabitWeekGrid: rows = habits, columns = one week's 7 days, with
-   prev/next navigation. */
-.habit-week-grid {
-  margin-top: var(--space-2xs);
-}
-
-.habit-week-grid-nav {
-  display: flex;
-  justify-content: space-between;
-  gap: var(--space-sm);
-  margin-bottom: var(--space-sm);
-}
-
-.habit-week-nav-button {
-  font-size: var(--font-size-caption);
-  padding: var(--space-2xs) var(--space-sm);
-}
-
-.habit-week-grid-table {
-  display: flex;
-  flex-direction: column;
-  overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
-}
-
-/* The label column used to be minmax(96px, 1fr) -- on any card wider
-   than a phone, 1fr stretched it to fill all the leftover width,
-   shoving the day cells (the actual done/undone checkboxes) off to
-   the far edge of the row, away from the name they belong to. Capping
-   the max instead keeps every row's cells starting at the same shared
-   x-position (still one grid template for header + every row, so the
-   day columns stay in a straight vertical line down the card -- see
-   the header comment above) while letting a typical habit name sit
-   right next to its own cells instead of a card-width away from them. */
-.habit-week-grid-header,
-.habit-week-grid-row {
-  display: grid;
-  grid-template-columns: minmax(96px, 160px) repeat(7, 20px);
-  align-items: center;
-  gap: var(--space-2xs);
-}
-
-.habit-week-grid-header {
-  padding-bottom: var(--space-xs);
-  border-bottom: 1px solid var(--color-border);
-}
-
-/* One habit per row, each set off from the next by its own divider --
-   without this, same-width rows of near-identical squares read as one
-   undifferentiated block instead of separate habits. Padding's a
-   touch taller than the cells themselves (20px) so adjacent rows'
-   tap targets never feel like they could be the next habit's. */
-.habit-week-grid-row {
-  padding: var(--space-sm) 0;
-  border-bottom: 1px solid var(--color-border);
-}
-
-.habit-week-grid-row:last-child {
-  border-bottom: none;
-}
-
-.habit-week-grid-row-label {
-  font-size: var(--font-size-body-sm);
-  color: var(--color-text-primary);
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  padding-right: var(--space-xs);
-}
-
-.habit-week-grid-day-label {
-  font-size: var(--font-size-caption);
-  color: var(--color-text-muted);
-  text-align: center;
-}
-
-.habit-week-cell {
-  width: 20px;
-  height: 20px;
-  cursor: pointer;
-}
-
-.habit-week-cell.is-pad {
-  cursor: default;
-}
-
 .habit-cell-badge {
   position: absolute;
   bottom: -3px;
@@ -429,75 +335,101 @@
   line-height: 1;
 }
 
-/* HabitHistoryHeatmap: collapsible 12-week GitHub-style grid, week
-   columns/weekday rows -- same shape the old single-goal vote grid
-   used, via lib/votes.js's buildWeeks. */
-.habit-history-heatmap {
-  margin-top: var(--space-lg);
+/* HabitTodayGrid: the list card's own habit rows. The date axis (the
+   calendar week, fixed Mon->Sun order -- see HabitTodayGrid.jsx) is
+   drawn once, in .habit-today-header, instead of every row repeating
+   its own copy of it -- rows below are then just that axis's
+   checkboxes. Not used by GoalDetail (Records Timeline only, see that
+   section below). */
+.habit-today-grid {
+  margin-top: var(--space-2xs);
+  display: flex;
+  flex-direction: column;
 }
 
-.habit-history-toggle {
-  appearance: none;
-  background: none;
-  border: none;
-  padding: 0;
-  color: var(--color-text-secondary);
+.habit-today-header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  padding-bottom: var(--space-xs);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.habit-today-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: var(--space-sm) 0;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.habit-today-row:last-child {
+  border-bottom: none;
+}
+
+.habit-today-row-label {
+  flex: 0 0 108px;
   font-size: var(--font-size-body-sm);
+  color: var(--color-text-primary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Both the header's day labels and every row's checkboxes below live
+   in one of these -- same flex structure, same flex: 1 per child (see
+   .habit-today-day-label/.habit-today-cell), so a column lines up
+   exactly under its header label regardless of card width, and the
+   whole axis stretches to fill the card instead of sitting cramped at
+   a fixed pixel size. */
+.habit-today-cells {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: var(--space-3xs);
+}
+
+/* min-width: 0 is what lets a flex item shrink narrower than its own
+   content in the first place (the default is auto, which floors it at
+   content width and would break the equal-column math every sibling
+   here relies on) -- nowrap + hidden overflow is what keeps a label
+   that does get squeezed from wrapping to a second line or spilling
+   into the cell beside it instead of just clipping cleanly. */
+.habit-today-day-label {
+  flex: 1 1 0;
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-align: center;
+  font-size: var(--font-size-caption);
+  color: var(--color-text-muted);
+}
+
+/* Whichever column is actually today this week -- same accent this
+   app already marks "the current one" with (see e.g. BottomNav's own
+   accent-per-tab convention), so the header itself points at which
+   column is actually tappable, wherever in Mon->Sun it falls. */
+.habit-today-day-label.is-today {
+  color: var(--color-accent-strong);
+  font-weight: var(--font-weight-medium);
+}
+
+.habit-today-cell {
+  flex: 1 1 0;
+  min-width: 0;
+  height: 28px;
+  cursor: default;
+}
+
+/* Today's column: the only one of the row that still does anything,
+   marked with the same accent as its header label above. --
+   .priority-vote-cell.is-voted (same specificity, defined earlier)
+   already overrides this back to the standard glow border once done --
+   the accent only shows while there's still something to do. */
+.habit-today-cell.is-today {
+  border-color: var(--color-accent);
   cursor: pointer;
-}
-
-.habit-history-toggle:hover {
-  color: var(--color-text-primary);
-}
-
-.habit-history-mode-row {
-  margin-top: var(--space-sm);
-}
-
-.habit-history-select {
-  padding: var(--space-2xs) var(--space-sm);
-  border-radius: var(--radius-sm);
-  border: 1px solid var(--color-border);
-  background: rgba(var(--color-mist-rgb), 0.04);
-  color: var(--color-text-primary);
-  font-size: var(--font-size-body-sm);
-}
-
-.habit-history-grid {
-  margin-top: var(--space-sm);
-  overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
-}
-
-.habit-history-grid-columns {
-  display: inline-flex;
-  gap: 3px;
-  padding-bottom: var(--space-2xs);
-}
-
-.habit-history-grid-week {
-  display: grid;
-  grid-template-rows: repeat(7, 1fr);
-  gap: 3px;
-}
-
-.habit-history-cell.is-level-0 {
-  background: rgba(var(--color-mist-rgb), 0.06);
-}
-
-.habit-history-cell.is-level-1 {
-  background: rgba(var(--color-glow-rgb), 0.22);
-  border-color: rgba(var(--color-glow-rgb), 0.3);
-}
-
-.habit-history-cell.is-level-2 {
-  background: rgba(var(--color-glow-rgb), 0.4);
-  border-color: rgba(var(--color-glow-rgb), 0.5);
-}
-
-.habit-history-cell.is-level-3 {
-  background: rgba(var(--color-glow-bright-rgb), 0.55);
-  border-color: rgba(var(--color-glow-bright-rgb), 0.7);
 }
 
 /* HabitCellModal: unified record (undone cell) / view-edit-undo (done

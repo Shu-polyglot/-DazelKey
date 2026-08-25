@@ -338,7 +338,7 @@ function App() {
           }
           transition={isOverlayOpen ? { duration: 0.55, ease: easing.exit } : { duration: 0.5, ease: easing.emphasized }}
         >
-          <Header title="DazelKey" onAddBucket={() => setIsAddModalOpen(true)} />
+          <Header title="DazelKey" />
 
           <main className="tab-content">
             <div className={`tab-page${route === 'core' ? ' is-active' : ''}`} aria-hidden={route !== 'core'}>
@@ -356,7 +356,7 @@ function App() {
                 onUpdateBucket={updateBucket}
                 onDeleteBucket={deleteBucket}
                 onCompleteBucket={handleCompleteBucket}
-                onOpenBucket={setDetailsBucketId}
+                onAddBucket={() => setIsAddModalOpen(true)}
                 activeView={momentumView}
                 onViewChange={setMomentumView}
               />

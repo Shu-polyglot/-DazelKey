@@ -50,15 +50,6 @@ function AchievementsShelf({ buckets, onUpdate, onDelete, onOpenStory }) {
 
   return (
     <section className="app-section" id="achievements-section">
-      <motion.div
-        className="section-heading"
-        initial={{ opacity: 0, y: 14, filter: 'blur(6px)' }}
-        animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
-        transition={entranceTransition(dashboardEntrance.achievements)}
-      >
-        <span className="section-label">The Achievement</span>
-      </motion.div>
-
       <motion.button
         type="button"
         className="achievement-story-link"

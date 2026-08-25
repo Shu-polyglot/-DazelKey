@@ -38,13 +38,10 @@
   position: relative;
 }
 
-/* Archive Overview (top of The Achievement tab), Next Up (top of The
-   Bucket Lists tab), and the Profile tab each stand alone as their own
-   tab's lead (or only) card -- Overview and Next Up used to share one
-   surface split by a hairline when they sat side by side, so this is that
-   same card chrome given to each individually. */
+/* Archive Overview (top of The Achievement tab) and the Profile tab
+   each stand alone as their own tab's lead (or only) card -- this is
+   the shared card chrome both get. */
 .overview-panel,
-.next-up-panel,
 .profile-page {
   background: linear-gradient(180deg, rgba(var(--color-void-3-rgb), 0.7), rgba(var(--color-void-2-rgb), 0.75));
   border: 1px solid var(--color-border);

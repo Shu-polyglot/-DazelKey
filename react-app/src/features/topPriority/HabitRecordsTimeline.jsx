@@ -17,13 +17,16 @@ function buildTimeline(habits, logs) {
 }
 
 /*
-  "Records Timeline" -- GoalDetail's other view (see its own
-  priority-view-toggle), a chronological look-back over every day this
-  goal's habits were actually done, in place of the heatmaps' at-a-
-  glance grid read. Tapping an entry opens the exact same HabitCellModal
-  the heatmaps already open (via the shared onSelectCell prop) -- no new
+  "Records Timeline" -- GoalDetail's only content now that the heatmap
+  pair and habit-registration form it used to share that screen with
+  (behind a toggle) are both gone; editing lives entirely behind the
+  card's own long-press menu instead (see GoalEditModal). A
+  chronological look-back over every day this goal's habits were
+  actually done. Tapping an entry opens the exact same HabitCellModal
+  the old heatmaps used to (via the shared onSelectCell prop) -- no new
   photo/journal viewer, just this list feeding the one that already
-  exists.
+  exists. Data logic here (buildTimeline) is untouched by any of
+  this -- only how each entry is laid out changed, see topPriority.css.
 */
 function HabitRecordsTimeline({ habits, logs, onSelectCell }) {
   const entries = buildTimeline(habits, logs);

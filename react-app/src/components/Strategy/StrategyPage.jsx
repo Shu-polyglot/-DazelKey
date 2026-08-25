@@ -6,7 +6,6 @@ import DoingGoalDetail from './DoingGoalDetail';
 import LogMoneyFlow from './LogMoneyFlow';
 import DoingHistoryModal from './DoingHistoryModal';
 import AddGoalFlow from './AddGoalFlow';
-import NextUpPanel from '../NextUpPanel';
 import BucketListPanel from '../BucketList/BucketListPanel';
 import { MAX_DOING_GOALS } from '../../lib/buckets';
 import { getTotalProgress } from '../../lib/doing';
@@ -62,7 +61,7 @@ function StrategyPage({
   onUpdateBucket,
   onDeleteBucket,
   onCompleteBucket,
-  onOpenBucket,
+  onAddBucket,
   activeView,
   onViewChange,
 }) {
@@ -99,7 +98,6 @@ function StrategyPage({
       >
         <span className="section-label">Identity</span>
         <div className="section-heading-row">
-          <h2>Momentum</h2>
           <button type="button" className="strategy-history-link" onClick={() => setIsHistoryOpen(true)}>
             History
           </button>
@@ -132,12 +130,12 @@ function StrategyPage({
       <AnimatePresence mode="wait">
         {activeView === 'bucket-lists' ? (
           <motion.div key="bucket-lists" variants={viewVariants} initial="enter" animate="center" exit="exit">
-            <NextUpPanel buckets={buckets} onOpenBucket={onOpenBucket} />
             <BucketListPanel
               buckets={buckets}
               onUpdate={onUpdateBucket}
               onDelete={onDeleteBucket}
               onComplete={onCompleteBucket}
+              onAdd={onAddBucket}
               variant="embedded"
             />
           </motion.div>

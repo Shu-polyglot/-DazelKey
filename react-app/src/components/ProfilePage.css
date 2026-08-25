@@ -8,7 +8,6 @@
   align-items: center;
   text-align: center;
   gap: var(--space-sm);
-  margin-top: var(--space-md);
 }
 
 .profile-avatar {

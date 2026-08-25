@@ -4,7 +4,7 @@ import { AnimatePresence, motion } from 'motion/react';
 import WhenFilters from './WhenFilters';
 import BucketCard from './BucketCard';
 import ExpandedBucketCard from './ExpandedBucketCard';
-import { dashboardEntrance, entranceTransition } from '../../styles/motion';
+import { dashboardEntrance, entranceTransition, spring } from '../../styles/motion';
 import './BucketList.css';
 
 // `variant`: 'page' (default) renders The Bucket List's own full page
@@ -18,6 +18,7 @@ function BucketListPanel({
   onUpdate,
   onDelete,
   onComplete,
+  onAdd,
   sectionId = 'bucket-list-section',
   layoutIdPrefix = 'bucket-card-',
   baseDelay = dashboardEntrance.bucketList,
@@ -60,6 +61,18 @@ function BucketListPanel({
         {variant === 'embedded' ? (
           <div className="section-heading-row bucket-heading-row">
             <h3>The Bucket List</h3>
+            {onAdd && (
+              <motion.button
+                type="button"
+                className="bucket-add-icon"
+                aria-label="Add to The Bucket List"
+                onClick={onAdd}
+                whileHover={{ y: -1, transition: spring.hover }}
+                whileTap={{ y: 1, scale: 0.94, transition: spring.press }}
+              >
+                +
+              </motion.button>
+            )}
           </div>
         ) : (
           <div className="section-heading">

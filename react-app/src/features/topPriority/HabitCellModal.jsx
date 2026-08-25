@@ -19,9 +19,10 @@ const tapProps = {
 };
 
 /*
-  What a heatmap cell opens into, for both states a cell can be in --
-  see HabitWeekGrid/HabitHistoryHeatmap's onSelectCell. An undone cell
-  opens this in "record" mode: tapping it never sets done by itself,
+  What a habit cell opens into, for both states a cell can be in -- see
+  GoalCard's HabitTodayGrid and GoalDetail's HabitRecordsTimeline, both
+  of which reach this through the same shared onSelectCell. An undone
+  cell opens this in "record" mode: tapping it never sets done by itself,
   only the "Record" button inside does, so a cancelled/closed modal
   leaves the day untouched. A done cell opens in "view" mode: photo/
   journal are shown, both editable and independently removable, plus

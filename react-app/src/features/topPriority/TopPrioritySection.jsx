@@ -14,13 +14,16 @@ import './topPriority.css';
 /*
   Core (formerly "Top 3 Priority"), end to end: goals (its own data
   store, capped at MAX_TOP_PRIORITIES), habits registered per goal, and
-  the daily habit-log heatmap -- see topPriority.js for all three
-  stores. Goals themselves carry no vote/milestone/progress data
-  anymore; every recording action lives on the habit-log side (see
-  HabitCellModal). This component needs nothing handed down from
-  Strategy to run standalone. (Internal module/route names stay
-  "topPriority"/"priority" on purpose -- only the user-facing label
-  changed.)
+  the daily habit log -- see topPriority.js for all three stores. Goals
+  themselves carry no vote/milestone/progress data anymore; every
+  recording action lives on the habit-log side (see HabitCellModal).
+  Editing (title/commitment, habit add-remove) lives entirely behind a
+  goal card's long-press menu (GoalCardMenu -> GoalEditModal); tapping
+  a card instead opens GoalDetail, a read-only look back via Records
+  Timeline -- the heatmap views that used to live there too are gone.
+  This component needs nothing handed down from Strategy to run
+  standalone. (Internal module/route names stay "topPriority"/
+  "priority" on purpose -- only the user-facing label changed.)
 */
 // `variant`: 'embedded' (default) renders just Core's own sub-heading
 // (h3 + add icon), no outer page chrome -- for dropping into another
@@ -46,11 +49,10 @@ function TopPrioritySection({ readOnly = false, variant = 'embedded' }) {
   const editing = priorities.find((priority) => priority.id === editGoalId) || null;
   // GoalDetail's Records Timeline needs archived habits too (their logs
   // still need a name to resolve against, see topPriority.js's
-  // normalizeHabit) -- everywhere else scoped to "current" habits
-  // (HabitWeekGrid, AddHabitForm, GoalCard's own grid) filters
-  // archivedAt out below instead.
+  // normalizeHabit) -- GoalCard's own grid and GoalEditModal's
+  // AddHabitForm both stay scoped to "current" habits instead, via
+  // editingHabits below.
   const expandedAllHabits = habits.filter((habit) => habit.goalId === expandedId);
-  const expandedHabits = expandedAllHabits.filter((habit) => !habit.archivedAt);
   const editingHabits = habits.filter((habit) => habit.goalId === editGoalId && !habit.archivedAt);
 
   function handleAdd({ commitment }) {
@@ -116,10 +118,7 @@ function TopPrioritySection({ readOnly = false, variant = 'embedded' }) {
     variant === 'page' ? (
       <div className="section-heading">
         <span className="section-label">Identity</span>
-        <div className="section-heading-row priority-heading-row">
-          <h2>Core</h2>
-          {addIcon}
-        </div>
+        {addIcon && <div className="section-heading-row priority-heading-row-solo">{addIcon}</div>}
         <p className="core-tagline">Think Big, Act Small</p>
       </div>
     ) : (
@@ -148,7 +147,9 @@ function TopPrioritySection({ readOnly = false, variant = 'embedded' }) {
             // Archived habits still count toward the total -- their
             // logs are exactly as real, only their active-list presence
             // (the grid below) is gone. See topPriority.js's
-            // archiveHabit.
+            // archiveHabit. GoalCard no longer renders this (the "N
+            // small acts toward this" line was removed), but the
+            // calculation stays wired through in case it's needed again.
             const recordCount = logs.filter((log) => goalHabitIds.has(log.habitId)).length;
 
             return (
@@ -180,15 +181,10 @@ function TopPrioritySection({ readOnly = false, variant = 'embedded' }) {
             <GoalDetail
               key={expanded.id}
               priority={expanded}
-              habits={expandedHabits}
               allHabits={expandedAllHabits}
               logs={logs}
-              getLog={getLog}
-              onAddHabit={handleAddHabit}
-              onDeleteHabit={handleRemoveHabit}
               onSelectCell={handleSelectCell}
               onClose={() => setExpandedId(null)}
-              readOnly={readOnly}
             />
           )}
         </AnimatePresence>,

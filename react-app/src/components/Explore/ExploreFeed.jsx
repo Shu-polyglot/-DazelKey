@@ -28,7 +28,6 @@ function ExploreFeed({ onOpenDM }) {
         transition={entranceTransition(0)}
       >
         <span className="section-label">Discover</span>
-        <h2>Explore</h2>
       </motion.div>
 
       <ViewFilters activeFilter={activeFilter} onChange={setActiveFilter} />
