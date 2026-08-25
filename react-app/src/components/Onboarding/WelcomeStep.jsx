@@ -11,27 +11,10 @@ const sequenceVariants = {
 const TITLE_DELAY = 0.6;
 const CTA_DELAY = TITLE_DELAY + 1.4;
 
-/*
-  The lockup PNG (src/assets/logo) is one flat image -- icon on top,
-  wordmark, tagline, top to bottom -- so a single top-down clip-path
-  reveal naturally uncovers them in that exact order without needing
-  three separately-cropped/aligned assets. The percentages below are
-  where each section actually sits in that 1200-tall source (icon ends
-  ~52%, wordmark ~73%, tagline 100%) -- see dazelkey-icon.png/
-  dazelkey-lockup-compact.png's own crop bounds for where these numbers
-  came from.
-*/
-const logoRevealTransition = {
-  delay: TITLE_DELAY,
-  duration: 1.5,
-  times: [0, 0.55, 0.8, 1],
-  ease: easing.emphasized,
-};
-
 /**
- * The opening beat of DazelKey: the sea/sun backdrop keeps rolling while
- * the logo reveals itself top-down (icon, then wordmark, then tagline),
- * with Enter following a beat behind it.
+ * The opening beat of DazelKey: a static black background with the logo
+ * fading in, Enter following a beat behind it. No video, no elaborate
+ * reveal -- just the lockup settling into place.
  */
 function WelcomeStep({ onEnter }) {
   return (
@@ -49,14 +32,7 @@ function WelcomeStep({ onEnter }) {
           animate={{ opacity: 1, scale: 1, filter: 'blur(0px)' }}
           transition={{ duration: 1, delay: TITLE_DELAY, ease: easing.emphasized }}
         >
-          <motion.img
-            src={dazelkeyLockup}
-            alt="DazelKey — Unlock Unlived Moments"
-            className="opening-logo dazelkey-mark-inverted"
-            initial={{ clipPath: 'inset(0 0 100% 0)' }}
-            animate={{ clipPath: ['inset(0 0 100% 0)', 'inset(0 0 48% 0)', 'inset(0 0 27% 0)', 'inset(0 0 0% 0)'] }}
-            transition={logoRevealTransition}
-          />
+          <img src={dazelkeyLockup} alt="DazelKey — Unlock Unlived Moments" className="opening-logo dazelkey-mark-inverted" />
         </motion.div>
 
         <motion.button

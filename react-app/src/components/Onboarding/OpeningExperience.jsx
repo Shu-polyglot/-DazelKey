@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import { AnimatePresence, motion } from 'motion/react';
-import CinematicBackground from './CinematicBackground';
 import WelcomeStep from './WelcomeStep';
 import NameStep from './NameStep';
 import AgeStep from './AgeStep';
@@ -23,9 +22,10 @@ const experienceVariants = {
  * Orchestrates the pre-dashboard flow: Welcome always shows on every open.
  * If the profile is already complete, Enter goes straight to the dashboard.
  * Otherwise Enter continues into Name -> Age -> Photo, which together
- * complete the profile. One persistent CinematicBackground carries across
- * every step so the transition reads as forward motion through the same
- * scene rather than a hard screen change.
+ * complete the profile. A static black background (.opening-experience's
+ * own --color-bg) carries across every step -- no video here (see
+ * CinematicBackground, still used by the Life Archive experiences it was
+ * built for, just not this one).
  */
 function OpeningExperience({ profile, onComplete }) {
   const [step, setStep] = useState('welcome');
@@ -63,8 +63,6 @@ function OpeningExperience({ profile, onComplete }) {
       exit="exit"
       variants={experienceVariants}
     >
-      <CinematicBackground />
-
       <AnimatePresence mode="wait">
         {step === 'welcome' && <WelcomeStep key="welcome" onEnter={handleEnter} />}
         {step === 'name' && <NameStep key="name" initialValue={draft.name} onSubmit={handleName} />}

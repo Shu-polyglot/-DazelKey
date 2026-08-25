@@ -3,7 +3,7 @@
   align-items: center;
   justify-content: space-between;
   gap: var(--space-lg);
-  margin-bottom: var(--space-lg);
+  margin-bottom: var(--space-xl);
 }
 
 .brand-wrap {
@@ -16,8 +16,13 @@
   line-height: 0;
 }
 
+/* ~1.6x the old clamp(28px, 4vw, 36px) -- big enough to actually read at
+   a glance (this is the only thing left in the header, see Header.jsx's
+   own comment), still bounded so it can never crowd the header or run
+   off narrow screens. width: auto off the source image's own aspect
+   ratio keeps it undistorted. */
 .brand-logo {
-  height: clamp(28px, 4vw, 36px);
+  height: clamp(44px, 6.5vw, 60px);
   width: auto;
 }
 
