@@ -1,5 +1,4 @@
-import { defineConfig } from 'vite'
-import react from '@vitejs/plugin-react'
+import { defineConfig } from 'vite'import react from '@vitejs/plugin-react'
 
 // https://vite.dev/config/
 export default defineConfig({
@@ -10,6 +9,6 @@ export default defineConfig({
   // there 404s every asset the opposite way -- `VERCEL` is set on every
   // build Vercel runs (and only there), which is what tells the two
   // apart without needing a second config file.
-  base: process.env.VERCEL ? '/' : '/dazelkey/',
+  base: process.env.VERCEL ? '/' : '/-DazelKey/',
   plugins: [react()],
 })
