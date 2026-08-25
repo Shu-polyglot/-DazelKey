@@ -35,8 +35,7 @@ function autoMilestoneLabel(totalAfterThisVote) {
 
   `storageKey` defaults to Strategy's own vote store, but any feature
   that needs this exact same one-vote-per-day/milestone engine against
-  its own goals -- Top 3 Priority, see src/features/topPriority -- can
-  pass its own key instead of reinventing the logic.
+  its own goals can pass its own key instead of reinventing the logic.
 */
 export function useVotes(storageKey = DEFAULT_STORAGE_KEY, legacyStorageKey = DEFAULT_LEGACY_STORAGE_KEY) {
   const [votes, setVotes] = useLocalStorage(storageKey, () => [], legacyStorageKey);
@@ -68,10 +67,9 @@ export function useVotes(storageKey = DEFAULT_STORAGE_KEY, legacyStorageKey = DE
     return vote;
   }
 
-  // Attaches an optional photo/comment "moment" to an already-cast vote --
-  // e.g. the light prompt Top 3 Priority shows right after a vote (see
-  // VoteMomentPrompt). A no-op past the vote actually existing; either
-  // field may be omitted/null without clearing the other.
+  // Attaches an optional photo/comment "moment" to an already-cast vote.
+  // A no-op past the vote actually existing; either field may be
+  // omitted/null without clearing the other.
   function attachVoteMedia(voteId, { photoUrl, comment } = {}) {
     if (!votes.some((vote) => vote.id === voteId)) {
       return false;

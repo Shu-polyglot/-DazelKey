@@ -50,7 +50,7 @@ const viewVariants = {
   exit: { opacity: 0, y: -8, filter: 'blur(4px)', transition: transitions.exit },
 };
 
-function StrategyPage({ buckets, votes, contributions, onLogMoney, onAddDoingGoal, onToggleChecklistItem, onAddAchievement }) {
+function StrategyPage({ buckets, votes, contributions, onLogMoney, onAddDoingGoal, onToggleChecklistItem }) {
   // Drops out once doingCompletedAt is set (100% reached, see App.jsx's
   // checkDoingCompletion) -- the goal itself lives on in `buckets` for
   // DoingHistoryModal to look back up, just no longer "in progress"
@@ -116,7 +116,7 @@ function StrategyPage({ buckets, votes, contributions, onLogMoney, onAddDoingGoa
       <AnimatePresence mode="wait">
         {activeView === 'core' ? (
           <motion.div key="core" variants={viewVariants} initial="enter" animate="center" exit="exit">
-            <TopPrioritySection onAddAchievement={onAddAchievement} />
+            <TopPrioritySection />
           </motion.div>
         ) : (
           <motion.div key="realize" variants={viewVariants} initial="enter" animate="center" exit="exit">

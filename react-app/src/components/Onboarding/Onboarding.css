@@ -231,14 +231,13 @@
   text-shadow: 0 1px 12px rgba(var(--color-void-1-rgb), 0.6);
 }
 
-.opening-title {
-  font-family: var(--font-family-display);
-  font-weight: var(--font-weight-regular);
-  font-size: clamp(2.75rem, 7vw, 6rem);
-  line-height: var(--leading-tight);
-  letter-spacing: var(--tracking-tight);
-  color: var(--color-text-primary);
-  text-shadow: 0 4px 32px rgba(var(--color-void-1-rgb), 0.65), 0 1px 3px rgba(var(--color-void-1-rgb), 0.5);
+.opening-logo-wrap {
+  filter: drop-shadow(0 4px 32px rgba(var(--color-void-1-rgb), 0.65));
+}
+
+.opening-logo {
+  width: clamp(220px, 42vw, 380px);
+  height: auto;
 }
 
 .opening-cta {

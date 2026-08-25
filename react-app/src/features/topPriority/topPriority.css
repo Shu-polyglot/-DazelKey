@@ -1,9 +1,9 @@
 /*
-  Top 3 Priority's own stylesheet -- a deliberate, mostly-duplicate copy
-  of the visual recipe Strategy.css uses for its own cards/empty-states
-  (same tokens, same shapes), rather than a shared import. The module is
-  meant to be droppable into any page with zero Strategy dependency, and
-  that includes its CSS.
+  Core's own stylesheet -- a deliberate, mostly-duplicate copy of the
+  visual recipe Strategy.css uses for its own cards/empty-states (same
+  tokens, same shapes), rather than a shared import. The module is
+  meant to be droppable into any page with zero Strategy dependency,
+  and that includes its CSS.
 */
 
 .priority-empty {
@@ -51,192 +51,16 @@
   color: var(--color-text-muted);
 }
 
-.priority-footer {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  flex-wrap: wrap;
-  gap: var(--space-md);
-  margin-top: var(--space-lg);
-}
-
-/* Total votes is the one number this card foregrounds -- no streak, no
-   percentage sharing the spotlight (see the requirements this was built
-   against: emotional reward over metric accuracy). */
-.priority-count {
-  display: flex;
-  align-items: baseline;
-  gap: var(--space-2xs);
-}
-
-.priority-count-number {
-  font-family: var(--font-family-display);
-  font-size: 2rem;
-  font-weight: var(--font-weight-regular);
-  color: var(--color-text-primary);
-}
-
-.priority-count-label {
-  font-size: var(--font-size-caption);
-  letter-spacing: var(--tracking-wide);
-  text-transform: uppercase;
-  color: var(--color-text-muted);
-}
-
-.priority-vote-button {
-  max-width: 280px;
-  text-align: center;
-  line-height: var(--leading-normal);
-  white-space: normal;
-}
-
-.priority-vote-button.is-voted {
-  background: var(--color-accent-subtle);
-  border-color: rgba(var(--color-glow-rgb), 0.35);
-  color: var(--color-accent-strong);
-  cursor: default;
-}
-
-/* GitHub's contribution graph, in this app's own palette -- weeks as
-   columns, days as rows, scrolled to its right (most recent) edge by
-   default. */
-.priority-vote-grid {
-  margin-top: var(--space-xs);
-  overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
-}
-
-.priority-vote-grid::-webkit-scrollbar {
-  height: 6px;
-}
-
-.priority-vote-grid::-webkit-scrollbar-thumb {
-  background: var(--color-border-strong);
-  border-radius: var(--radius-pill);
-}
-
-.priority-vote-grid-columns {
-  display: inline-flex;
-  gap: 3px;
-  padding-bottom: var(--space-2xs);
-}
-
-.priority-vote-grid-week {
-  display: grid;
-  grid-template-rows: repeat(7, 1fr);
-  gap: 3px;
-}
-
-.priority-vote-cell {
-  box-sizing: border-box;
-  width: 14px;
-  height: 14px;
-  border-radius: 3px;
-  background: rgba(var(--color-mist-rgb), 0.06);
-  border: 1px solid var(--color-border);
-}
-
-.priority-vote-cell.is-pad {
-  background: transparent;
-  border-color: transparent;
-}
-
-.priority-vote-cell.is-voted {
-  background: rgba(var(--color-glow-rgb), 0.45);
-  border-color: rgba(var(--color-glow-rgb), 0.55);
-}
-
-/* A special vote -- the milestone ritual fires the moment one of these is
-   recorded. Same cell footprint as a normal vote (no layout shift between
-   grid columns), just visibly lifted: brighter glow-toned fill, a
-   stronger border, and a soft outer glow instead of a bigger box. */
-.priority-vote-cell.is-milestone {
-  background: linear-gradient(180deg, rgba(var(--color-glow-bright-rgb), 0.6), rgba(var(--color-glow-rgb), 0.55));
-  border: 1.5px solid rgba(var(--color-glow-bright-rgb), 0.8);
-  box-shadow: 0 0 6px rgba(var(--color-glow-rgb), 0.5), 0 0 14px rgba(var(--color-glow-rgb), 0.22);
-  transform: scale(1.2);
-}
-
-.priority-detail-count {
-  margin-top: var(--space-md);
-}
-
-.priority-milestone-mark {
-  margin-top: var(--space-md);
-  padding-top: var(--space-md);
-  border-top: 1px solid var(--color-border);
-}
-
-.priority-milestone-mark-label {
-  margin-bottom: var(--space-xs);
-  font-size: var(--font-size-caption);
-  color: var(--color-text-muted);
-}
-
-.priority-milestone-chip-row {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-xs);
-}
-
-.priority-milestone-chip {
-  appearance: none;
-  padding: var(--space-xs) var(--space-md);
-  border-radius: var(--radius-pill);
-  border: 1px solid var(--color-border);
-  background: rgba(var(--color-mist-rgb), 0.04);
-  color: var(--color-text-secondary);
-  cursor: pointer;
-  font-size: var(--font-size-body-sm);
-  transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease;
-}
-
-.priority-milestone-chip:hover {
-  border-color: var(--color-border-strong);
-  color: var(--color-text-primary);
-}
-
-.priority-milestone-marked {
-  margin-top: var(--space-md);
-  padding-top: var(--space-md);
-  border-top: 1px solid var(--color-border);
-  font-size: var(--font-size-body-sm);
-  color: var(--color-accent-strong);
-}
-
-.priority-milestone-list {
-  margin-top: var(--space-lg);
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-xs);
-}
-
-.priority-milestone-item {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: var(--space-sm);
-  padding: var(--space-sm);
-  border-radius: var(--radius-sm);
-  background: rgba(var(--color-glow-rgb), 0.08);
-  border: 1px solid rgba(var(--color-glow-rgb), 0.22);
-  font-size: var(--font-size-body-sm);
-  color: var(--color-text-primary);
-}
-
-.priority-milestone-item-date {
-  font-size: var(--font-size-caption);
-  color: var(--color-text-muted);
-  white-space: nowrap;
-}
-
 /* Quiet, centered note shown in place of the heading's add icon once the
-   list has hit its cap. */
-.priority-limit-note {
+   list has hit its cap, and also reused as GoalDetail's "no habits yet"
+   placeholder. */
+.priority-limit-note,
+.priority-empty-note {
   padding: var(--space-sm) 0;
   color: var(--color-text-muted);
   font-size: var(--font-size-body-sm);
   text-align: center;
+  line-height: var(--leading-relaxed);
 }
 
 /* Core's own sub-heading -- section-heading-row (App.css) handles the
@@ -274,13 +98,6 @@
   background: rgba(var(--color-mist-rgb), 0.1);
 }
 
-.priority-empty-note {
-  color: var(--color-text-secondary);
-  font-size: var(--font-size-body-sm);
-  line-height: var(--leading-relaxed);
-  text-align: center;
-}
-
 /* Add a Priority wizard */
 
 /* The freeform identity-commitment textarea -- step-editor-field-input's
@@ -308,16 +125,23 @@
   box-shadow: 0 0 0 3px var(--color-accent-subtle);
 }
 
-.priority-milestone-preview {
-  width: 100%;
-  max-width: 320px;
+/* Habit registration (AddHabitForm) -- same input+add-button+list+
+   delete shape the old milestones step used, just inline in GoalDetail
+   instead of a wizard step. */
+.add-habit-form {
+  margin: var(--space-md) 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+.add-habit-list {
   display: flex;
   flex-direction: column;
   gap: var(--space-2xs);
-  margin-bottom: var(--space-md);
 }
 
-.priority-milestone-preview-item {
+.add-habit-list-item {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -330,41 +154,231 @@
   font-size: var(--font-size-body-sm);
 }
 
-.priority-milestone-form {
+.add-habit-input-row {
   display: flex;
-  flex-direction: column;
   align-items: center;
   gap: var(--space-sm);
-  width: 100%;
-  max-width: 320px;
 }
 
-.priority-milestone-form .step-editor-field-input {
+.add-habit-input-row .step-editor-field-input {
+  flex: 1;
   max-width: none;
 }
 
-/* Vote Moment: the light photo/note prompt shown right after a vote
-   (VoteMomentPrompt), and the enlarged view a grid cell opens into when
-   that vote actually has one attached (VoteMomentModal). */
-.vote-moment-prompt-subtitle {
-  margin: calc(-1 * var(--space-sm)) 0 var(--space-md);
+/* Habit heatmaps -- both grids share this cell recipe (Core's own
+   contribution-graph square: 14px, angular but softened corner, mist/
+   glow tone). */
+.priority-vote-cell {
+  box-sizing: border-box;
+  width: 14px;
+  height: 14px;
+  border-radius: 3px;
+  background: rgba(var(--color-mist-rgb), 0.06);
+  border: 1px solid var(--color-border);
+  position: relative;
+}
+
+.priority-vote-cell.is-pad {
+  background: transparent;
+  border-color: transparent;
+}
+
+.priority-vote-cell.is-voted {
+  background: rgba(var(--color-glow-rgb), 0.45);
+  border-color: rgba(var(--color-glow-rgb), 0.55);
+}
+
+/* HabitWeekGrid: rows = habits, columns = one week's 7 days, with
+   prev/next navigation. */
+.habit-week-grid {
+  margin-top: var(--space-2xs);
+}
+
+.habit-week-grid-nav {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-sm);
+  margin-bottom: var(--space-sm);
+}
+
+.habit-week-nav-button {
+  font-size: var(--font-size-caption);
+  padding: var(--space-2xs) var(--space-sm);
+}
+
+.habit-week-grid-table {
+  display: flex;
+  flex-direction: column;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.habit-week-grid-header,
+.habit-week-grid-row {
+  display: grid;
+  grid-template-columns: minmax(96px, 1fr) repeat(7, 20px);
+  align-items: center;
+  gap: var(--space-2xs);
+}
+
+.habit-week-grid-header {
+  padding-bottom: var(--space-xs);
+  border-bottom: 1px solid var(--color-border);
+}
+
+/* One habit per row, each set off from the next by its own divider --
+   without this, same-width rows of near-identical squares read as one
+   undifferentiated block instead of separate habits. */
+.habit-week-grid-row {
+  padding: var(--space-xs) 0;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.habit-week-grid-row:last-child {
+  border-bottom: none;
+}
+
+.habit-week-grid-row-label {
+  font-size: var(--font-size-body-sm);
+  color: var(--color-text-primary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  padding-right: var(--space-xs);
+}
+
+.habit-week-grid-day-label {
+  font-size: var(--font-size-caption);
+  color: var(--color-text-muted);
+  text-align: center;
+}
+
+.habit-week-cell {
+  width: 20px;
+  height: 20px;
+  cursor: pointer;
+}
+
+.habit-week-cell.is-pad {
+  cursor: default;
+}
+
+.habit-cell-badge {
+  position: absolute;
+  bottom: -3px;
+  right: -3px;
+  font-size: 8px;
+  line-height: 1;
+}
+
+/* HabitHistoryHeatmap: collapsible 12-week GitHub-style grid, week
+   columns/weekday rows -- same shape the old single-goal vote grid
+   used, via lib/votes.js's buildWeeks. */
+.habit-history-heatmap {
+  margin-top: var(--space-lg);
+}
+
+.habit-history-toggle {
+  appearance: none;
+  background: none;
+  border: none;
+  padding: 0;
   color: var(--color-text-secondary);
+  font-size: var(--font-size-body-sm);
+  cursor: pointer;
+}
+
+.habit-history-toggle:hover {
+  color: var(--color-text-primary);
+}
+
+.habit-history-mode-row {
+  margin-top: var(--space-sm);
+}
+
+.habit-history-select {
+  padding: var(--space-2xs) var(--space-sm);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--color-border);
+  background: rgba(var(--color-mist-rgb), 0.04);
+  color: var(--color-text-primary);
   font-size: var(--font-size-body-sm);
 }
 
-.achieve-photo-preview.vote-moment-photo-preview {
+.habit-history-grid {
+  margin-top: var(--space-sm);
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.habit-history-grid-columns {
+  display: inline-flex;
+  gap: 3px;
+  padding-bottom: var(--space-2xs);
+}
+
+.habit-history-grid-week {
+  display: grid;
+  grid-template-rows: repeat(7, 1fr);
+  gap: 3px;
+}
+
+.habit-history-cell.is-level-0 {
+  background: rgba(var(--color-mist-rgb), 0.06);
+}
+
+.habit-history-cell.is-level-1 {
+  background: rgba(var(--color-glow-rgb), 0.22);
+  border-color: rgba(var(--color-glow-rgb), 0.3);
+}
+
+.habit-history-cell.is-level-2 {
+  background: rgba(var(--color-glow-rgb), 0.4);
+  border-color: rgba(var(--color-glow-rgb), 0.5);
+}
+
+.habit-history-cell.is-level-3 {
+  background: rgba(var(--color-glow-bright-rgb), 0.55);
+  border-color: rgba(var(--color-glow-bright-rgb), 0.7);
+}
+
+/* HabitCellModal: unified record (undone cell) / view-edit-undo (done
+   cell) modal -- reuses the old vote-moment naming's shape for the
+   photo/journal form itself. */
+.habit-cell-modal-date {
+  font-family: var(--font-family-display);
+  font-size: 1.4rem;
+  color: var(--color-text-primary);
+}
+
+.habit-cell-modal-habit {
+  margin-top: var(--space-2xs);
+  font-size: var(--font-size-caption);
+  color: var(--color-text-muted);
+}
+
+.achieve-photo-preview.habit-cell-photo-preview {
   width: 100%;
   height: 160px;
   border-radius: var(--radius-md);
   margin-bottom: var(--space-md);
+  position: relative;
 }
 
-.vote-moment-comment-label {
+.habit-cell-photo-remove {
+  position: absolute;
+  bottom: var(--space-xs);
+  right: var(--space-xs);
+  font-size: var(--font-size-caption);
+  padding: var(--space-2xs) var(--space-sm);
+}
+
+.habit-cell-journal-label {
   display: block;
   margin-top: var(--space-md);
 }
 
-.step-editor-field-input.vote-moment-comment-input {
+.step-editor-field-input.habit-cell-journal-input {
   max-width: none;
   min-height: 56px;
   padding: var(--space-sm);
@@ -377,25 +391,13 @@
   resize: vertical;
 }
 
-.step-editor-field-input.vote-moment-comment-input:focus {
+.step-editor-field-input.habit-cell-journal-input:focus {
   outline: none;
   border-color: var(--color-accent);
   box-shadow: 0 0 0 3px var(--color-accent-subtle);
 }
 
-.vote-moment-modal-date {
-  font-family: var(--font-family-display);
-  font-size: 1.4rem;
-  color: var(--color-text-primary);
-}
-
-.vote-moment-modal-milestone {
-  margin-top: var(--space-2xs);
-  font-size: var(--font-size-caption);
-  color: var(--color-accent-strong);
-}
-
-.vote-moment-modal-photo {
+.habit-cell-modal-photo {
   width: 100%;
   max-height: 60vh;
   object-fit: cover;
@@ -403,9 +405,15 @@
   margin-top: var(--space-md);
 }
 
-.vote-moment-modal-comment {
+.habit-cell-modal-journal {
   margin-top: var(--space-md);
   color: var(--color-text-primary);
   line-height: var(--leading-relaxed);
   white-space: pre-wrap;
+}
+
+.habit-cell-modal-empty {
+  margin-top: var(--space-md);
+  color: var(--color-text-muted);
+  font-size: var(--font-size-body-sm);
 }

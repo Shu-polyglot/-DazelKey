@@ -47,6 +47,23 @@ img {
   display: block;
 }
 
+/* DazelKey's logo assets (src/assets/logo) are pre-processed to black
+   line art on a transparent background (see scratchpad's png_alpha.py --
+   alpha derived from source luminance, since the supplied master was
+   opaque black-on-white with no alpha of its own). Every in-app
+   placement sits on this app's one dark theme (see html's color-scheme
+   above), so this class just flips black -> white; alpha is untouched by
+   invert(), so transparency survives. (Tried mix-blend-mode: screen and
+   an SVG feColorMatrix first -- both failed: blend modes only composite
+   within their own stacking context, which any animated ancestor
+   isolates, and this Chrome build silently ignores feColorMatrix's alpha
+   output when referenced via CSS filter: url() on an <img>.) Only
+   favicon/OGP (viewed outside the app's own dark chrome) skip this and
+   use a plain opaque export instead. */
+.dazelkey-mark-inverted {
+  filter: invert(1);
+}
+
 #root {
   min-height: 100vh;
 }

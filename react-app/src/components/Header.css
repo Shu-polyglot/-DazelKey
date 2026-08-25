@@ -51,13 +51,14 @@
   font-size: var(--font-size-label);
 }
 
-.brand-copy h1 {
+.brand-wordmark {
   margin: 4px 0 0;
-  font-family: var(--font-family-display);
-  font-size: clamp(2.5rem, 4vw, 4rem);
-  line-height: var(--leading-tight);
-  letter-spacing: var(--tracking-tight);
-  font-weight: var(--font-weight-regular);
+  line-height: 0;
+}
+
+.brand-logo {
+  height: clamp(28px, 4vw, 36px);
+  width: auto;
 }
 
 .glass-button {

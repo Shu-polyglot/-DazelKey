@@ -37,7 +37,7 @@ function ExploreFeed({ onOpenDM }) {
         <div className="explore-empty">
           {isFriendsEmpty
             ? "No friends here yet -- add someone from Everyone, and their bucket comes to you."
-            : 'Nothing here yet -- try a different filter.'}
+            : 'Nothing shared yet -- check back soon.'}
         </div>
       ) : (
         <div className="explore-feed">

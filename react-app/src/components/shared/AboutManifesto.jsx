@@ -3,6 +3,7 @@ import { AnimatePresence, motion } from 'motion/react';
 import { manifestoParagraphs } from '../../data/manifesto';
 import { useNarration } from '../../hooks/useNarration';
 import { easing } from '../../styles/motion';
+import dazelkeyLockup from '../../assets/logo/dazelkey-lockup-full.png';
 import '../TransitionRitual.css';
 import './AboutManifesto.css';
 
@@ -108,6 +109,8 @@ function AboutManifesto({ onClose }) {
       </div>
 
       <div className="transition-ritual-content">
+        <img src={dazelkeyLockup} alt="DazelKey — Unlock Unlived Moments" className="about-manifesto-logo dazelkey-mark-inverted" />
+
         <AnimatePresence mode="wait">
           {currentParagraph && (
             <motion.p

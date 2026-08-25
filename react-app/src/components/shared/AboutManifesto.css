@@ -1,3 +1,8 @@
+.about-manifesto-logo {
+  width: clamp(160px, 30vw, 220px);
+  height: auto;
+}
+
 /* Narrower and smaller than a Transition Ritual quote -- these are
    multi-sentence paragraphs, not a single epigram, so they need room to
    wrap onto several lines without overwhelming the screen. */

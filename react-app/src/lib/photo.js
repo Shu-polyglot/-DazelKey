@@ -29,11 +29,11 @@ function loadImage(src) {
   });
 }
 
-export async function resizeImageToDataUrl(file) {
+export async function resizeImageToDataUrl(file, { maxDimension = MAX_DIMENSION, quality = JPEG_QUALITY } = {}) {
   const original = await readImageAsDataUrl(file);
   const img = await loadImage(original);
 
-  const scale = Math.min(1, MAX_DIMENSION / Math.max(img.width, img.height));
+  const scale = Math.min(1, maxDimension / Math.max(img.width, img.height));
   const width = Math.round(img.width * scale);
   const height = Math.round(img.height * scale);
 
@@ -42,7 +42,7 @@ export async function resizeImageToDataUrl(file) {
   canvas.height = height;
   canvas.getContext('2d').drawImage(img, 0, 0, width, height);
 
-  return canvas.toDataURL('image/jpeg', JPEG_QUALITY);
+  return canvas.toDataURL('image/jpeg', quality);
 }
 
 // Avatars are always cropped to a square, then displayed as either a square
