@@ -1,10 +1,9 @@
 import { motion } from 'motion/react';
 import { spring, dashboardEntrance, entranceTransition } from '../styles/motion';
-import { getInitials } from '../lib/profile';
 import dazelkeyLockup from '../assets/logo/dazelkey-lockup-compact.png';
 import './Header.css';
 
-function Header({ title, profile, onAddBucket, onOpenProfile }) {
+function Header({ title, onAddBucket }) {
   return (
     <motion.header
       className="topbar"
@@ -13,23 +12,9 @@ function Header({ title, profile, onAddBucket, onOpenProfile }) {
       transition={entranceTransition(dashboardEntrance.header)}
     >
       <div className="brand-wrap">
-        <motion.button
-          type="button"
-          className="brand-mark"
-          onClick={onOpenProfile}
-          aria-label={profile?.name ? `Edit profile — ${profile.name}` : 'Edit profile'}
-          style={profile?.photo ? { backgroundImage: `url(${profile.photo})` } : undefined}
-          whileHover={{ y: -2, transition: spring.hover }}
-          whileTap={{ scale: 0.94, transition: spring.press }}
-        >
-          {!profile?.photo && getInitials(profile?.name)}
-        </motion.button>
-        <div className="brand-copy">
-          <span className="eyebrow">Life archive</span>
-          <h1 className="brand-wordmark">
-            <img src={dazelkeyLockup} alt={title} className="brand-logo dazelkey-mark-inverted" />
-          </h1>
-        </div>
+        <h1 className="brand-wordmark">
+          <img src={dazelkeyLockup} alt={title} className="brand-logo dazelkey-mark-inverted" />
+        </h1>
       </div>
 
       <motion.button
