@@ -2,7 +2,6 @@ import { useState } from 'react';
 import { createPortal } from 'react-dom';
 import { AnimatePresence, motion } from 'motion/react';
 import Header from './components/Header';
-import OverviewPanel from './components/OverviewPanel';
 import AchievementsShelf from './components/Achievements/AchievementsShelf';
 import CalendarPanel from './components/Calendar/CalendarPanel';
 import ExploreFeed from './components/Explore/ExploreFeed';
@@ -145,20 +144,6 @@ function App() {
   function closeStory(closeMode) {
     setArchiveCloseMode(closeMode);
     navigate('achievement');
-  }
-
-  // OverviewPanel now lives at the top of The Achievement tab, so its
-  // "remaining" link (from the archive progress modal) has to leave the
-  // tab -- switch to Momentum's Bucket Lists view (see momentumView
-  // above; The Bucket List moved off its own tab and in there after the
-  // Core/Bucket Lists swap), then scroll once that tab is actually
-  // showing.
-  function handleViewRemainingBuckets() {
-    setMomentumView('bucket-lists');
-    navigate('strategy');
-    window.setTimeout(() => {
-      document.getElementById('bucket-list-section')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }, 350);
   }
 
   // The bridge's second option hands off to a different full-screen
@@ -367,7 +352,6 @@ function App() {
             </div>
 
             <div className={`tab-page${route === 'achievement' ? ' is-active' : ''}`} aria-hidden={route !== 'achievement'}>
-              <OverviewPanel buckets={buckets} onViewRemaining={handleViewRemainingBuckets} />
               <CalendarPanel buckets={buckets} onOpenBucket={setDetailsBucketId} />
               <AchievementsShelf
                 buckets={buckets}

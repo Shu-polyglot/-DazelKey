@@ -156,31 +156,3 @@
     min-width: 44px;
   }
 }
-
-/* A one-shot, full-screen flash of the tab's name on tap -- fixed to the
-   viewport (rendered as a sibling of <nav>, see BottomNav.jsx, since the
-   pill's own backdrop-filter would otherwise box this in). Non-interactive
-   and above everything else the nav itself sits over. Opacity keyframes
-   and their timing come from JS (NAV_FLASH_TRANSITION in BottomNav.jsx,
-   built off bottomNavTapEffects.js's NAV_NAME_FLASH_MS) -- this rule is
-   just the static look. */
-.bottom-nav-name-flash {
-  position: fixed;
-  inset: 0;
-  z-index: 300;
-  display: grid;
-  place-items: center;
-  padding: 0 var(--space-xl);
-  pointer-events: none;
-  text-align: center;
-  background: radial-gradient(circle at 50% 50%, rgba(var(--color-void-1-rgb), 0.45), transparent 68%);
-  font-family: var(--font-family-display);
-  font-size: var(--font-size-display);
-  font-weight: var(--font-weight-semibold);
-  line-height: var(--leading-tight);
-  letter-spacing: var(--tracking-tight);
-  color: var(--nav-flash-color, var(--color-text-primary));
-  text-shadow:
-    0 0 32px rgba(var(--nav-flash-rgb, var(--color-glow-rgb)), 0.55),
-    0 10px 30px rgba(2, 4, 10, 0.55);
-}

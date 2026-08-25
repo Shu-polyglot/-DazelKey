@@ -109,12 +109,11 @@ function StrategyPage({
           Deliberately one button, not a Bucket Lists/Realize chip pair:
           the label always names where a tap goes next, so it reads as a
           single toggle rather than two tabs. `activeView` is lifted to
-          App (not local state) so OverviewPanel's "view remaining" link
-          and Archive's "explore ahead" bridge -- both of which used to
-          jump straight to the old standalone Bucket Lists tab -- can
-          force this toggle onto Bucket Lists before landing here, since
-          AnimatePresence's mode="wait" below means the other view isn't
-          even mounted while it's not showing. */}
+          App (not local state) so Archive's "explore ahead" bridge --
+          which used to jump straight to the old standalone Bucket Lists
+          tab -- can force this toggle onto Bucket Lists before landing
+          here, since AnimatePresence's mode="wait" below means the other
+          view isn't even mounted while it's not showing. */}
       <motion.button
         type="button"
         className="momentum-view-toggle"

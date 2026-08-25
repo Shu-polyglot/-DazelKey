@@ -8,7 +8,6 @@ import {
   NAV_GLOW_MOVE_TRANSITION,
   NAV_GLOW_COLOR_TRANSITION,
   NAV_GLOW_COLOR_MODE,
-  NAV_NAME_FLASH_MS,
   navGlowBackground,
   navGlowShadow,
 } from './bottomNavTapEffects';
@@ -23,18 +22,6 @@ const NAV_GLOW_CROSSFADE_TRANSITION = {
   layout: NAV_GLOW_MOVE_TRANSITION,
   backgroundColor: NAV_GLOW_COLOR_TRANSITION,
   boxShadow: NAV_GLOW_COLOR_TRANSITION,
-};
-
-const NAV_FLASH_TOTAL_MS = NAV_NAME_FLASH_MS.fadeIn + NAV_NAME_FLASH_MS.hold + NAV_NAME_FLASH_MS.fadeOut;
-const NAV_FLASH_TRANSITION = {
-  duration: NAV_FLASH_TOTAL_MS / 1000,
-  times: [
-    0,
-    NAV_NAME_FLASH_MS.fadeIn / NAV_FLASH_TOTAL_MS,
-    (NAV_NAME_FLASH_MS.fadeIn + NAV_NAME_FLASH_MS.hold) / NAV_FLASH_TOTAL_MS,
-    1,
-  ],
-  ease: 'easeOut',
 };
 
 // The Story has no tab of its own -- it's reached from within The
@@ -154,12 +141,6 @@ function AchievementIcon({ active }) {
 }
 
 function BottomNav({ active, onNavigate, profile }) {
-  // The full-screen nav-name flash currently playing, if any. The id
-  // changes on every tap (even repeat taps on the same item) so the flash
-  // remounts -- via its `key` below -- and instantly cancels/replaces
-  // whatever was still fading, instead of the two overlapping.
-  const [flash, setFlash] = useState(null);
-
   // Only meaningful in 'snap' color mode (see bottomNavTapEffects.js):
   // holds the departing tab's route until the frame's move finishes, so
   // the color swap can land instantly right as the motion settles rather
@@ -185,104 +166,80 @@ function BottomNav({ active, onNavigate, profile }) {
     // frame that could drift the two apart.
     onNavigate(item.route);
     playTapChime(NAV_CHIME_NOTES[item.route]);
-    setFlash({ route: item.route, label: item.label, id: `${item.route}-${Date.now()}-${Math.random()}` });
   }
 
   return (
-    <>
-      <nav className="bottom-nav" aria-label="Primary">
-        {NAV_ITEMS.map((item) => {
-          const isActive = item.matches.includes(active);
+    <nav className="bottom-nav" aria-label="Primary">
+      {NAV_ITEMS.map((item) => {
+        const isActive = item.matches.includes(active);
 
-          return (
-            <motion.button
-              key={item.route}
-              type="button"
-              className={`bottom-nav-item${isActive ? ' is-active' : ''}`}
-              aria-current={isActive ? 'page' : undefined}
-              aria-label={item.label}
-              onClick={() => handleTap(item)}
-              whileTap={{ scale: 0.9, transition: spring.press }}
-            >
-              <span className="bottom-nav-glow-wrap">
-                {isActive &&
-                  (NAV_GLOW_COLOR_MODE === 'snap' ? (
-                    // 'snap': stay the departing tab's color for the whole
-                    // move (a plain `style`, not `animate`, so Motion never
-                    // tweens it), then jump to the new color the instant
-                    // the layout animation reports done.
-                    <motion.span
-                      layoutId="bottom-nav-active-glow"
-                      className="bottom-nav-active-glow"
-                      aria-hidden="true"
-                      transition={NAV_GLOW_MOVE_TRANSITION}
-                      style={{
-                        backgroundColor: navGlowBackground(NAV_ITEM_COLORS[settledRoute].rgb),
-                        boxShadow: navGlowShadow(NAV_ITEM_COLORS[settledRoute].rgb),
-                      }}
-                      onLayoutAnimationComplete={() => setSettledRoute(item.route)}
-                    />
-                  ) : (
-                    // 'crossfade': mount already colored as the departing
-                    // tab (`initial`), then tween to the new tab's color
-                    // (`animate`) across the same spring as the move.
-                    <motion.span
-                      layoutId="bottom-nav-active-glow"
-                      className="bottom-nav-active-glow"
-                      aria-hidden="true"
-                      transition={NAV_GLOW_CROSSFADE_TRANSITION}
-                      initial={{
-                        backgroundColor: navGlowBackground(NAV_ITEM_COLORS[previousActiveRoute].rgb),
-                        boxShadow: navGlowShadow(NAV_ITEM_COLORS[previousActiveRoute].rgb),
-                      }}
-                      animate={{
-                        backgroundColor: navGlowBackground(NAV_ITEM_COLORS[item.route].rgb),
-                        boxShadow: navGlowShadow(NAV_ITEM_COLORS[item.route].rgb),
-                      }}
-                    />
-                  ))}
-                {item.route === 'profile' ? (
-                  <span
-                    className="bottom-nav-avatar"
-                    style={profile?.photo ? { backgroundImage: `url(${profile.photo})` } : undefined}
-                  >
-                    {!profile?.photo && getInitials(profile?.name)}
-                  </span>
+        return (
+          <motion.button
+            key={item.route}
+            type="button"
+            className={`bottom-nav-item${isActive ? ' is-active' : ''}`}
+            aria-current={isActive ? 'page' : undefined}
+            aria-label={item.label}
+            onClick={() => handleTap(item)}
+            whileTap={{ scale: 0.9, transition: spring.press }}
+          >
+            <span className="bottom-nav-glow-wrap">
+              {isActive &&
+                (NAV_GLOW_COLOR_MODE === 'snap' ? (
+                  // 'snap': stay the departing tab's color for the whole
+                  // move (a plain `style`, not `animate`, so Motion never
+                  // tweens it), then jump to the new color the instant
+                  // the layout animation reports done.
+                  <motion.span
+                    layoutId="bottom-nav-active-glow"
+                    className="bottom-nav-active-glow"
+                    aria-hidden="true"
+                    transition={NAV_GLOW_MOVE_TRANSITION}
+                    style={{
+                      backgroundColor: navGlowBackground(NAV_ITEM_COLORS[settledRoute].rgb),
+                      boxShadow: navGlowShadow(NAV_ITEM_COLORS[settledRoute].rgb),
+                    }}
+                    onLayoutAnimationComplete={() => setSettledRoute(item.route)}
+                  />
                 ) : (
-                  <span className="bottom-nav-icon">
-                    {item.route === 'core' && <CoreIcon active={isActive} />}
-                    {item.route === 'strategy' && <StrategyIcon active={isActive} />}
-                    {item.route === 'explore' && <ExploreIcon active={isActive} />}
-                    {item.route === 'achievement' && <AchievementIcon active={isActive} />}
-                  </span>
-                )}
-              </span>
-            </motion.button>
-          );
-        })}
-      </nav>
-
-      {/* Rendered as a sibling of <nav>, not inside it -- .bottom-nav's own
-          backdrop-filter would otherwise become this element's containing
-          block and trap its position: fixed inside the pill instead of
-          the viewport. */}
-      {flash && (
-        <motion.div
-          key={flash.id}
-          className="bottom-nav-name-flash"
-          aria-hidden="true"
-          style={{
-            '--nav-flash-color': NAV_ITEM_COLORS[flash.route]?.hex,
-            '--nav-flash-rgb': NAV_ITEM_COLORS[flash.route]?.rgb,
-          }}
-          animate={{ opacity: [0, 1, 1, 0] }}
-          transition={NAV_FLASH_TRANSITION}
-          onAnimationComplete={() => setFlash(null)}
-        >
-          {flash.label}
-        </motion.div>
-      )}
-    </>
+                  // 'crossfade': mount already colored as the departing
+                  // tab (`initial`), then tween to the new tab's color
+                  // (`animate`) across the same spring as the move.
+                  <motion.span
+                    layoutId="bottom-nav-active-glow"
+                    className="bottom-nav-active-glow"
+                    aria-hidden="true"
+                    transition={NAV_GLOW_CROSSFADE_TRANSITION}
+                    initial={{
+                      backgroundColor: navGlowBackground(NAV_ITEM_COLORS[previousActiveRoute].rgb),
+                      boxShadow: navGlowShadow(NAV_ITEM_COLORS[previousActiveRoute].rgb),
+                    }}
+                    animate={{
+                      backgroundColor: navGlowBackground(NAV_ITEM_COLORS[item.route].rgb),
+                      boxShadow: navGlowShadow(NAV_ITEM_COLORS[item.route].rgb),
+                    }}
+                  />
+                ))}
+              {item.route === 'profile' ? (
+                <span
+                  className="bottom-nav-avatar"
+                  style={profile?.photo ? { backgroundImage: `url(${profile.photo})` } : undefined}
+                >
+                  {!profile?.photo && getInitials(profile?.name)}
+                </span>
+              ) : (
+                <span className="bottom-nav-icon">
+                  {item.route === 'core' && <CoreIcon active={isActive} />}
+                  {item.route === 'strategy' && <StrategyIcon active={isActive} />}
+                  {item.route === 'explore' && <ExploreIcon active={isActive} />}
+                  {item.route === 'achievement' && <AchievementIcon active={isActive} />}
+                </span>
+              )}
+            </span>
+          </motion.button>
+        );
+      })}
+    </nav>
   );
 }
 

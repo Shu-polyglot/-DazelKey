@@ -45,15 +45,6 @@ export const NAV_GLOW_COLOR_TRANSITION = {
 // SWITCH HERE:
 export const NAV_GLOW_COLOR_MODE = 'snap'; // 'crossfade' | 'snap'
 
-// Full-screen nav-name flash: fade in, hold, fade out. Total (600ms) is
-// kept shorter than the tap chime's ~1.1s fundamental decay (see
-// lib/chime.js) so the text is gone while the note is still ringing out.
-export const NAV_NAME_FLASH_MS = {
-  fadeIn: 100,
-  hold: 250,
-  fadeOut: 250,
-};
-
 export function navGlowBackground(rgb) {
   return `rgba(${rgb}, 0.16)`;
 }
