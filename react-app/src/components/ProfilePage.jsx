@@ -42,7 +42,7 @@ const PROFILE_TABS = [
   { id: 'achievements', label: 'The Achievement' },
 ];
 
-// Pure display of the same profile data Header's brand-mark and
+// Pure display of the same profile data BottomNav's avatar and
 // ProfilePanel already read/write -- editing still happens through that
 // existing modal (passed in via onEditProfile), not rebuilt here.
 function ProfilePage({ profile, buckets, onUpdateBucket, onDeleteBucket, onCompleteBucket, onEditProfile }) {

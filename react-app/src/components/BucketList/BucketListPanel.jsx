@@ -7,6 +7,12 @@ import ExpandedBucketCard from './ExpandedBucketCard';
 import { dashboardEntrance, entranceTransition } from '../../styles/motion';
 import './BucketList.css';
 
+// `variant`: 'page' (default) renders The Bucket List's own full page
+// heading (eyebrow + h2) inside an app-section -- for ProfilePage,
+// PreviewProfile, and any other standalone use. 'embedded' renders the
+// lighter h3 sub-heading Momentum's Core/Realize views use instead, with
+// no outer app-section chrome, for dropping into Momentum's own toggle
+// (see StrategyPage) after the Core/Bucket Lists swap.
 function BucketListPanel({
   buckets,
   onUpdate,
@@ -16,6 +22,7 @@ function BucketListPanel({
   layoutIdPrefix = 'bucket-card-',
   baseDelay = dashboardEntrance.bucketList,
   readOnly = false,
+  variant = 'page',
 }) {
   const [activeFilter, setActiveFilter] = useState('All');
   const [expandedId, setExpandedId] = useState(null);
@@ -40,18 +47,26 @@ function BucketListPanel({
   );
 
   const expandedBucket = buckets.find((bucket) => bucket.id === expandedId) || null;
+  const Wrapper = variant === 'embedded' ? 'div' : 'section';
+  const wrapperClassName = variant === 'embedded' ? 'strategy-subsection' : 'app-section bucket-section';
 
   return (
-    <section className="app-section bucket-section" id={sectionId}>
+    <Wrapper className={wrapperClassName} id={sectionId}>
       <motion.div
         initial={{ opacity: 0, y: 14, filter: 'blur(6px)' }}
         animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
         transition={entranceTransition(baseDelay)}
       >
-        <div className="section-heading">
-          <span className="section-label">Intentions</span>
-          <h2>The Bucket List</h2>
-        </div>
+        {variant === 'embedded' ? (
+          <div className="section-heading-row bucket-heading-row">
+            <h3>The Bucket List</h3>
+          </div>
+        ) : (
+          <div className="section-heading">
+            <span className="section-label">Intentions</span>
+            <h2>The Bucket List</h2>
+          </div>
+        )}
 
         <WhenFilters activeFilter={activeFilter} onChange={setActiveFilter} />
       </motion.div>
@@ -110,7 +125,7 @@ function BucketListPanel({
         </AnimatePresence>,
         document.body,
       )}
-    </section>
+    </Wrapper>
   );
 }
 

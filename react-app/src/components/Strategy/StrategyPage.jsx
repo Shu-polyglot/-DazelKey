@@ -6,7 +6,8 @@ import DoingGoalDetail from './DoingGoalDetail';
 import LogMoneyFlow from './LogMoneyFlow';
 import DoingHistoryModal from './DoingHistoryModal';
 import AddGoalFlow from './AddGoalFlow';
-import TopPrioritySection from '../../features/topPriority/TopPrioritySection';
+import NextUpPanel from '../NextUpPanel';
+import BucketListPanel from '../BucketList/BucketListPanel';
 import { MAX_DOING_GOALS } from '../../lib/buckets';
 import { getTotalProgress } from '../../lib/doing';
 import { entranceTransition, spring, transitions } from '../../styles/motion';
@@ -43,14 +44,28 @@ function SwapIcon() {
 // Fade + a small vertical settle + blur -- the same enter/exit shape as
 // every other content swap in this app (dashboard sections' own entrance,
 // BucketStepEditor's step panels), just without that wizard's horizontal
-// slide since Core/Realize aren't an ordered sequence to move "through".
+// slide since Bucket Lists/Realize aren't an ordered sequence to move
+// "through".
 const viewVariants = {
   enter: { opacity: 0, y: 8, filter: 'blur(4px)' },
   center: { opacity: 1, y: 0, filter: 'blur(0px)', transition: transitions.emphasis },
   exit: { opacity: 0, y: -8, filter: 'blur(4px)', transition: transitions.exit },
 };
 
-function StrategyPage({ buckets, votes, contributions, onLogMoney, onAddDoingGoal, onToggleChecklistItem }) {
+function StrategyPage({
+  buckets,
+  votes,
+  contributions,
+  onLogMoney,
+  onAddDoingGoal,
+  onToggleChecklistItem,
+  onUpdateBucket,
+  onDeleteBucket,
+  onCompleteBucket,
+  onOpenBucket,
+  activeView,
+  onViewChange,
+}) {
   // Drops out once doingCompletedAt is set (100% reached, see App.jsx's
   // checkDoingCompletion) -- the goal itself lives on in `buckets` for
   // DoingHistoryModal to look back up, just no longer "in progress"
@@ -66,17 +81,12 @@ function StrategyPage({ buckets, votes, contributions, onLogMoney, onAddDoingGoa
   const [isLogMoneyOpen, setIsLogMoneyOpen] = useState(false);
   const [expandedDoingGoalId, setExpandedDoingGoalId] = useState(null);
   const [isHistoryOpen, setIsHistoryOpen] = useState(false);
-  // Core and Realize used to sit stacked, both always on screen -- now
-  // only one shows at a time (see momentum-view-toggle below), purely a
-  // display-layer choice: neither section's own state/data above this
-  // line changed, so switching back and forth never loses anything.
-  const [activeView, setActiveView] = useState('core');
 
   const expandedDoingGoal = doingGoals.find((goal) => goal.id === expandedDoingGoalId) || null;
   const logMoneyGoals = doingGoals.map((goal) => ({ id: goal.id, title: goal.title, target: goal.doingGoalAmount, current: goal.total }));
 
   function toggleView() {
-    setActiveView((prev) => (prev === 'core' ? 'realize' : 'core'));
+    onViewChange(activeView === 'bucket-lists' ? 'realize' : 'bucket-lists');
   }
 
   return (
@@ -98,25 +108,38 @@ function StrategyPage({ buckets, votes, contributions, onLogMoney, onAddDoingGoa
 
       {/* Fixed in place above whichever view is showing -- switching
           never moves this button, only the label/destination it names.
-          Deliberately one button, not a Core/Realize chip pair: the
-          label always names where a tap goes next, so it reads as a
-          single toggle rather than two tabs. */}
+          Deliberately one button, not a Bucket Lists/Realize chip pair:
+          the label always names where a tap goes next, so it reads as a
+          single toggle rather than two tabs. `activeView` is lifted to
+          App (not local state) so OverviewPanel's "view remaining" link
+          and Archive's "explore ahead" bridge -- both of which used to
+          jump straight to the old standalone Bucket Lists tab -- can
+          force this toggle onto Bucket Lists before landing here, since
+          AnimatePresence's mode="wait" below means the other view isn't
+          even mounted while it's not showing. */}
       <motion.button
         type="button"
         className="momentum-view-toggle"
         onClick={toggleView}
-        aria-label={`Switch to ${activeView === 'core' ? 'Realize' : 'Core'}`}
+        aria-label={`Switch to ${activeView === 'bucket-lists' ? 'Realize' : 'Bucket Lists'}`}
         whileHover={{ y: -1, transition: spring.hover }}
         whileTap={{ y: 1, scale: 0.96, transition: spring.press }}
       >
         <SwapIcon />
-        {activeView === 'core' ? 'Realize' : 'Core'}
+        {activeView === 'bucket-lists' ? 'Realize' : 'Bucket Lists'}
       </motion.button>
 
       <AnimatePresence mode="wait">
-        {activeView === 'core' ? (
-          <motion.div key="core" variants={viewVariants} initial="enter" animate="center" exit="exit">
-            <TopPrioritySection />
+        {activeView === 'bucket-lists' ? (
+          <motion.div key="bucket-lists" variants={viewVariants} initial="enter" animate="center" exit="exit">
+            <NextUpPanel buckets={buckets} onOpenBucket={onOpenBucket} />
+            <BucketListPanel
+              buckets={buckets}
+              onUpdate={onUpdateBucket}
+              onDelete={onDeleteBucket}
+              onComplete={onCompleteBucket}
+              variant="embedded"
+            />
           </motion.div>
         ) : (
           <motion.div key="realize" variants={viewVariants} initial="enter" animate="center" exit="exit">

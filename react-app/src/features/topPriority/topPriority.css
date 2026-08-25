@@ -36,12 +36,20 @@
   cursor: pointer;
 }
 
+/* The card's one job is to make the goal itself the thing your eye
+   lands on first -- sized up to --font-size-h2 (an existing token,
+   otherwise unused; not a new size invented for this) rather than
+   bumped via font-weight, since every other --font-family-display use
+   in this app stays at font-weight-regular (the face itself carries
+   its own presence at that weight; see e.g. .section-heading h2,
+   .expanded-card-title) -- weight was never this app's lever for
+   emphasis on this family, size and italic already are. */
 .priority-commitment {
   margin-top: var(--space-2xs);
   font-family: var(--font-family-display);
   font-style: italic;
-  font-size: 1.4rem;
-  line-height: var(--leading-relaxed);
+  font-size: var(--font-size-h2);
+  line-height: var(--leading-tight);
   color: var(--color-text-primary);
 }
 
@@ -49,6 +57,44 @@
   margin-top: var(--space-lg);
   font-size: var(--font-size-caption);
   color: var(--color-text-muted);
+}
+
+/* The card's own cumulative-acts sentence, tucked right under the
+   commitment title -- deliberately snugger than .priority-summary's
+   own spacing (that one sits where the habit grid would otherwise
+   start; this one is part of the title's own reading group) and
+   quieter than the title itself, so the number never competes with
+   the commitment it's in service of. */
+.priority-record-count {
+  margin-top: var(--space-2xs);
+  font-size: var(--font-size-caption);
+  color: var(--color-text-muted);
+}
+
+/* Marks the seam between the goal (big, above) and the small daily
+   acts toward it (quieter, below) on the list card specifically --
+   same hairline-plus-breathing-room recipe Realize's own
+   .doing-checklist already uses for an identical "here's the next
+   tier down" moment. Scoped to .priority-card (not the bare
+   .habit-week-grid/.priority-summary classes) so GoalDetail's modal --
+   which has its own header treatment, not .priority-commitment -- is
+   untouched. */
+.priority-card .habit-week-grid,
+.priority-card .priority-summary {
+  margin-top: var(--space-lg);
+  padding-top: var(--space-md);
+  border-top: 1px solid var(--color-border);
+}
+
+/* Core's own standalone-page tagline ("Think Big, Act Small") -- sits
+   under the Identity/Core heading, quiet enough not to compete with
+   it. Only rendered for `variant="page"` (see TopPrioritySection). */
+.core-tagline {
+  margin-top: var(--space-2xs);
+  color: var(--color-text-muted);
+  font-size: var(--font-size-body-sm);
+  font-style: italic;
+  letter-spacing: var(--tracking-wide);
 }
 
 /* Quiet, centered note shown in place of the heading's add icon once the
@@ -96,6 +142,107 @@
 .priority-add-icon:hover {
   border-color: var(--color-border-strong);
   background: rgba(var(--color-mist-rgb), 0.1);
+}
+
+/* GoalDetail's Heatmap/Records Timeline switch -- a deliberate,
+   pixel-for-pixel duplicate of Strategy.css's .momentum-view-toggle
+   (same recipe, same reasoning as every other rule on this page: Core
+   stays droppable with zero Strategy dependency). */
+.priority-view-toggle {
+  appearance: none;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2xs);
+  margin-bottom: var(--space-lg);
+  padding: var(--space-2xs) var(--space-md);
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--color-border-strong);
+  background: rgba(var(--color-glow-rgb), 0.08);
+  color: var(--color-accent-strong);
+  font-size: var(--font-size-body-sm);
+  font-weight: var(--font-weight-medium);
+  cursor: pointer;
+  transition: border-color 0.2s ease, background 0.2s ease;
+}
+
+.priority-view-toggle:hover {
+  border-color: rgba(var(--color-glow-rgb), 0.4);
+  background: rgba(var(--color-glow-rgb), 0.14);
+}
+
+/* Records Timeline -- a plain chronological list, each row a single
+   logged day. Kept close in weight to .priority-card/.doing-history-
+   item (this app's other "quiet record row" recipes) rather than
+   borrowing Story's own full-bleed card treatment, which is styled for
+   a different, Bucket-specific narrative context. */
+.habit-records-timeline {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+}
+
+.habit-record-row {
+  appearance: none;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: var(--space-sm);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-border);
+  background: rgba(var(--color-mist-rgb), 0.04);
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: border-color 0.2s ease, background 0.2s ease;
+}
+
+.habit-record-row:hover {
+  border-color: var(--color-border-strong);
+  background: rgba(var(--color-mist-rgb), 0.1);
+}
+
+.habit-record-thumb {
+  flex: none;
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-sm);
+  background-color: rgba(var(--color-mist-rgb), 0.08);
+  background-size: cover;
+  background-position: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+}
+
+.habit-record-thumb.has-photo {
+  font-size: 0;
+}
+
+.habit-record-meta {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3xs);
+}
+
+.habit-record-date {
+  font-size: var(--font-size-caption);
+  color: var(--color-text-muted);
+}
+
+.habit-record-habit {
+  font-size: var(--font-size-body-sm);
+  color: var(--color-text-primary);
+}
+
+.habit-record-journal {
+  font-size: var(--font-size-caption);
+  color: var(--color-text-secondary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 /* Add a Priority wizard */
@@ -213,10 +360,19 @@
   -webkit-overflow-scrolling: touch;
 }
 
+/* The label column used to be minmax(96px, 1fr) -- on any card wider
+   than a phone, 1fr stretched it to fill all the leftover width,
+   shoving the day cells (the actual done/undone checkboxes) off to
+   the far edge of the row, away from the name they belong to. Capping
+   the max instead keeps every row's cells starting at the same shared
+   x-position (still one grid template for header + every row, so the
+   day columns stay in a straight vertical line down the card -- see
+   the header comment above) while letting a typical habit name sit
+   right next to its own cells instead of a card-width away from them. */
 .habit-week-grid-header,
 .habit-week-grid-row {
   display: grid;
-  grid-template-columns: minmax(96px, 1fr) repeat(7, 20px);
+  grid-template-columns: minmax(96px, 160px) repeat(7, 20px);
   align-items: center;
   gap: var(--space-2xs);
 }
@@ -228,9 +384,11 @@
 
 /* One habit per row, each set off from the next by its own divider --
    without this, same-width rows of near-identical squares read as one
-   undifferentiated block instead of separate habits. */
+   undifferentiated block instead of separate habits. Padding's a
+   touch taller than the cells themselves (20px) so adjacent rows'
+   tap targets never feel like they could be the next habit's. */
 .habit-week-grid-row {
-  padding: var(--space-xs) 0;
+  padding: var(--space-sm) 0;
   border-bottom: 1px solid var(--color-border);
 }
 
@@ -416,4 +574,46 @@
   margin-top: var(--space-md);
   color: var(--color-text-muted);
   font-size: var(--font-size-body-sm);
+}
+
+/* A goal card's long-press menu -- Modal's own backdrop/dialog chrome
+   (see Modal.jsx), just narrower and padding-free since its content is
+   a stack of full-width rows, not a form. */
+.goal-card-menu {
+  width: min(100%, 300px);
+  padding: var(--space-xs);
+  display: flex;
+  flex-direction: column;
+}
+
+.goal-card-menu-item {
+  appearance: none;
+  width: 100%;
+  padding: var(--space-md);
+  border: none;
+  background: none;
+  border-radius: var(--radius-sm);
+  color: var(--color-text-primary);
+  font-size: var(--font-size-body);
+  text-align: center;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.goal-card-menu-item:hover {
+  background: rgba(var(--color-mist-rgb), 0.08);
+}
+
+.goal-card-menu-item + .goal-card-menu-item {
+  border-top: 1px solid var(--color-border);
+}
+
+.goal-card-menu-item.is-destructive {
+  color: var(--color-danger);
+}
+
+.goal-card-menu-item.is-cancel {
+  margin-top: var(--space-xs);
+  color: var(--color-text-muted);
+  border-top: none;
 }

@@ -3,12 +3,11 @@ import { createPortal } from 'react-dom';
 import { AnimatePresence, motion } from 'motion/react';
 import Header from './components/Header';
 import OverviewPanel from './components/OverviewPanel';
-import NextUpPanel from './components/NextUpPanel';
 import AchievementsShelf from './components/Achievements/AchievementsShelf';
 import CalendarPanel from './components/Calendar/CalendarPanel';
-import BucketListPanel from './components/BucketList/BucketListPanel';
 import ExploreFeed from './components/Explore/ExploreFeed';
 import StrategyPage from './components/Strategy/StrategyPage';
+import TopPrioritySection from './features/topPriority/TopPrioritySection';
 import ProfilePage from './components/ProfilePage';
 import BucketCreateModal from './components/Modals/BucketCreateModal';
 import BucketDetailsModal from './components/Modals/BucketDetailsModal';
@@ -47,6 +46,12 @@ function App() {
   const { votes } = useVotes();
   const { contributions, addContribution } = useContributions();
   const [route, navigate] = useRoute();
+  // Which of Momentum's two views (see StrategyPage) is showing --
+  // lifted up here, not local to StrategyPage, so handleViewRemaining
+  // Buckets/handleExploreAhead below can force it onto 'bucket-lists'
+  // before navigating there, the same way they used to jump straight to
+  // the old standalone Bucket Lists tab.
+  const [momentumView, setMomentumView] = useState('bucket-lists');
   const [hasEntered, setHasEntered] = useState(false);
   const [showAchievementBanner, setShowAchievementBanner] = useState(false);
   const [showEntryRitual, setShowEntryRitual] = useState(false);
@@ -144,10 +149,13 @@ function App() {
 
   // OverviewPanel now lives at the top of The Achievement tab, so its
   // "remaining" link (from the archive progress modal) has to leave the
-  // tab -- switch to The Bucket Lists, then scroll once that tab is
-  // actually showing.
+  // tab -- switch to Momentum's Bucket Lists view (see momentumView
+  // above; The Bucket List moved off its own tab and in there after the
+  // Core/Bucket Lists swap), then scroll once that tab is actually
+  // showing.
   function handleViewRemainingBuckets() {
-    navigate('bucket-lists');
+    setMomentumView('bucket-lists');
+    navigate('strategy');
     window.setTimeout(() => {
       document.getElementById('bucket-list-section')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }, 350);
@@ -157,7 +165,8 @@ function App() {
   // experience rather than back to a tab, so it skips closeStory entirely.
   function handleExploreAhead() {
     setArchiveCloseMode('complete');
-    navigate('bucket-lists');
+    setMomentumView('bucket-lists');
+    navigate('strategy');
     setIsWhatsAheadOpen(true);
   }
 
@@ -329,23 +338,11 @@ function App() {
           }
           transition={isOverlayOpen ? { duration: 0.55, ease: easing.exit } : { duration: 0.5, ease: easing.emphasized }}
         >
-          <Header
-            title="DazelKey"
-            profile={profile}
-            onAddBucket={() => setIsAddModalOpen(true)}
-            onOpenProfile={() => setIsProfileOpen(true)}
-          />
+          <Header title="DazelKey" onAddBucket={() => setIsAddModalOpen(true)} />
 
           <main className="tab-content">
-            <div className={`tab-page${route === 'bucket-lists' ? ' is-active' : ''}`} aria-hidden={route !== 'bucket-lists'}>
-              <NextUpPanel buckets={buckets} onOpenBucket={setDetailsBucketId} />
-
-              <BucketListPanel
-                buckets={buckets}
-                onUpdate={updateBucket}
-                onDelete={deleteBucket}
-                onComplete={handleCompleteBucket}
-              />
+            <div className={`tab-page${route === 'core' ? ' is-active' : ''}`} aria-hidden={route !== 'core'}>
+              <TopPrioritySection variant="page" />
             </div>
 
             <div className={`tab-page${route === 'strategy' ? ' is-active' : ''}`} aria-hidden={route !== 'strategy'}>
@@ -356,6 +353,12 @@ function App() {
                 onLogMoney={handleLogMoney}
                 onAddDoingGoal={handleAddDoingGoal}
                 onToggleChecklistItem={handleToggleChecklistItem}
+                onUpdateBucket={updateBucket}
+                onDeleteBucket={deleteBucket}
+                onCompleteBucket={handleCompleteBucket}
+                onOpenBucket={setDetailsBucketId}
+                activeView={momentumView}
+                onViewChange={setMomentumView}
               />
             </div>
 

@@ -3,16 +3,26 @@ import { useEffect, useState } from 'react';
 // Timeline no longer has its own tab -- it now lives at the top of the
 // Achievement tab -- so it's not a navigable route, but old #/timeline
 // hashes are still recognized below and mapped onto 'achievement'.
-export const ROUTES = ['story', 'achievement', 'bucket-lists', 'explore', 'strategy', 'profile'];
-const DEFAULT_ROUTE = 'bucket-lists';
+export const ROUTES = ['story', 'achievement', 'core', 'explore', 'strategy', 'profile'];
+const DEFAULT_ROUTE = 'core';
 
 // Recognizes both the tab hashes this router owns (#/story, #/achievement...)
 // and the pre-existing Copy Link format from ShareModal (#achievement-<id>),
 // which predates tab navigation and must keep landing on the Achievement tab.
+// 'bucket-lists' is also still recognized here -- that used to be its own
+// leftmost tab, but The Bucket List now lives inside Momentum (see
+// StrategyPage), so an old #/bucket-lists link lands there instead of
+// falling through to the (now different) default route.
 function readRouteFromHash(hash) {
-  const tabMatch = hash.match(/^#\/(story|achievement|bucket-lists|explore|strategy|profile|timeline)\b/);
+  const tabMatch = hash.match(/^#\/(story|achievement|core|explore|strategy|profile|timeline|bucket-lists)\b/);
   if (tabMatch) {
-    return tabMatch[1] === 'timeline' ? 'achievement' : tabMatch[1];
+    if (tabMatch[1] === 'timeline') {
+      return 'achievement';
+    }
+    if (tabMatch[1] === 'bucket-lists') {
+      return 'strategy';
+    }
+    return tabMatch[1];
   }
   if (/^#achievement-/.test(hash)) {
     return 'achievement';

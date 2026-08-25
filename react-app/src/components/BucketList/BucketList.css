@@ -1,3 +1,20 @@
+/* The Bucket List's own sub-heading, used when embedded inside Momentum
+   (see BucketListPanel's `variant="embedded"`) -- mirrors Strategy.css's
+   .realize-heading-row / topPriority.css's .priority-heading-row, a
+   deliberate duplicate rather than a shared import (same reasoning as
+   those two). No add-icon here: adding a bucket list item is still done
+   from the header's own "+ Add to The Bucket List" button. */
+.bucket-heading-row {
+  margin-bottom: var(--space-md);
+}
+
+.bucket-heading-row h3 {
+  font-family: var(--font-family-display);
+  font-weight: var(--font-weight-regular);
+  font-size: var(--font-size-h3);
+  color: var(--color-text-primary);
+}
+
 .filter-row {
   display: flex;
   flex-wrap: wrap;

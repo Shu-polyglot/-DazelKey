@@ -41,7 +41,28 @@ export function useTopPriorities() {
     return record;
   }
 
-  return { priorities, addPriority };
+  // Edits the one field a priority actually has -- its own identity-
+  // commitment sentence (see this module's own header comment: "title"
+  // here IS that sentence, there's no separate short label). A no-op on
+  // an empty trim, same validation addPriority already applies.
+  function updatePriority(id, { title }) {
+    const trimmed = title?.trim();
+    if (!trimmed) {
+      return;
+    }
+    setStored((prev) => prev.map((priority) => (priority.id === id ? { ...priority, title: trimmed } : priority)));
+  }
+
+  // Habits/logs referencing this goal are deliberately left as-is, not
+  // cascade-deleted -- the same orphan-tolerant choice deleteHabit below
+  // already makes for its own logs (see that comment): nothing else in
+  // the app resolves them without a live priority to filter by, so they
+  // simply stop being reachable rather than needing an explicit sweep.
+  function deletePriority(id) {
+    setStored((prev) => prev.filter((priority) => priority.id !== id));
+  }
+
+  return { priorities, addPriority, updatePriority, deletePriority };
 }
 
 function normalizeHabit(habit) {
@@ -50,6 +71,15 @@ function normalizeHabit(habit) {
     goalId: habit.goalId,
     name: habit.name || '',
     createdAt: habit.createdAt || todayIso(),
+    // Set once a habit with at least one log gets "removed" through the
+    // edit screen (see GoalEditModal/TopPrioritySection's
+    // handleRemoveHabit) -- an archived habit drops out of every active
+    // list (HabitWeekGrid, AddHabitForm, GoalCard's own habits) but its
+    // id and name stay resolvable, so its past logs keep reading
+    // correctly wherever they're looked back on (HabitRecordsTimeline).
+    // A habit with zero logs when removed skips this state entirely and
+    // is hard-deleted instead -- there's nothing of it to protect.
+    archivedAt: habit.archivedAt || null,
   };
 }
 
@@ -71,11 +101,22 @@ export function useHabits() {
     return record;
   }
 
+  // Irreversible, unlike archiveHabit below -- callers only reach for
+  // this once they've confirmed the habit has no logs to protect (see
+  // handleRemoveHabit), the same way this function always worked before
+  // archiving existed.
   function deleteHabit(id) {
     setStored((prev) => prev.filter((habit) => habit.id !== id));
   }
 
-  return { habits, addHabit, deleteHabit };
+  // The safe "remove" for a habit that already has recorded days --
+  // hides it from active use without touching its own record or any
+  // log that points at it.
+  function archiveHabit(id) {
+    setStored((prev) => prev.map((habit) => (habit.id === id ? { ...habit, archivedAt: todayIso() } : habit)));
+  }
+
+  return { habits, addHabit, deleteHabit, archiveHabit };
 }
 
 function normalizeLog(log) {

@@ -41,7 +41,7 @@ const NAV_FLASH_TRANSITION = {
 // Achievement (see AchievementsShelf's "Story" link) and returns there on
 // close -- so it's treated as part of that tab for the active indicator.
 const NAV_ITEMS = [
-  { route: 'bucket-lists', label: 'The Bucket Lists', matches: ['bucket-lists'] },
+  { route: 'core', label: 'Core', matches: ['core'] },
   { route: 'strategy', label: 'Momentum', matches: ['strategy'] },
   { route: 'explore', label: 'Explore', matches: ['explore'] },
   { route: 'achievement', label: 'The Achievement', matches: ['achievement', 'story'] },
@@ -61,7 +61,7 @@ function resolveNavRoute(rawRoute) {
 // Kept as its own table, keyed by route, so the notes can be retuned
 // without touching NAV_ITEMS' routing/labels.
 const NAV_CHIME_NOTES = {
-  'bucket-lists': 1046.5, // C6
+  core: 1046.5, // C6
   strategy: 1174.66, // D6
   explore: 1318.51, // E6
   achievement: 1396.91, // F6
@@ -75,7 +75,11 @@ const NAV_CHIME_NOTES = {
 // literary motifs on purpose (a horizon, a line chart, a calendar) --
 // the trophy/flag pair this set replaced read too much like a game's
 // scoreboard for this app's own cinematic tone.
-function BucketListIcon({ active }) {
+// This was Bucket Lists' own glyph before the Core/Bucket Lists swap moved
+// Bucket List content inside Momentum -- kept as-is (see NAV_ITEM_COLORS'
+// "Horizon" comment) rather than commissioning a new one for Core, since
+// the mountain-skyline shape reads just as well as a "foundation" motif.
+function CoreIcon({ active }) {
   return (
     <svg viewBox="0 0 24 24" width="23" height="23" aria-hidden="true">
       <path
@@ -246,7 +250,7 @@ function BottomNav({ active, onNavigate, profile }) {
                   </span>
                 ) : (
                   <span className="bottom-nav-icon">
-                    {item.route === 'bucket-lists' && <BucketListIcon active={isActive} />}
+                    {item.route === 'core' && <CoreIcon active={isActive} />}
                     {item.route === 'strategy' && <StrategyIcon active={isActive} />}
                     {item.route === 'explore' && <ExploreIcon active={isActive} />}
                     {item.route === 'achievement' && <AchievementIcon active={isActive} />}
