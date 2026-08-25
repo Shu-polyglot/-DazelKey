@@ -3,7 +3,7 @@ import { motion } from 'motion/react';
 import Modal from '../../components/Modals/Modal';
 import CameraCapture from '../../components/shared/CameraCapture';
 import { MAX_PHOTO_BYTES, resizeImageToDataUrl, supportsCamera } from '../../lib/photo';
-import { formatDate } from '../../lib/dates';
+import { formatDate, todayIso } from '../../lib/dates';
 import { spring } from '../../styles/motion';
 import '../../components/Modals/Modals.css';
 import '../../components/Modals/BucketStepEditor.css';
@@ -19,23 +19,28 @@ const tapProps = {
 };
 
 /*
-  What a habit cell opens into, for both states a cell can be in -- see
-  GoalCard's HabitTodayGrid and GoalDetail's HabitRecordsTimeline, both
-  of which reach this through the same shared onSelectCell. An undone
-  cell opens this in "record" mode: tapping it never sets done by itself,
-  only the "Record" button inside does, so a cancelled/closed modal
-  leaves the day untouched. A done cell opens in "view" mode: photo/
-  journal are shown, both editable and independently removable, plus
-  an "Undo" that deletes the whole log (see topPriority.js's undoLog --
-  there's no partial "undone but still has a photo" state).
+  What a priority's "Action" button opens -- was HabitCellModal (habit +
+  date + per-day done log) before Core retired habits entirely in favor
+  of free-form Actions; this is that exact same photo+journal UI, just
+  keyed to an Action (goalId + timestamp) instead of a habit/date pair,
+  since there's no day slot to fill anymore -- a goal can carry any
+  number of Actions, whenever. No `action` prop: record mode, tapping
+  "Record" always creates a new entry (never overwrites one, unlike the
+  old one-per-day cell). An `action` passed in (from HabitRecordsTimeline)
+  opens in view mode instead -- photo/journal shown, both editable, plus
+  Delete for removing that one entry outright (the old "mark as not
+  done" doesn't apply here; there's no day to un-mark, just this one
+  record to keep or drop).
 */
-function HabitCellModal({ habitName, date, log, readOnly = false, onRecord, onUpdateMedia, onUndo, onClose }) {
-  const isDone = Boolean(log);
-  const [isEditing, setIsEditing] = useState(!isDone);
-  const [photo, setPhoto] = useState(log?.photo || null);
-  const [journal, setJournal] = useState(log?.journal || '');
+function ActionRecordModal({ priorityTitle, action, readOnly = false, onRecord, onUpdateMedia, onDelete, onClose }) {
+  const isExisting = Boolean(action);
+  const [isEditing, setIsEditing] = useState(!isExisting);
+  const [photo, setPhoto] = useState(action?.photo || null);
+  const [journal, setJournal] = useState(action?.journal || '');
   const [isCameraOpen, setIsCameraOpen] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
+
+  const date = isExisting ? action.time.slice(0, 10) : todayIso();
 
   async function processPhotoFile(file) {
     if (file.size > MAX_PHOTO_BYTES) {
@@ -78,19 +83,19 @@ function HabitCellModal({ habitName, date, log, readOnly = false, onRecord, onUp
     setIsEditing(false);
   }
 
-  function handleUndo() {
-    onUndo();
+  function handleDelete() {
+    onDelete();
     onClose();
   }
 
-  const showForm = !isDone || isEditing;
+  const showForm = !isExisting || isEditing;
 
   return (
     <Modal onClose={onClose} className="habit-cell-modal">
       <div className="modal-header detail-header">
         <div>
           <p className="habit-cell-modal-date">{formatDate(date)}</p>
-          <p className="habit-cell-modal-habit">{habitName}</p>
+          <p className="habit-cell-modal-habit">{priorityTitle}</p>
         </div>
         <motion.button
           type="button"
@@ -137,10 +142,10 @@ function HabitCellModal({ habitName, date, log, readOnly = false, onRecord, onUp
           )}
 
           {!readOnly && (
-            <label className="step-editor-field-label habit-cell-journal-label" htmlFor="habit-cell-journal">
+            <label className="step-editor-field-label habit-cell-journal-label" htmlFor="action-record-journal">
               <span className="sr-only">A short note</span>
               <textarea
-                id="habit-cell-journal"
+                id="action-record-journal"
                 className="step-editor-field-input habit-cell-journal-input"
                 value={journal}
                 onChange={(event) => setJournal(event.target.value.slice(0, MAX_JOURNAL_LENGTH))}
@@ -152,7 +157,7 @@ function HabitCellModal({ habitName, date, log, readOnly = false, onRecord, onUp
 
           {!readOnly && (
             <div className="detail-actions">
-              {isDone && (
+              {isExisting && (
                 <motion.button type="button" className="secondary-button" onClick={() => setIsEditing(false)} {...tapProps}>
                   Cancel
                 </motion.button>
@@ -160,25 +165,25 @@ function HabitCellModal({ habitName, date, log, readOnly = false, onRecord, onUp
               <motion.button
                 type="button"
                 className="primary-button"
-                onClick={isDone ? handleSaveEdit : handleRecord}
+                onClick={isExisting ? handleSaveEdit : handleRecord}
                 disabled={isProcessing}
                 {...tapProps}
               >
-                {isDone ? 'Save' : 'Record'}
+                {isExisting ? 'Save' : 'Record'}
               </motion.button>
             </div>
           )}
         </>
       ) : (
         <>
-          {log.photo && <img src={log.photo} alt="" className="habit-cell-modal-photo" />}
-          {log.journal && <p className="habit-cell-modal-journal">{log.journal}</p>}
-          {!log.photo && !log.journal && <p className="habit-cell-modal-empty">Recorded, no photo or note.</p>}
+          {action.photo && <img src={action.photo} alt="" className="habit-cell-modal-photo" />}
+          {action.journal && <p className="habit-cell-modal-journal">{action.journal}</p>}
+          {!action.photo && !action.journal && <p className="habit-cell-modal-empty">Recorded, no photo or note.</p>}
 
           {!readOnly && (
             <div className="detail-actions">
-              <motion.button type="button" className="secondary-button" onClick={handleUndo} {...tapProps}>
-                Mark as not done
+              <motion.button type="button" className="secondary-button" onClick={handleDelete} {...tapProps}>
+                Delete
               </motion.button>
               <motion.button type="button" className="primary-button" onClick={() => setIsEditing(true)} {...tapProps}>
                 Edit
@@ -193,4 +198,4 @@ function HabitCellModal({ habitName, date, log, readOnly = false, onRecord, onUp
   );
 }
 
-export default HabitCellModal;
+export default ActionRecordModal;

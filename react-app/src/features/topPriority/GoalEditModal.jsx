@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { motion } from 'motion/react';
 import Modal from '../../components/Modals/Modal';
-import AddHabitForm from './AddHabitForm';
 import { spring } from '../../styles/motion';
 import '../../components/Modals/Modals.css';
 import '../../components/Modals/BucketStepEditor.css';
@@ -16,13 +15,12 @@ const tapProps = {
   The goal card's long-press "Edit" destination: its one text field
   (see topPriority.js's updatePriority -- "title" already IS the
   identity-commitment sentence, there's no separate short label to
-  edit) plus the same habit add/remove surface GoalDetail already
-  offers, reused here rather than rebuilt (see AddHabitForm). Habit
-  removal here goes through the caller's onRemoveHabit, which decides
-  archive vs. delete per habit -- this component has no opinion on
-  that, same as AddHabitForm's own onDelete prop never has.
+  edit). Used to also carry habit add/remove here (see AddHabitForm),
+  but habits are retired -- Core records Actions instead, added from
+  the card itself (see GoalCard), not through an edit screen -- so this
+  is just the one field now.
 */
-function GoalEditModal({ priority, habits, onAddHabit, onRemoveHabit, onSave, onClose }) {
+function GoalEditModal({ priority, onSave, onClose }) {
   const [title, setTitle] = useState(priority.title);
   const trimmed = title.trim();
 
@@ -61,8 +59,6 @@ function GoalEditModal({ priority, habits, onAddHabit, onRemoveHabit, onSave, on
           rows={3}
         />
       </label>
-
-      <AddHabitForm habits={habits} onAdd={(name) => onAddHabit(priority.id, name)} onDelete={onRemoveHabit} />
 
       <div className="detail-actions">
         <motion.button type="button" className="secondary-button" onClick={onClose} {...tapProps}>

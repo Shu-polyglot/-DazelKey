@@ -2,18 +2,27 @@ import { useLocalStorage } from '../../hooks/useLocalStorage';
 import { todayIso } from '../../lib/dates';
 
 /*
-  Core's own data stores -- deliberately not Buckets, and deliberately
-  split into two tiers. A goal (Core's "priority") is just a freeform
-  identity-commitment sentence and a container; it carries no vote/
-  milestone/progress data of its own. A habit belongs to exactly one
-  goal and is the actual unit that gets logged day to day (see
-  useHabitLogs below) -- the heatmap in GoalDetail reads/writes habits
-  and logs, never the goal directly.
+  Core's own data stores. A goal (Core's "priority") is just a freeform
+  identity-commitment sentence and a container -- it carries no vote/
+  milestone/progress data of its own.
+
+  useHabits/useHabitLogs are the retired habit-tracking system (goal ->
+  habit -> per-day done log, with its own Mon-Sun grid and heatmaps).
+  The UI for creating/viewing habits and logs is gone -- Core now records
+  free-form Actions instead (see usePriorityActions below), any number
+  of times, with no day/streak semantics at all. These two hooks stay
+  exactly as they were, unused by any live screen, purely so existing
+  habit/log data already in localStorage keeps loading correctly (never
+  wiped) and stays available to whatever later arranges it into Records
+  Timeline -- see this module's own comments on archiveHabit/
+  normalizeHabit for why that data was already built to outlive its
+  habit ever being "active".
 */
 const STORAGE_KEY = 'dazelkey-top-priorities-v1';
 const LEGACY_STORAGE_KEY = 'lifeos-top-priorities-v1';
 const HABITS_STORAGE_KEY = 'dazelkey-habits-v1';
 const HABIT_LOGS_STORAGE_KEY = 'dazelkey-habit-logs-v1';
+const ACTIONS_STORAGE_KEY = 'dazelkey-priority-actions-v1';
 
 export const MAX_TOP_PRIORITIES = 3;
 
@@ -71,14 +80,12 @@ function normalizeHabit(habit) {
     goalId: habit.goalId,
     name: habit.name || '',
     createdAt: habit.createdAt || todayIso(),
-    // Set once a habit with at least one log gets "removed" through the
-    // edit screen (see GoalEditModal/TopPrioritySection's
-    // handleRemoveHabit) -- an archived habit drops out of every active
-    // list (AddHabitForm, GoalCard's own HabitTodayGrid) but its id and
-    // name stay resolvable, so its past logs keep reading correctly
-    // wherever they're looked back on (HabitRecordsTimeline).
-    // A habit with zero logs when removed skips this state entirely and
-    // is hard-deleted instead -- there's nothing of it to protect.
+    // Historical: set once a habit with at least one log got "removed"
+    // through the old edit screen -- an archived habit dropped out of
+    // every active list but kept its id/name resolvable, so its past
+    // logs kept reading correctly wherever they were looked back on. No
+    // UI reaches archiveHabit anymore (see this module's own header
+    // comment), but the field/data stay exactly as they were.
     archivedAt: habit.archivedAt || null,
   };
 }
@@ -101,17 +108,13 @@ export function useHabits() {
     return record;
   }
 
-  // Irreversible, unlike archiveHabit below -- callers only reach for
-  // this once they've confirmed the habit has no logs to protect (see
-  // handleRemoveHabit), the same way this function always worked before
-  // archiving existed.
+  // Historical, like archiveHabit below -- no UI calls either anymore
+  // (see this module's own header comment), kept only so the shape of
+  // this hook doesn't change out from under any stored data.
   function deleteHabit(id) {
     setStored((prev) => prev.filter((habit) => habit.id !== id));
   }
 
-  // The safe "remove" for a habit that already has recorded days --
-  // hides it from active use without touching its own record or any
-  // log that points at it.
   function archiveHabit(id) {
     setStored((prev) => prev.map((habit) => (habit.id === id ? { ...habit, archivedAt: todayIso() } : habit)));
   }
@@ -191,4 +194,59 @@ export function useHabitLogs() {
   }
 
   return { logs, getLog, recordLog, updateLogMedia, undoLog };
+}
+
+function normalizeAction(action) {
+  return {
+    id: action.id,
+    goalId: action.goalId,
+    photo: action.photo || null,
+    journal: action.journal || null,
+    time: action.time || new Date().toISOString(),
+  };
+}
+
+// Core's live recording mechanism: a free-form photo/journal moment
+// against a goal, any number of times, whenever -- no habit, no day
+// slot, no done/undone state. One flat store across every goal, same
+// shape as useHabits/useHabitLogs above, filtered per goal by callers.
+// Feeds GoalCard's "Action" button and, from there, HabitRecordsTimeline
+// (still that component/name -- see its own header comment).
+export function usePriorityActions() {
+  const [stored, setStored] = useLocalStorage(ACTIONS_STORAGE_KEY, () => []);
+  const actions = Array.isArray(stored) ? stored.map(normalizeAction) : [];
+
+  function addAction(goalId, { photo, journal } = {}) {
+    if (!goalId) {
+      return null;
+    }
+    const record = normalizeAction({
+      id: `${goalId}-${Date.now()}`,
+      goalId,
+      photo: photo || null,
+      journal: journal?.trim() || null,
+      time: new Date().toISOString(),
+    });
+    setStored((prev) => [...prev, record]);
+    return record;
+  }
+
+  // Edits an already-recorded Action's photo/journal (either field may be
+  // cleared by passing null) without touching its own timestamp -- same
+  // "edit, don't re-timestamp" shape updateLogMedia used for habit logs.
+  function updateAction(id, { photo, journal }) {
+    setStored((prev) =>
+      prev.map((action) =>
+        action.id === id
+          ? { ...action, photo: photo === undefined ? action.photo : photo, journal: journal === undefined ? action.journal : journal?.trim() || null }
+          : action,
+      ),
+    );
+  }
+
+  function deleteAction(id) {
+    setStored((prev) => prev.filter((action) => action.id !== id));
+  }
+
+  return { actions, addAction, updateAction, deleteAction };
 }

@@ -30,8 +30,8 @@ export function todayIso() {
 const MS_PER_DAY = 24 * 60 * 60 * 1000;
 
 // Monday of the week containing `date` (local time) -- same Mon-start
-// convention as every other week view in this app (HabitTodayGrid's
-// getCurrentWeekDates, CalendarPanel's day grid).
+// convention as every other week view in this app (CalendarPanel's day
+// grid).
 function startOfWeek(date) {
   const start = new Date(date.getFullYear(), date.getMonth(), date.getDate());
   const day = start.getDay(); // 0 = Sun ... 6 = Sat

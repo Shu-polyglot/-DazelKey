@@ -1,56 +1,53 @@
 import { formatDate } from '../../lib/dates';
 
-// Every one of this goal's logged days, newest first -- the same
+// Every one of this goal's recorded Actions, newest first -- the same
 // filter-then-sort-by-date shape the Archive's own Story sequence
 // builds its chronological reel with (see lib/archive.js's
-// buildYearStorySequence), applied here to habit logs instead of
-// completed Buckets. Kept local rather than imported: that helper's
-// shape is Bucket-specific (completedDate, image, message), so this is
-// the same pattern applied to a different schema, not a shared call.
-function buildTimeline(habits, logs) {
-  const habitById = new Map(habits.map((habit) => [habit.id, habit]));
-  return logs
-    .filter((log) => habitById.has(log.habitId))
-    .slice()
-    .sort((a, b) => b.date.localeCompare(a.date))
-    .map((log) => ({ log, habit: habitById.get(log.habitId) }));
+// buildYearStorySequence), applied here to Actions instead of completed
+// Buckets. Kept local rather than imported: that helper's shape is
+// Bucket-specific (completedDate, image, message), so this is the same
+// pattern applied to a different schema, not a shared call.
+function buildTimeline(actions) {
+  return actions.slice().sort((a, b) => b.time.localeCompare(a.time));
 }
 
 /*
-  "Records Timeline" -- GoalDetail's only content now that the heatmap
-  pair and habit-registration form it used to share that screen with
-  (behind a toggle) are both gone; editing lives entirely behind the
-  card's own long-press menu instead (see GoalEditModal). A
-  chronological look-back over every day this goal's habits were
-  actually done. Tapping an entry opens the exact same HabitCellModal
-  the old heatmaps used to (via the shared onSelectCell prop) -- no new
+  "Records Timeline" -- GoalDetail's only content, and Core's whole
+  look-back mechanism now that habits are retired: every Action recorded
+  against this goal (see GoalCard's "Action" button / ActionRecordModal),
+  not day-by-day habit logs. Tapping an entry reopens the exact same
+  ActionRecordModal the Action button itself opens (via the shared
+  onSelectAction prop), just already carrying that entry -- no new
   photo/journal viewer, just this list feeding the one that already
-  exists. Data logic here (buildTimeline) is untouched by any of
-  this -- only how each entry is laid out changed, see topPriority.css.
+  exists.
+
+  Still named for the habit-log system it replaced -- see this module's
+  other files for the same "Core"/"priority" naming holdover -- and its
+  own old habit/log data is untouched in storage, just not shown here
+  yet (see topPriority.js's own header comment).
 */
-function HabitRecordsTimeline({ habits, logs, onSelectCell }) {
-  const entries = buildTimeline(habits, logs);
+function HabitRecordsTimeline({ actions, onSelectAction }) {
+  const entries = buildTimeline(actions);
 
   if (entries.length === 0) {
-    return <p className="priority-empty-note">No records yet -- days you complete will show up here.</p>;
+    return <p className="priority-empty-note">No records yet -- tap Action to add the first one.</p>;
   }
 
   return (
     <ul className="habit-records-timeline">
-      {entries.map(({ log, habit }) => (
-        <li key={log.id}>
-          <button type="button" className="habit-record-row" onClick={() => onSelectCell(habit, log.date, log)}>
+      {entries.map((action) => (
+        <li key={action.id}>
+          <button type="button" className="habit-record-row" onClick={() => onSelectAction(action)}>
             <span
-              className={`habit-record-thumb${log.photo ? ' has-photo' : ''}`}
-              style={log.photo ? { backgroundImage: `url(${log.photo})` } : undefined}
+              className={`habit-record-thumb${action.photo ? ' has-photo' : ''}`}
+              style={action.photo ? { backgroundImage: `url(${action.photo})` } : undefined}
               aria-hidden="true"
             >
-              {!log.photo && (log.journal ? '📝' : '✓')}
+              {!action.photo && (action.journal ? '📝' : '✓')}
             </span>
             <span className="habit-record-meta">
-              <span className="habit-record-date">{formatDate(log.date)}</span>
-              <span className="habit-record-habit">{habit.name}</span>
-              {log.journal && <span className="habit-record-journal">{log.journal}</span>}
+              <span className="habit-record-date">{formatDate(action.time.slice(0, 10))}</span>
+              {action.journal && <span className="habit-record-journal">{action.journal}</span>}
             </span>
           </button>
         </li>

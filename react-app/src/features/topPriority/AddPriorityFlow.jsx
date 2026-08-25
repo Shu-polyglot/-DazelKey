@@ -13,9 +13,9 @@ const tapProps = {
 
 /*
   Creates a goal outright from a freeform identity-commitment sentence
-  -- the big, long-term thing someone's becoming. Single step: habits
-  (the goal's actual day-to-day units) are registered afterward, in
-  GoalDetail, not at creation time.
+  -- the big, long-term thing someone's becoming. Single step: recording
+  progress toward it (see GoalCard's "Action" button) is a separate,
+  ongoing thing, not part of creating the goal itself.
 */
 function AddPriorityFlow({ onSave, onClose }) {
   const [commitment, setCommitment] = useState('');
