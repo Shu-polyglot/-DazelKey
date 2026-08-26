@@ -1,13 +1,12 @@
 import { useEffect, useState } from 'react';
 import { motion } from 'motion/react';
-import BucketStepEditor from '../Modals/BucketStepEditor';
+import BucketPlanEditor from '../Modals/BucketPlanEditor';
 import CompletePrompt from '../shared/CompletePrompt';
 import CompletedPhotoHero from '../shared/CompletedPhotoHero';
 import { getStatusLabel, getWhenLabel, modeLabels } from '../../lib/buckets';
 import { formatDate } from '../../lib/dates';
 import { spring, easing } from '../../styles/motion';
 import '../Modals/Modals.css';
-import '../Modals/BucketStepEditor.css';
 import './ExpandedBucketCard.css';
 
 const backdropVariants = {
@@ -90,7 +89,7 @@ function ExpandedCardView({ bucket, onEdit, onDelete, onClose, onComplete, readO
       {!readOnly && (
         <div className="expanded-card-actions detail-actions">
           <motion.button type="button" className="secondary-button" onClick={onEdit} {...tapProps}>
-            Edit
+            Plan
           </motion.button>
           <motion.button type="button" className="secondary-button" onClick={handleDelete} {...tapProps}>
             Delete
@@ -142,7 +141,7 @@ function ExpandedBucketCard({ bucket, onClose, onUpdate, onDelete, onComplete, l
       >
         <motion.div variants={contentVariants} initial="hidden" animate="visible" exit="exit">
           {mode === 'edit' ? (
-            <BucketStepEditor
+            <BucketPlanEditor
               bucket={bucket}
               onCancel={() => setMode('view')}
               onSave={(patch) => {

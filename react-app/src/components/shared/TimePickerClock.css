@@ -1,0 +1,154 @@
+.time-picker-backdrop {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-md) var(--space-md) calc(var(--space-md) + var(--nav-height));
+  background: rgba(var(--color-void-1-rgb), 0.6);
+  backdrop-filter: blur(10px);
+  z-index: 40;
+}
+
+.time-picker {
+  width: min(100%, 300px);
+  padding: var(--space-lg) var(--space-md) var(--space-md);
+  display: grid;
+  gap: var(--space-md);
+  background: rgba(var(--color-void-2-rgb), 0.94);
+  border: 1px solid var(--color-border);
+  border-radius: 26px;
+  box-shadow: var(--shadow-strong);
+}
+
+.time-picker-readout {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: var(--space-3xs);
+}
+
+.time-picker-part {
+  appearance: none;
+  border: none;
+  background: none;
+  padding: var(--space-3xs) var(--space-2xs);
+  border-radius: var(--radius-sm);
+  font-family: var(--font-family-display);
+  font-size: 2.4rem;
+  line-height: 1;
+  color: var(--color-text-muted);
+  cursor: pointer;
+  transition: color 0.2s ease, background 0.2s ease;
+}
+
+.time-picker-part.is-active {
+  color: var(--color-text-primary);
+  background: rgba(var(--color-mist-rgb), 0.08);
+}
+
+.time-picker-colon {
+  font-family: var(--font-family-display);
+  font-size: 2.4rem;
+  color: var(--color-text-muted);
+}
+
+.time-picker-period {
+  display: grid;
+  gap: var(--space-3xs);
+  margin-left: var(--space-xs);
+  align-self: center;
+}
+
+.time-picker-period-button {
+  appearance: none;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: rgba(var(--color-mist-rgb), 0.04);
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-caption);
+  letter-spacing: var(--tracking-wide);
+  padding: var(--space-3xs) var(--space-xs);
+  cursor: pointer;
+  transition: border-color 0.2s ease, color 0.2s ease, background 0.2s ease;
+}
+
+.time-picker-period-button.is-active {
+  color: var(--color-text-primary);
+  border-color: rgba(var(--color-glow-rgb), 0.4);
+  background: var(--color-accent-subtle);
+}
+
+/* The dial itself -- pointerdown/move/up all read from this element's
+   own bounding rect (see TimePickerClock's angleFromEvent), so its size
+   here is the only thing that needs to change for the narrow-screen
+   variant below. */
+.time-picker-face {
+  position: relative;
+  width: 220px;
+  height: 220px;
+  margin: 0 auto;
+  border-radius: 50%;
+  background: rgba(var(--color-mist-rgb), 0.04);
+  border: 1px solid var(--color-border);
+  touch-action: none;
+  cursor: pointer;
+}
+
+.time-picker-hand {
+  position: absolute;
+  left: 50%;
+  bottom: 50%;
+  width: 2px;
+  height: 32%;
+  background: rgba(var(--color-glow-rgb), 0.65);
+  /* Anchoring by `bottom` (not `top`) makes the box grow upward from the
+     face's center point, so at rotate(0) it already points at 12 --
+     matching handAngle's own 0deg-is-up, clockwise convention (see
+     TimePickerClock's angleFromEvent/applyAngle). transform-origin sits
+     on that same bottom edge, so rotation pivots exactly on the center. */
+  transform-origin: bottom center;
+  /* transform itself is set inline (translateX(-50%) plus the JS-computed
+     rotate) -- an inline `style` replaces the whole property, so setting
+     it here too would just be silently overridden. */
+  border-radius: var(--radius-pill);
+  pointer-events: none;
+}
+
+.time-picker-center-dot {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--color-accent-strong);
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+
+.time-picker-mark {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-body-sm);
+  font-variant-numeric: tabular-nums;
+  pointer-events: none;
+}
+
+.time-picker-actions {
+  margin-top: 0;
+}
+
+@media (max-width: 360px) {
+  .time-picker-face {
+    width: 190px;
+    height: 190px;
+  }
+}

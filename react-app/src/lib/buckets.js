@@ -75,6 +75,43 @@ export const MAX_DOING_GOALS = 5;
 // migrated or saved yet).
 export const defaultBuckets = [];
 
+// A Plan item is one row of a Bucket's own itinerary -- a 24h "HH:MM"
+// clock time plus free-text ("10:00", "Meet at the station"). Entirely
+// separate from Top Priority's Records Timeline (features/topPriority) --
+// same "list of timestamped entries" shape in spirit, but a different
+// store, keyed to a different kind of thing (a Bucket's own plan for the
+// day, not a logged-after-the-fact Action).
+const TIME_PATTERN = /^([01]\d|2[0-3]):([0-5]\d)$/;
+
+function normalizePlanItem(item, index) {
+  return {
+    id: item.id || `plan-${Date.now()}-${index}`,
+    time: TIME_PATTERN.test(item.time) ? item.time : '09:00',
+    text: item.text || '',
+  };
+}
+
+// Chronological, earliest first -- "HH:MM" zero-padded strings sort
+// correctly as plain text, no date-parsing needed.
+export function sortPlanItems(items) {
+  return [...items].sort((a, b) => a.time.localeCompare(b.time));
+}
+
+// "14:05" -> "2:05 PM" -- every other time-of-day this app shows a person
+// (none, until Plan) should read in the same 12-hour form as its dates
+// already do (see lib/dates' 'en-US' formatting), even though the stored
+// value stays 24h for simple string sorting above.
+export function formatPlanTime(time) {
+  if (!TIME_PATTERN.test(time)) {
+    return time;
+  }
+  const [hourStr, minute] = time.split(':');
+  const hour24 = Number(hourStr);
+  const period = hour24 >= 12 ? 'PM' : 'AM';
+  const hour12 = hour24 % 12 || 12;
+  return `${hour12}:${minute} ${period}`;
+}
+
 export function normalizeBucket(bucket, index) {
   const safeStatus = bucket.status === 'completed' ? 'completed' : 'planned';
   const safeMode = modeOptions.includes(bucket.mode) ? bucket.mode : 'solo';
@@ -127,6 +164,12 @@ export function normalizeBucket(bucket, index) {
     source: bucket.source || null,
     sourceType: bucket.sourceType || null,
     sourceGoalId: bucket.sourceGoalId || null,
+
+    // See normalizePlanItem's own comment above -- this Bucket's own
+    // itinerary, edited from ExpandedBucketCard's Plan button.
+    planItems: Array.isArray(bucket.planItems)
+      ? sortPlanItems(bucket.planItems.map((item, itemIndex) => normalizePlanItem(item, itemIndex)))
+      : [],
   };
 }
 

@@ -1,0 +1,153 @@
+.plan-editor {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+.plan-editor-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.plan-editor-topbar h3 {
+  margin: 0;
+  font-family: var(--font-family-display);
+  font-weight: var(--font-weight-regular);
+  font-size: 1.6rem;
+  letter-spacing: var(--tracking-tight);
+  color: var(--color-text-primary);
+}
+
+/* The When chips read fine centered on BucketStepEditor's own full-bleed
+   step, but sit inside a left-aligned detail-form-label here -- so this
+   one row starts from the left instead of BucketStepEditor.css's own
+   centered .step-editor-chip-row. */
+.plan-editor-when-row {
+  justify-content: flex-start;
+}
+
+.plan-editor-itinerary {
+  display: grid;
+  gap: var(--space-sm);
+  padding-top: var(--space-sm);
+  border-top: 1px solid var(--color-border);
+}
+
+.plan-editor-itinerary-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-sm);
+}
+
+.plan-editor-itinerary-heading span {
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-primary);
+  font-size: 0.85rem;
+  letter-spacing: var(--tracking-wide);
+  text-transform: uppercase;
+}
+
+.plan-editor-add-button {
+  appearance: none;
+  padding: var(--space-2xs) var(--space-sm);
+  border-radius: var(--radius-pill);
+  border: 1px dashed var(--color-border-strong);
+  background: transparent;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-body-sm);
+  cursor: pointer;
+  transition: border-color 0.2s ease, color 0.2s ease, background 0.2s ease;
+}
+
+.plan-editor-add-button:hover {
+  border-color: rgba(var(--color-glow-rgb), 0.4);
+  color: var(--color-text-primary);
+  background: rgba(var(--color-mist-rgb), 0.05);
+}
+
+.plan-editor-empty {
+  padding: var(--space-lg) var(--space-md);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  text-align: center;
+  color: var(--color-text-secondary);
+  font-family: var(--font-family-display);
+  font-style: italic;
+  font-size: 1rem;
+  background: rgba(var(--color-mist-rgb), 0.02);
+}
+
+.plan-editor-list {
+  display: grid;
+  gap: var(--space-xs);
+  /* Rows can grow long on a busy itinerary -- scrolls on its own rather
+     than pushing Save/Cancel off the bottom of the modal. */
+  max-height: 40vh;
+  overflow-y: auto;
+  padding-right: var(--space-3xs);
+}
+
+.plan-editor-row {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: var(--space-xs);
+}
+
+.plan-editor-time-button {
+  appearance: none;
+  flex-shrink: 0;
+  padding: var(--space-2xs) var(--space-xs);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--color-border-strong);
+  background: rgba(var(--color-void-1-rgb), 0.6);
+  color: var(--color-text-primary);
+  font-size: var(--font-size-body-sm);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: border-color 0.2s ease, background 0.2s ease;
+}
+
+.plan-editor-time-button:hover {
+  border-color: rgba(var(--color-glow-rgb), 0.4);
+}
+
+.plan-editor-text-input {
+  min-width: 0;
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-sm);
+  background: rgba(var(--color-void-1-rgb), 0.6);
+  color: var(--color-text-primary);
+  padding: var(--space-2xs) var(--space-xs);
+  font-size: var(--font-size-body-sm);
+}
+
+.plan-editor-text-input:focus {
+  outline: none;
+  border-color: rgba(var(--color-glow-rgb), 0.4);
+  box-shadow: 0 0 0 3px var(--color-accent-subtle);
+}
+
+.plan-editor-remove {
+  width: 30px;
+  height: 30px;
+  font-size: 1.1rem;
+  flex-shrink: 0;
+}
+
+.plan-editor-actions {
+  margin-top: var(--space-2xs);
+}
+
+@media (max-width: 480px) {
+  .plan-editor-row {
+    grid-template-columns: auto 1fr auto;
+  }
+
+  .plan-editor-time-button {
+    padding: var(--space-2xs);
+  }
+}
