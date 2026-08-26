@@ -52,6 +52,15 @@ function SpeakerIcon({ muted }) {
   );
 }
 
+// ---- About DazelKeyの中身を一時非表示 (temporary hide) ------------------
+// The narrated manifesto (logo + paragraphs + mute control) is gated
+// behind this flag rather than deleted, so it can come back with a
+// one-line flip -- same convention as TopPrioritySection's own
+// SHOW_PRIORITY_FEATURES flag. What replaced it as this screen's reason
+// to exist: the Replay Tutorial entry point, moved in from ProfilePanel
+// (see this component's own header comment below).
+const SHOW_MANIFESTO_CONTENT = false;
+
 /*
   Profile's "About DazelKey" entry point, opened as often as anyone
   likes -- reads the app's own design manifesto (data/manifesto) one
@@ -62,11 +71,18 @@ function SpeakerIcon({ muted }) {
   ProfilePage -- keeping SpeechSynthesis's first call inside that same
   user-gesture turn is what lets it actually play on browsers (notably
   Safari/iOS) that gate audio behind one.
+
+  Also now hosts Replay Tutorial, moved in from ProfilePanel's header --
+  About DazelKey is the more natural home for "learn how this app works"
+  than the edit-profile form was.
 */
-function AboutManifesto({ onClose }) {
+function AboutManifesto({ onClose, onReplayTutorial }) {
   const { currentParagraph, index, isFinished, isMuted, start, stop, toggleMute } = useNarration(manifestoParagraphs);
 
   useEffect(() => {
+    if (!SHOW_MANIFESTO_CONTENT) {
+      return undefined;
+    }
     start();
     return stop;
     // start/stop are stable for the lifetime of this mount (see
@@ -79,6 +95,16 @@ function AboutManifesto({ onClose }) {
     onClose();
   }
 
+  // Closes this full-screen shell first -- OnboardingTutorial is its own
+  // full-screen overlay at the same z-index, so leaving this one open
+  // behind it (the way ProfilePanel's plain modal used to) would just
+  // have the two fight over which paints on top.
+  function handleReplayTutorial() {
+    stop();
+    onClose();
+    onReplayTutorial();
+  }
+
   return (
     <motion.div
       className="transition-ritual about-manifesto"
@@ -88,43 +114,57 @@ function AboutManifesto({ onClose }) {
       variants={overlayVariants}
     >
       <div className="about-manifesto-controls">
-        <motion.button
-          type="button"
-          className="about-manifesto-control"
-          aria-label={isMuted ? 'Unmute narration' : 'Mute narration'}
-          aria-pressed={isMuted}
-          onClick={toggleMute}
-          whileTap={{ scale: 0.88 }}
-        >
-          <SpeakerIcon muted={isMuted} />
-        </motion.button>
+        {SHOW_MANIFESTO_CONTENT && (
+          <motion.button
+            type="button"
+            className="about-manifesto-control"
+            aria-label={isMuted ? 'Unmute narration' : 'Mute narration'}
+            aria-pressed={isMuted}
+            onClick={toggleMute}
+            whileTap={{ scale: 0.88 }}
+          >
+            <SpeakerIcon muted={isMuted} />
+          </motion.button>
+        )}
         <motion.button
           type="button"
           className="about-manifesto-control about-manifesto-close"
           onClick={handleClose}
           whileTap={{ scale: 0.92 }}
         >
-          {isFinished ? 'Close' : 'Skip'}
+          {SHOW_MANIFESTO_CONTENT ? (isFinished ? 'Close' : 'Skip') : 'Close'}
         </motion.button>
       </div>
 
       <div className="transition-ritual-content">
         <img src={dazelkeyLockup} alt="DazelKey — Unlock Unlived Moments" className="about-manifesto-logo dazelkey-mark-inverted" />
 
-        <AnimatePresence mode="wait">
-          {currentParagraph && (
-            <motion.p
-              key={index}
-              className="transition-ritual-quote about-manifesto-paragraph"
-              variants={paragraphVariants}
-              initial="hidden"
-              animate="visible"
-              exit="exit"
-            >
-              {currentParagraph}
-            </motion.p>
-          )}
-        </AnimatePresence>
+        {SHOW_MANIFESTO_CONTENT && (
+          <AnimatePresence mode="wait">
+            {currentParagraph && (
+              <motion.p
+                key={index}
+                className="transition-ritual-quote about-manifesto-paragraph"
+                variants={paragraphVariants}
+                initial="hidden"
+                animate="visible"
+                exit="exit"
+              >
+                {currentParagraph}
+              </motion.p>
+            )}
+          </AnimatePresence>
+        )}
+
+        <motion.button
+          type="button"
+          className="primary-button about-manifesto-replay-tutorial"
+          onClick={handleReplayTutorial}
+          whileHover={{ y: -1 }}
+          whileTap={{ y: 1, scale: 0.97 }}
+        >
+          Replay Tutorial
+        </motion.button>
       </div>
     </motion.div>
   );

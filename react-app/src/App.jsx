@@ -369,6 +369,7 @@ function App() {
                 onDeleteBucket={deleteBucket}
                 onCompleteBucket={handleCompleteBucket}
                 onEditProfile={() => setIsProfileOpen(true)}
+                onReplayTutorial={() => setIsReplayTutorialOpen(true)}
               />
             </div>
           </main>
@@ -450,7 +451,6 @@ function App() {
                     updateProfile(patch);
                     setIsProfileOpen(false);
                   }}
-                  onReplayTutorial={() => setIsReplayTutorialOpen(true)}
                 />
               )}
             </AnimatePresence>,

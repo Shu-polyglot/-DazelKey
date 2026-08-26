@@ -45,7 +45,7 @@ const PROFILE_TABS = [
 // Pure display of the same profile data BottomNav's avatar and
 // ProfilePanel already read/write -- editing still happens through that
 // existing modal (passed in via onEditProfile), not rebuilt here.
-function ProfilePage({ profile, buckets, onUpdateBucket, onDeleteBucket, onCompleteBucket, onEditProfile }) {
+function ProfilePage({ profile, buckets, onUpdateBucket, onDeleteBucket, onCompleteBucket, onEditProfile, onReplayTutorial }) {
   const hasPhoto = Boolean(profile?.photo);
   const [activeTab, setActiveTab] = useState('buckets');
   const [isAboutOpen, setIsAboutOpen] = useState(false);
@@ -158,7 +158,11 @@ function ProfilePage({ profile, buckets, onUpdateBucket, onDeleteBucket, onCompl
           every other fixed-position full-screen overlay in this app is
           (see App.jsx's own portal comment). */}
       {createPortal(
-        <AnimatePresence>{isAboutOpen && <AboutManifesto key="about-manifesto" onClose={() => setIsAboutOpen(false)} />}</AnimatePresence>,
+        <AnimatePresence>
+          {isAboutOpen && (
+            <AboutManifesto key="about-manifesto" onClose={() => setIsAboutOpen(false)} onReplayTutorial={onReplayTutorial} />
+          )}
+        </AnimatePresence>,
         document.body,
       )}
 

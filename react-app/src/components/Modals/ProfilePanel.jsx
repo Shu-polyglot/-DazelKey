@@ -22,7 +22,7 @@ import './ProfilePanel.css';
 const MIN_AGE = 1;
 const MAX_AGE = 119;
 
-function ProfilePanel({ profile, onSaveTraitQuiz, onClose, onSave, onReplayTutorial }) {
+function ProfilePanel({ profile, onSaveTraitQuiz, onClose, onSave }) {
   const [isQuizOpen, setIsQuizOpen] = useState(false);
   const hasTakenQuiz = Boolean(profile?.traitQuizTakenAt);
   const quizIsStale = isTraitQuizStale(profile);
@@ -104,9 +104,6 @@ function ProfilePanel({ profile, onSaveTraitQuiz, onClose, onSave, onReplayTutor
     <Modal onClose={onClose}>
       <div className="modal-header profile-panel-header">
         <h3>Your profile</h3>
-        <button type="button" className="profile-replay-tutorial-link" onClick={onReplayTutorial}>
-          Replay Tutorial
-        </button>
       </div>
 
       {/* Who you are, on your own quiet schedule -- fully decoupled from
