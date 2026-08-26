@@ -27,8 +27,10 @@ const NAV_GLOW_CROSSFADE_TRANSITION = {
 // The Story has no tab of its own -- it's reached from within The
 // Achievement (see AchievementsShelf's "Story" link) and returns there on
 // close -- so it's treated as part of that tab for the active indicator.
+// Core (tagline + Year Progress widget) also has no tab of its own anymore
+// -- it was folded into the top of Momentum, so 'strategy' is now the
+// leftmost item (see useRoute's #/core -> 'strategy' remap).
 const NAV_ITEMS = [
-  { route: 'core', label: 'Core', matches: ['core'] },
   { route: 'strategy', label: 'Momentum', matches: ['strategy'] },
   { route: 'explore', label: 'Explore', matches: ['explore'] },
   { route: 'achievement', label: 'The Achievement', matches: ['achievement', 'story'] },
@@ -44,15 +46,14 @@ function resolveNavRoute(rawRoute) {
 }
 
 // Tap-chime fundamental per nav item, left to right -- a C major scale run
-// (Do-Re-Mi-Fa-Sol) so tapping across the bar audibly climbs the scale.
+// (Do-Re-Mi-Fa) so tapping across the bar audibly climbs the scale.
 // Kept as its own table, keyed by route, so the notes can be retuned
 // without touching NAV_ITEMS' routing/labels.
 const NAV_CHIME_NOTES = {
-  core: 1046.5, // C6
-  strategy: 1174.66, // D6
-  explore: 1318.51, // E6
-  achievement: 1396.91, // F6
-  profile: 1567.98, // G6
+  strategy: 1046.5, // C6
+  explore: 1174.66, // D6
+  achievement: 1318.51, // E6
+  profile: 1396.91, // F6
 };
 
 // Icon-first glyphs in the app's own thin-stroke line style (matches
@@ -62,24 +63,6 @@ const NAV_CHIME_NOTES = {
 // literary motifs on purpose (a horizon, a line chart, a calendar) --
 // the trophy/flag pair this set replaced read too much like a game's
 // scoreboard for this app's own cinematic tone.
-// This was Bucket Lists' own glyph before the Core/Bucket Lists swap moved
-// Bucket List content inside Momentum -- kept as-is (see NAV_ITEM_COLORS'
-// "Horizon" comment) rather than commissioning a new one for Core, since
-// the mountain-skyline shape reads just as well as a "foundation" motif.
-function CoreIcon({ active }) {
-  return (
-    <svg viewBox="0 0 24 24" width="23" height="23" aria-hidden="true">
-      <path
-        d="M3 18.5 L9 8 L12.3 12.8 L14.6 9.3 L21 18.5 Z"
-        fill={active ? 'currentColor' : 'none'}
-        stroke="currentColor"
-        strokeWidth="1.6"
-        strokeLinejoin="round"
-        strokeLinecap="round"
-      />
-    </svg>
-  );
-}
 
 // A pulse -- an EKG-style trace, not a trend chart -- for the tab that's
 // really about showing up daily rather than a metric going up and to the
@@ -229,7 +212,6 @@ function BottomNav({ active, onNavigate, profile }) {
                 </span>
               ) : (
                 <span className="bottom-nav-icon">
-                  {item.route === 'core' && <CoreIcon active={isActive} />}
                   {item.route === 'strategy' && <StrategyIcon active={isActive} />}
                   {item.route === 'explore' && <ExploreIcon active={isActive} />}
                   {item.route === 'achievement' && <AchievementIcon active={isActive} />}

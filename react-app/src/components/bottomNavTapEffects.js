@@ -10,7 +10,6 @@
 // just resolved in JS since the moving frame's colors are real animatable
 // style values (backgroundColor/boxShadow), not custom-property pass-through.
 export const NAV_ITEM_COLORS = {
-  core: { name: 'amber', hex: '#d9a441', rgb: '217, 164, 65' }, // Horizon
   strategy: { name: 'coral', hex: '#ef6f5e', rgb: '239, 111, 94' }, // Pulse
   explore: { name: 'teal', hex: '#3fb6ac', rgb: '63, 182, 172' },
   achievement: { name: 'violet', hex: '#9b83e0', rgb: '155, 131, 224' }, // Calendar

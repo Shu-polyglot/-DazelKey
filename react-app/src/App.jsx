@@ -326,11 +326,11 @@ function App() {
           <Header title="DazelKey" />
 
           <main className="tab-content">
-            <div className={`tab-page${route === 'core' ? ' is-active' : ''}`} aria-hidden={route !== 'core'}>
-              <TopPrioritySection variant="page" />
-            </div>
-
             <div className={`tab-page${route === 'strategy' ? ' is-active' : ''}`} aria-hidden={route !== 'strategy'}>
+              {/* Core (tagline + Year Progress widget) used to be its own
+                  leftmost tab -- now it sits at the top of Momentum instead,
+                  see useRoute's #/core -> 'strategy' remap. */}
+              <TopPrioritySection variant="page" />
               <StrategyPage
                 buckets={buckets}
                 votes={votes}

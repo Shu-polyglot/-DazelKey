@@ -90,13 +90,19 @@ function StrategyPage({
 
   return (
     <section className="app-section" id="strategy-section">
+      {/*
+        No "Identity" eyebrow here -- Core's own tagline+widget section
+        (rendered right above this one now that it sits at the top of
+        Momentum instead of its own tab, see App.jsx) already carries that
+        label, and repeating it immediately below would just look like a
+        duplicate heading on the same screen.
+      */}
       <motion.div
         className="section-heading"
         initial={{ opacity: 0, y: 14, filter: 'blur(6px)' }}
         animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
         transition={entranceTransition(0)}
       >
-        <span className="section-label">Identity</span>
         <div className="section-heading-row">
           <button type="button" className="strategy-history-link" onClick={() => setIsHistoryOpen(true)}>
             History
