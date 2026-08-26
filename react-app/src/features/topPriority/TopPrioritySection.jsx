@@ -118,7 +118,6 @@ function TopPrioritySection({ readOnly = false, variant = 'embedded' }) {
   const heading =
     variant === 'page' ? (
       <div className="section-heading">
-        <span className="section-label">Identity</span>
         {addIcon && <div className="section-heading-row priority-heading-row-solo">{addIcon}</div>}
         <p className="core-tagline">Think Big, Act Small</p>
       </div>
