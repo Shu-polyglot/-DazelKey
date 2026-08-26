@@ -1,23 +1,19 @@
-import { useMemo, useState } from 'react';
+import { useMemo } from 'react';
 import { motion } from 'motion/react';
 import ExploreCard from './ExploreCard';
-import ViewFilters from './ViewFilters';
 import { useExploreFeed } from '../../hooks/useExploreFeed';
 import { useFriends } from '../../hooks/useFriends';
 import { entranceTransition } from '../../styles/motion';
 import './Explore.css';
 
+// Friends-only now -- the Everyone tab (and the ViewFilters chip switch
+// that toggled between them) is gone, so this always filters `feed` down
+// to people the user has marked as a friend (see useFriends' isFriend).
 function ExploreFeed({ onOpenDM }) {
   const { feed, toggleInspired } = useExploreFeed();
   const { isFriend, toggleFriend } = useFriends();
-  const [activeFilter, setActiveFilter] = useState('Everyone');
 
-  const filteredFeed = useMemo(
-    () => (activeFilter === 'Everyone' ? feed : feed.filter((post) => isFriend(post.user.handle))),
-    [feed, activeFilter, isFriend],
-  );
-
-  const isFriendsEmpty = activeFilter === 'Friends' && filteredFeed.length === 0;
+  const filteredFeed = useMemo(() => feed.filter((post) => isFriend(post.user.handle)), [feed, isFriend]);
 
   return (
     <section className="app-section" id="explore-section">
@@ -30,14 +26,8 @@ function ExploreFeed({ onOpenDM }) {
         <span className="section-label">Discover</span>
       </motion.div>
 
-      <ViewFilters activeFilter={activeFilter} onChange={setActiveFilter} />
-
       {filteredFeed.length === 0 ? (
-        <div className="explore-empty">
-          {isFriendsEmpty
-            ? "No friends here yet -- add someone from Everyone, and their bucket comes to you."
-            : 'Nothing shared yet -- check back soon.'}
-        </div>
+        <div className="explore-empty">No friends here yet -- add someone, and their bucket comes to you.</div>
       ) : (
         <div className="explore-feed">
           {filteredFeed.map((post, index) => (
