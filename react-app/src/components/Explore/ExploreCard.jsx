@@ -34,8 +34,20 @@ function MessageIcon() {
   );
 }
 
-function ExploreCard({ post, index = 0, onToggleInspired, onOpenDM, isFriend, onToggleFriend }) {
+// friendStatus: 'none' | 'requested' (outgoing, pending) | 'incoming'
+// (they requested us -- shown same as 'none' here since accepting an
+// incoming request happens from a dedicated requests list, not this
+// card) | 'friends'.
+const FRIEND_BUTTON_LABEL = {
+  none: 'Add as Friend',
+  requested: 'Requested',
+  incoming: 'Add as Friend',
+  friends: 'Friend',
+};
+
+function ExploreCard({ post, index = 0, onToggleInspired, onOpenDM, friendStatus, onToggleFriend }) {
   const meta = post.place;
+  const isActive = friendStatus === 'friends' || friendStatus === 'requested';
 
   return (
     <motion.article
@@ -56,13 +68,13 @@ function ExploreCard({ post, index = 0, onToggleInspired, onOpenDM, isFriend, on
           </div>
           <motion.button
             type="button"
-            className={`explore-card-friend-button${isFriend ? ' is-active' : ''}`}
-            aria-pressed={isFriend}
-            onClick={() => onToggleFriend(post.user.handle)}
+            className={`explore-card-friend-button${isActive ? ' is-active' : ''}`}
+            aria-pressed={isActive}
+            onClick={onToggleFriend}
             whileHover={{ y: -1, transition: spring.hover }}
             whileTap={{ y: 1, scale: 0.96, transition: spring.press }}
           >
-            {isFriend ? 'Friend' : 'Add as Friend'}
+            {FRIEND_BUTTON_LABEL[friendStatus] || FRIEND_BUTTON_LABEL.none}
           </motion.button>
         </div>
 

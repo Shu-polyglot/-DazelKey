@@ -24,6 +24,7 @@ import AchievementPhotoPrompt from './components/Achievements/AchievementPhotoPr
 import BottomNav from './components/BottomNav';
 import { useBuckets } from './hooks/useBuckets';
 import { useProfile } from './hooks/useProfile';
+import { usePublicProfile } from './hooks/usePublicProfile';
 import { useOnboardingTutorial } from './hooks/useOnboardingTutorial';
 import { useVotes } from './hooks/useVotes';
 import { useContributions } from './hooks/useContributions';
@@ -41,6 +42,7 @@ function App() {
   const { user, loading } = useAuth();
   const { buckets, addBucket, updateBucket, deleteBucket, completeBucket, addAchievement } = useBuckets();
   const { profile, updateProfile, completeProfile } = useProfile();
+  const { publicProfile, saveHandleAndProfile } = usePublicProfile();
   const { hasSeenTutorial, markTutorialSeen } = useOnboardingTutorial();
   // Realize's own legacy read: nothing writes new votes here anymore (the
   // per-card daily vote was retired in favor of Log Money), but a goal
@@ -455,8 +457,10 @@ function App() {
                 <ProfilePanel
                   key="profile-panel"
                   profile={profile}
+                  publicProfile={publicProfile}
                   onSaveTraitQuiz={handleSaveTraitQuiz}
                   onClose={() => setIsProfileOpen(false)}
+                  onSavePublicProfile={saveHandleAndProfile}
                   onSave={(patch) => {
                     updateProfile(patch);
                     setIsProfileOpen(false);

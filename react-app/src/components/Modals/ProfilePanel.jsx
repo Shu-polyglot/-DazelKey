@@ -14,6 +14,7 @@ import {
   normalizeSocialUrl,
   isTraitQuizStale,
 } from '../../lib/profile';
+import { isValidHandle } from '../../hooks/usePublicProfile';
 import { formatDate } from '../../lib/dates';
 import '../Strategy/Strategy.css';
 import './Modals.css';
@@ -22,7 +23,16 @@ import './ProfilePanel.css';
 const MIN_AGE = 1;
 const MAX_AGE = 119;
 
-function ProfilePanel({ profile, onSaveTraitQuiz, onClose, onSave }) {
+// Maps lib/profile.js's SHARE_SECTIONS keys onto public_profiles' column
+// names (see supabase/public_profiles_and_friends.sql).
+const SHARE_COLUMN_BY_KEY = {
+  bucketLists: 'share_bucket_lists',
+  achievement: 'share_achievement',
+  core: 'share_core',
+  traits: 'share_traits',
+};
+
+function ProfilePanel({ profile, publicProfile, onSaveTraitQuiz, onClose, onSave, onSavePublicProfile }) {
   const [isQuizOpen, setIsQuizOpen] = useState(false);
   const hasTakenQuiz = Boolean(profile?.traitQuizTakenAt);
   const quizIsStale = isTraitQuizStale(profile);
@@ -32,10 +42,10 @@ function ProfilePanel({ profile, onSaveTraitQuiz, onClose, onSave }) {
   const [photo, setPhoto] = useState(profile?.photo || null);
   const [bio, setBio] = useState(profile?.bio || '');
   const [role, setRole] = useState(profile?.role || '');
+  const [handle, setHandle] = useState(publicProfile?.handle || '');
+  const [handleError, setHandleError] = useState('');
+  const [isSaving, setIsSaving] = useState(false);
   const [socialLinks, setSocialLinks] = useState(() => (profile?.socialLinks || []).map((link) => ({ ...link })));
-  // Defaults to whatever normalizeProfile already resolved onto `profile`
-  // (see lib/profile.js) -- every section off until the user turns one on
-  // here, same off-by-default rule PreviewProfile itself relies on.
   const [shareSettings, setShareSettings] = useState(() => ({ ...profile?.shareSettings }));
   const [cropSource, setCropSource] = useState(null);
   const fileInputRef = useRef(null);
@@ -80,12 +90,40 @@ function ProfilePanel({ profile, onSaveTraitQuiz, onClose, onSave }) {
     (platform) => !socialLinks.some((link) => link.platform === platform.id),
   );
 
-  function handleSubmit(event) {
+  async function handleSubmit(event) {
     event.preventDefault();
+    setHandleError('');
 
     const trimmedName = name.trim();
     const parsedAge = Number(age);
     const validAge = Number.isInteger(parsedAge) && parsedAge >= MIN_AGE && parsedAge <= MAX_AGE ? parsedAge : null;
+    const trimmedHandle = handle.trim().toLowerCase();
+
+    if (trimmedHandle && !isValidHandle(trimmedHandle)) {
+      setHandleError('Use 3-20 lowercase letters, numbers, or underscores.');
+      return;
+    }
+
+    setIsSaving(true);
+
+    if (trimmedHandle && onSavePublicProfile) {
+      const shareColumns = Object.fromEntries(
+        Object.entries(SHARE_COLUMN_BY_KEY).map(([key, column]) => [column, Boolean(shareSettings[key])]),
+      );
+      const { error } = await onSavePublicProfile({
+        handle: trimmedHandle,
+        name: trimmedName,
+        photo,
+        bio: bio.trim(),
+        role: role.trim(),
+        ...shareColumns,
+      });
+      if (error) {
+        setIsSaving(false);
+        setHandleError(error.message || 'Unable to save your username.');
+        return;
+      }
+    }
 
     onSave({
       name: trimmedName,
@@ -98,6 +136,7 @@ function ProfilePanel({ profile, onSaveTraitQuiz, onClose, onSave }) {
         .filter((link) => link.url),
       shareSettings,
     });
+    setIsSaving(false);
   }
 
   return (
@@ -106,9 +145,6 @@ function ProfilePanel({ profile, onSaveTraitQuiz, onClose, onSave }) {
         <h3>Your profile</h3>
       </div>
 
-      {/* Who you are, on your own quiet schedule -- fully decoupled from
-          Strategy's daily Become votes (see RadarChart/lib/radar.js). A
-          periodic self-check-in, not a live progress readout. */}
       <div className="profile-trait-section">
         {hasTakenQuiz && <RadarChart scores={profile.traitScores} />}
 
@@ -145,6 +181,20 @@ function ProfilePanel({ profile, onSaveTraitQuiz, onClose, onSave }) {
         <label className="detail-form-label">
           <span>Name</span>
           <input type="text" value={name} onChange={(event) => setName(event.target.value)} placeholder="Your name" />
+        </label>
+
+        <label className="detail-form-label">
+          <span>Username</span>
+          <input
+            type="text"
+            value={handle}
+            onChange={(event) => setHandle(event.target.value)}
+            placeholder="e.g. taro_yamada"
+          />
+          <span className="profile-share-hint">
+            Lets others find you (lowercase letters, numbers, underscores, 3-20 characters). Leave blank and nobody can find you yet.
+          </span>
+          {handleError && <span className="profile-share-hint" style={{ color: '#d33' }}>{handleError}</span>}
         </label>
 
         <label className="detail-form-label">
@@ -226,10 +276,6 @@ function ProfilePanel({ profile, onSaveTraitQuiz, onClose, onSave }) {
           )}
         </div>
 
-        {/* Off by default (see normalizeShareSettings) -- there's no
-            backend yet to actually publish any of this (see
-            PreviewProfile), but the setting itself is real and saved
-            here so flipping a section on ahead of time costs nothing. */}
         <div className="profile-share-section detail-form-label">
           <span>Shareable Profile</span>
           <p className="profile-share-hint">
@@ -262,20 +308,17 @@ function ProfilePanel({ profile, onSaveTraitQuiz, onClose, onSave }) {
           <motion.button
             type="submit"
             className="primary-button"
+            disabled={isSaving}
             whileHover={{ y: -2, transition: spring.hover }}
             whileTap={{ y: 1, scale: 0.95, transition: spring.commit }}
           >
-            Save
+            {isSaving ? 'Saving…' : 'Save'}
           </motion.button>
         </div>
       </form>
 
       {cropSource && <PhotoCropper imageSrc={cropSource} onConfirm={handleCropConfirm} onCancel={handleCropCancel} />}
 
-      {/* Portaled for the same reason every other modal in this app is --
-          nesting a second fixed-position Modal directly under this one
-          would get trapped by whichever ancestor Framer Motion happens to
-          be mid-animating a transform/filter on. */}
       {createPortal(
         <AnimatePresence>
           {isQuizOpen && (

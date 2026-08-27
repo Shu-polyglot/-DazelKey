@@ -8,12 +8,31 @@ import './Explore.css';
 
 // Friends-only now -- the Everyone tab (and the ViewFilters chip switch
 // that toggled between them) is gone, so this always filters `feed` down
-// to people the user has marked as a friend (see useFriends' isFriend).
+// to people the user has an accepted friendship with (see useFriends'
+// statusWith). Matches on post.user.id (a real auth user id), not a
+// display handle -- see useFriends.js for why.
 function ExploreFeed({ onOpenDM }) {
   const { feed, toggleInspired } = useExploreFeed();
-  const { isFriend, toggleFriend } = useFriends();
+  const { statusWith, sendRequest, removeFriendship, friendships } = useFriends();
 
-  const filteredFeed = useMemo(() => feed.filter((post) => isFriend(post.user.handle)), [feed, isFriend]);
+  const filteredFeed = useMemo(
+    () => feed.filter((post) => statusWith(post.user.id) === 'friends'),
+    [feed, statusWith],
+  );
+
+  function handleToggleFriend(userId) {
+    const status = statusWith(userId);
+    if (status === 'none') {
+      sendRequest(userId);
+      return;
+    }
+    // 'friends' or 'requested' (a pending outgoing request) -- either way,
+    // tapping the button again withdraws it. Find the row to remove.
+    const row = friendships.find((f) => f.requester_id === userId || f.addressee_id === userId);
+    if (row) {
+      removeFriendship(row.id);
+    }
+  }
 
   return (
     <section className="app-section" id="explore-section">
@@ -37,8 +56,8 @@ function ExploreFeed({ onOpenDM }) {
               index={index}
               onToggleInspired={toggleInspired}
               onOpenDM={onOpenDM}
-              isFriend={isFriend(post.user.handle)}
-              onToggleFriend={toggleFriend}
+              friendStatus={statusWith(post.user.id)}
+              onToggleFriend={() => handleToggleFriend(post.user.id)}
             />
           ))}
         </div>

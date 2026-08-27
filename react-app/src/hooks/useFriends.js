@@ -1,29 +1,110 @@
-import { useLocalStorage } from './useLocalStorage';
+import { useCallback, useEffect, useState } from 'react';
+import { supabase } from '../lib/supabase';
 
-const STORAGE_KEY = 'dazelkey-friends-v1';
-const LEGACY_STORAGE_KEY = 'lifeos-friends-v1';
-
-/*
-  Friend list is a local-only mock: an array of the handles this device
-  has marked as a friend, persisted the same way every other dazelkey-*
-  key is. There is no auth or friend-graph backend yet, so "friend" here
-  just means "this browser opted in" -- see isFriend below, the one
-  place that decision gets made, so a real backend swap only touches
-  this file.
-*/
+// Real friend-graph backend, replacing the old local-only handle array.
+// Friendships are mutual-approval: sendRequest creates a 'pending' row,
+// the addressee accepts or declines it, and only 'accepted' rows count
+// as an actual friendship (see isFriend/friends below).
 export function useFriends() {
-  const [friendHandles, setFriendHandles] = useLocalStorage(STORAGE_KEY, () => [], LEGACY_STORAGE_KEY);
+  const [friendships, setFriendships] = useState([]);
+  const [currentUserId, setCurrentUserId] = useState(null);
+  const [loading, setLoading] = useState(true);
 
-  function toggleFriend(handle) {
-    setFriendHandles((prev) =>
-      prev.includes(handle) ? prev.filter((existing) => existing !== handle) : [...prev, handle],
+  const refresh = useCallback(async () => {
+    const { data: userData } = await supabase.auth.getUser();
+    const user = userData?.user;
+    if (!user) {
+      setFriendships([]);
+      setCurrentUserId(null);
+      setLoading(false);
+      return;
+    }
+    setCurrentUserId(user.id);
+    const { data, error } = await supabase
+      .from('friendships')
+      .select('*')
+      .or(`requester_id.eq.${user.id},addressee_id.eq.${user.id}`);
+    if (error) {
+      console.warn('Unable to load friendships.', error);
+    }
+    setFriendships(data || []);
+    setLoading(false);
+  }, []);
+
+  useEffect(() => {
+    refresh();
+  }, [refresh]);
+
+  async function sendRequest(otherUserId) {
+    if (!currentUserId) {
+      return { error: { message: 'Not signed in.' } };
+    }
+    const { error } = await supabase
+      .from('friendships')
+      .insert({ requester_id: currentUserId, addressee_id: otherUserId });
+    if (!error) {
+      await refresh();
+    }
+    return { error };
+  }
+
+  async function respondToRequest(friendshipId, accept) {
+    const { error } = await supabase
+      .from('friendships')
+      .update({ status: accept ? 'accepted' : 'declined' })
+      .eq('id', friendshipId);
+    if (!error) {
+      await refresh();
+    }
+    return { error };
+  }
+
+  async function removeFriendship(friendshipId) {
+    const { error } = await supabase.from('friendships').delete().eq('id', friendshipId);
+    if (!error) {
+      await refresh();
+    }
+    return { error };
+  }
+
+  function statusWith(otherUserId) {
+    const row = friendships.find(
+      (f) => f.requester_id === otherUserId || f.addressee_id === otherUserId,
     );
+    if (!row) {
+      return 'none';
+    }
+    if (row.status === 'accepted') {
+      return 'friends';
+    }
+    if (row.status === 'pending') {
+      return row.requester_id === currentUserId ? 'requested' : 'incoming';
+    }
+    return 'none';
   }
 
-  // TODO: replace with backend friend graph
-  function isFriend(handle) {
-    return friendHandles.includes(handle);
+  function isFriend(otherUserId) {
+    return statusWith(otherUserId) === 'friends';
   }
 
-  return { friendHandles, toggleFriend, isFriend };
+  const acceptedFriendships = friendships.filter((f) => f.status === 'accepted');
+  const incomingRequests = friendships.filter(
+    (f) => f.status === 'pending' && f.addressee_id === currentUserId,
+  );
+  const outgoingRequests = friendships.filter(
+    (f) => f.status === 'pending' && f.requester_id === currentUserId,
+  );
+
+  return {
+    loading,
+    friendships: acceptedFriendships,
+    incomingRequests,
+    outgoingRequests,
+    sendRequest,
+    respondToRequest,
+    removeFriendship,
+    statusWith,
+    isFriend,
+    refresh,
+  };
 }
