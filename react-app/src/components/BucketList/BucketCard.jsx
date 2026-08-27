@@ -1,5 +1,5 @@
 import { motion } from 'motion/react';
-import { getStatusLabel, getWhenLabel, modeLabels } from '../../lib/buckets';
+import { getStatusLabel, getWhenLabel, sortPlanItems, formatPlanTime } from '../../lib/buckets';
 import { formatDate } from '../../lib/dates';
 import { spring, easing, dashboardEntrance, staggerDelay } from '../../styles/motion';
 
@@ -7,11 +7,7 @@ function BucketCard({ bucket, index = 0, onOpen, layoutId, baseDelay = dashboard
   const resolvedLayoutId = layoutId || `bucket-card-${bucket.id}`;
 
   const meta =
-    bucket.status === 'completed'
-      ? bucket.completedDate
-        ? formatDate(bucket.completedDate)
-        : 'Completed'
-      : [modeLabels[bucket.mode], bucket.place].filter(Boolean).join(' · ');
+    bucket.status === 'completed' ? (bucket.completedDate ? formatDate(bucket.completedDate) : 'Completed') : null;
 
   return (
     <motion.article
@@ -36,7 +32,18 @@ function BucketCard({ bucket, index = 0, onOpen, layoutId, baseDelay = dashboard
       </div>
 
       <h3>{bucket.title}</h3>
-      <div className="bucket-meta">{meta}</div>
+      {meta && <div className="bucket-meta">{meta}</div>}
+
+      {bucket.planItems?.length > 0 && (
+        <ul className="bucket-card-itinerary-list">
+          {sortPlanItems(bucket.planItems).map((item) => (
+            <li className="bucket-card-itinerary-row" key={item.id}>
+              <span className="bucket-card-itinerary-time">{formatPlanTime(item.time)}</span>
+              <span className="bucket-card-itinerary-text">{item.text}</span>
+            </li>
+          ))}
+        </ul>
+      )}
 
       <div className="bucket-card-actions">
         <motion.button

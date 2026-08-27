@@ -126,6 +126,38 @@
   font-size: var(--font-size-body-sm);
 }
 
+/* Preview-card counterpart to ExpandedBucketCard's itinerary list --
+   same time + text row shape and chronological order, just without the
+   "Itinerary" heading and border-top (the card front has no description
+   block above it to separate from). Only rendered when there's at least
+   one stop, so an empty itinerary adds no extra height. */
+.bucket-card-itinerary-list {
+  display: grid;
+  gap: var(--space-xs);
+}
+
+.bucket-card-itinerary-row {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: baseline;
+  gap: var(--space-xs);
+}
+
+.bucket-card-itinerary-time {
+  flex-shrink: 0;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-body-sm);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.bucket-card-itinerary-text {
+  min-width: 0;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-body-sm);
+  line-height: var(--leading-normal);
+}
+
 .bucket-card[data-status='Someday'] .bucket-status {
   background: rgba(var(--color-mist-rgb), 0.06);
   color: var(--color-text-secondary);
