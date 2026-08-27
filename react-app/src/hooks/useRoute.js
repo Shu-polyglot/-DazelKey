@@ -33,6 +33,15 @@ function readRouteFromHash(hash) {
   return null;
 }
 
+// A shared invite link (#/add-friend/somehandle) isn't one of the five
+// tabs above -- it's a standalone screen (see AddFriendScreen) that
+// takes over instead of the tab shell. Returns the handle, or null if
+// the hash isn't an invite link.
+export function readAddFriendHandleFromHash(hash) {
+  const match = hash.match(/^#\/add-friend\/([a-z0-9_]{3,20})\b/);
+  return match ? match[1] : null;
+}
+
 export function useRoute() {
   const [route, setRoute] = useState(() => readRouteFromHash(window.location.hash) || DEFAULT_ROUTE);
 

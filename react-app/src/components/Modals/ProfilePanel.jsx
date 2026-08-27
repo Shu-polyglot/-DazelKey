@@ -15,6 +15,8 @@ import {
   isTraitQuizStale,
 } from '../../lib/profile';
 import { isValidHandle } from '../../hooks/usePublicProfile';
+import { useFriends } from '../../hooks/useFriends';
+import FriendRequestsPanel from './FriendRequestsPanel';
 import { formatDate } from '../../lib/dates';
 import '../Strategy/Strategy.css';
 import './Modals.css';
@@ -33,6 +35,19 @@ const SHARE_COLUMN_BY_KEY = {
 };
 
 function ProfilePanel({ profile, publicProfile, onSaveTraitQuiz, onClose, onSave, onSavePublicProfile }) {
+  const { incomingRequests, respondToRequest } = useFriends();
+  const [linkCopied, setLinkCopied] = useState(false);
+  const inviteLink = publicProfile?.handle
+    ? `${window.location.origin}${window.location.pathname}#/add-friend/${publicProfile.handle}`
+    : null;
+
+  function handleCopyLink() {
+    if (!inviteLink) return;
+    navigator.clipboard.writeText(inviteLink).then(() => {
+      setLinkCopied(true);
+      setTimeout(() => setLinkCopied(false), 2000);
+    });
+  }
   const [isQuizOpen, setIsQuizOpen] = useState(false);
   const hasTakenQuiz = Boolean(profile?.traitQuizTakenAt);
   const quizIsStale = isTraitQuizStale(profile);
@@ -275,6 +290,24 @@ function ProfilePanel({ profile, publicProfile, onSaveTraitQuiz, onClose, onSave
             </div>
           )}
         </div>
+
+        {inviteLink && (
+          <div className="profile-share-section detail-form-label">
+            <span>Your Invite Link</span>
+            <p className="profile-share-hint">Share this so a friend can add you.</p>
+            <motion.button
+              type="button"
+              className="secondary-button"
+              onClick={handleCopyLink}
+              whileHover={{ y: -1, transition: spring.hover }}
+              whileTap={{ y: 1, scale: 0.96, transition: spring.press }}
+            >
+              {linkCopied ? 'Copied!' : 'Copy Invite Link'}
+            </motion.button>
+          </div>
+        )}
+
+        <FriendRequestsPanel incomingRequests={incomingRequests} onRespond={respondToRequest} />
 
         <div className="profile-share-section detail-form-label">
           <span>Shareable Profile</span>

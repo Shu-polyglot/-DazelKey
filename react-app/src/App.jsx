@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { AnimatePresence, motion } from 'motion/react';
 import Header from './components/Header';
@@ -28,7 +28,7 @@ import { usePublicProfile } from './hooks/usePublicProfile';
 import { useOnboardingTutorial } from './hooks/useOnboardingTutorial';
 import { useVotes } from './hooks/useVotes';
 import { useContributions } from './hooks/useContributions';
-import { useRoute } from './hooks/useRoute';
+import { useRoute, readAddFriendHandleFromHash } from './hooks/useRoute';
 import { todayIso } from './lib/dates';
 import { getTotalProgress } from './lib/doing';
 import { MAX_DOING_GOALS } from './lib/buckets';
@@ -36,10 +36,20 @@ import { hasOpeningAchievements } from './data/openingSequence';
 import { transitions, easing } from './styles/motion';
 import { useAuth } from './hooks/useAuth';
 import LoginScreen from './components/Auth/LoginScreen';
+import AddFriendScreen from './components/Friends/AddFriendScreen';
 import './App.css';
 
 function App() {
   const { user, loading } = useAuth();
+  const [addFriendHandle, setAddFriendHandle] = useState(() => readAddFriendHandleFromHash(window.location.hash));
+
+  useEffect(() => {
+    function handleHashChange() {
+      setAddFriendHandle(readAddFriendHandleFromHash(window.location.hash));
+    }
+    window.addEventListener('hashchange', handleHashChange);
+    return () => window.removeEventListener('hashchange', handleHashChange);
+  }, []);
   const { buckets, addBucket, updateBucket, deleteBucket, completeBucket, addAchievement } = useBuckets();
   const { profile, updateProfile, completeProfile } = useProfile();
   const { publicProfile, saveHandleAndProfile } = usePublicProfile();
@@ -101,6 +111,17 @@ function App() {
   }
   if (!user) {
     return <LoginScreen />;
+  }
+  if (addFriendHandle) {
+    return (
+      <AddFriendScreen
+        handle={addFriendHandle}
+        onDone={() => {
+          window.location.hash = '/profile';
+          setAddFriendHandle(null);
+        }}
+      />
+    );
   }
 
   function handleOnboardingComplete(patch) {

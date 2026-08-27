@@ -80,3 +80,19 @@ export async function lookupPublicProfileByHandle(handle) {
   }
   return data;
 }
+
+// Read-only lookup of someone else's public profile by their auth user
+// id (not handle) -- used to show a requester's name/photo in a friend
+// request list, where we only have their user_id.
+export async function lookupPublicProfileByUserId(userId) {
+  const { data, error } = await supabase
+    .from('public_profiles')
+    .select('*')
+    .eq('user_id', userId)
+    .maybeSingle();
+  if (error) {
+    console.warn(`Unable to look up user "${userId}".`, error);
+    return null;
+  }
+  return data;
+}
