@@ -80,6 +80,16 @@ export const SHARE_SECTIONS = [
   { key: 'traits', label: 'Trait diagnostic' },
 ];
 
+// Edit Profile only lets a user toggle these two -- Core and Trait
+// diagnostic keep their entries in SHARE_SECTIONS (and so in
+// shareSettings/normalizeShareSettings) since PreviewProfile still reads
+// share.core/share.traits; a profile that had either on before this
+// change keeps showing that section, it just can no longer be flipped
+// from the editor.
+export const EDITABLE_SHARE_SECTIONS = SHARE_SECTIONS.filter(
+  (section) => section.key === 'bucketLists' || section.key === 'achievement'
+);
+
 function defaultShareSettings() {
   return Object.fromEntries(SHARE_SECTIONS.map((section) => [section.key, false]));
 }

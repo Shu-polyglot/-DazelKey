@@ -9,7 +9,7 @@ import RadarChart from '../Strategy/RadarChart';
 import { spring } from '../../styles/motion';
 import {
   SOCIAL_PLATFORMS,
-  SHARE_SECTIONS,
+  EDITABLE_SHARE_SECTIONS,
   getSocialPlatform,
   normalizeSocialUrl,
   isTraitQuizStale,
@@ -236,7 +236,7 @@ function ProfilePanel({ profile, onSaveTraitQuiz, onClose, onSave }) {
             Choose what shows up in your profile preview. Everything starts private.
           </p>
           <div className="profile-share-list">
-            {SHARE_SECTIONS.map((section) => (
+            {EDITABLE_SHARE_SECTIONS.map((section) => (
               <div className="profile-share-row" key={section.key}>
                 <span>{section.label}</span>
                 <ToggleSwitch
