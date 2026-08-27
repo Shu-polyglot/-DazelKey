@@ -20,20 +20,6 @@ function InspiredIcon({ active }) {
   );
 }
 
-function MessageIcon() {
-  return (
-    <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true">
-      <path
-        d="M4 6.5 C4 5.4 4.9 4.5 6 4.5 H18 C19.1 4.5 20 5.4 20 6.5 V14.5 C20 15.6 19.1 16.5 18 16.5 H9.5 L5.5 19.7 V16.5 H6 C4.9 16.5 4 15.6 4 14.5 Z"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="1.5"
-        strokeLinejoin="round"
-      />
-    </svg>
-  );
-}
-
 // friendStatus: 'none' | 'requested' (outgoing, pending) | 'incoming'
 // (they requested us -- shown same as 'none' here since accepting an
 // incoming request happens from a dedicated requests list, not this
@@ -45,7 +31,7 @@ const FRIEND_BUTTON_LABEL = {
   friends: 'Friend',
 };
 
-function ExploreCard({ post, index = 0, onToggleInspired, onOpenDM, friendStatus, onToggleFriend }) {
+function ExploreCard({ post, index = 0, onToggleInspired, friendStatus, onToggleFriend }) {
   const meta = post.place;
   const isActive = friendStatus === 'friends' || friendStatus === 'requested';
 
@@ -103,17 +89,6 @@ function ExploreCard({ post, index = 0, onToggleInspired, onOpenDM, friendStatus
         >
           <InspiredIcon active={post.isInspired} />
           Inspired · {post.inspiredCount}
-        </motion.button>
-
-        <motion.button
-          type="button"
-          className="explore-action-button"
-          onClick={() => onOpenDM(post.user)}
-          whileHover={{ y: -1, transition: spring.hover }}
-          whileTap={{ y: 1, scale: 0.96, transition: spring.press }}
-        >
-          <MessageIcon />
-          Message
         </motion.button>
       </div>
     </motion.article>

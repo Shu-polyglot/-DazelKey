@@ -17,6 +17,7 @@ import {
 import { isValidHandle } from '../../hooks/usePublicProfile';
 import { useFriends } from '../../hooks/useFriends';
 import FriendRequestsPanel from './FriendRequestsPanel';
+import FriendsListPanel from './FriendsListPanel';
 import { formatDate } from '../../lib/dates';
 import '../Strategy/Strategy.css';
 import './Modals.css';
@@ -35,7 +36,8 @@ const SHARE_COLUMN_BY_KEY = {
 };
 
 function ProfilePanel({ profile, publicProfile, onSaveTraitQuiz, onClose, onSave, onSavePublicProfile }) {
-  const { incomingRequests, respondToRequest } = useFriends();
+  const { friendships, incomingRequests, outgoingRequests, currentUserId, respondToRequest, removeFriendship } =
+    useFriends();
   const [linkCopied, setLinkCopied] = useState(false);
   const inviteLink = publicProfile?.handle
     ? `${window.location.origin}${window.location.pathname}#/add-friend/${publicProfile.handle}`
@@ -308,6 +310,13 @@ function ProfilePanel({ profile, publicProfile, onSaveTraitQuiz, onClose, onSave
         )}
 
         <FriendRequestsPanel incomingRequests={incomingRequests} onRespond={respondToRequest} />
+
+        <FriendsListPanel
+          friendships={friendships}
+          outgoingRequests={outgoingRequests}
+          currentUserId={currentUserId}
+          onRemove={removeFriendship}
+        />
 
         <div className="profile-share-section detail-form-label">
           <span>Shareable Profile</span>

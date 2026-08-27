@@ -97,6 +97,7 @@ export function useFriends() {
 
   return {
     loading,
+    currentUserId,
     friendships: acceptedFriendships,
     incomingRequests,
     outgoingRequests,

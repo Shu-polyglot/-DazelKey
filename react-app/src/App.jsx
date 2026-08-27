@@ -11,7 +11,6 @@ import ProfilePage from './components/ProfilePage';
 import BucketCreateModal from './components/Modals/BucketCreateModal';
 import BucketDetailsModal from './components/Modals/BucketDetailsModal';
 import ProfilePanel from './components/Modals/ProfilePanel';
-import DMThreadModal from './components/Modals/DMThreadModal';
 import OpeningExperience from './components/Onboarding/OpeningExperience';
 import AchievementBanner from './components/Onboarding/AchievementBanner';
 import OnboardingTutorial from './components/Onboarding/OnboardingTutorial';
@@ -23,6 +22,7 @@ import CompleteScreen from './components/shared/CompleteScreen';
 import AchievementPhotoPrompt from './components/Achievements/AchievementPhotoPrompt';
 import BottomNav from './components/BottomNav';
 import { useBuckets } from './hooks/useBuckets';
+import { useAchievementSync } from './hooks/useAchievementSync';
 import { useProfile } from './hooks/useProfile';
 import { usePublicProfile } from './hooks/usePublicProfile';
 import { useOnboardingTutorial } from './hooks/useOnboardingTutorial';
@@ -53,6 +53,7 @@ function App() {
   const { buckets, addBucket, updateBucket, deleteBucket, completeBucket, addAchievement } = useBuckets();
   const { profile, updateProfile, completeProfile } = useProfile();
   const { publicProfile, saveHandleAndProfile } = usePublicProfile();
+  useAchievementSync(buckets, publicProfile);
   const { hasSeenTutorial, markTutorialSeen } = useOnboardingTutorial();
   // Realize's own legacy read: nothing writes new votes here anymore (the
   // per-card daily vote was retired in favor of Log Money), but a goal
@@ -74,7 +75,6 @@ function App() {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [detailsBucketId, setDetailsBucketId] = useState(null);
-  const [dmRecipient, setDmRecipient] = useState(null);
   // { caption, variant: 'milestone' | 'completion', achievement? } | null
   // -- drives MilestoneRitual for Realize's two triggers: a flagged
   // checklist item going done, and its own bigger "goal amount reached"
@@ -170,7 +170,6 @@ function App() {
     setIsAddModalOpen(false);
     setIsProfileOpen(false);
     setDetailsBucketId(null);
-    setDmRecipient(null);
     navigate(nextRoute);
   }
 
@@ -381,7 +380,7 @@ function App() {
             </div>
 
             <div className={`tab-page${route === 'explore' ? ' is-active' : ''}`} aria-hidden={route !== 'explore'}>
-              <ExploreFeed onOpenDM={setDmRecipient} />
+              <ExploreFeed />
             </div>
 
             <div className={`tab-page${route === 'achievement' ? ' is-active' : ''}`} aria-hidden={route !== 'achievement'}>
@@ -432,15 +431,6 @@ function App() {
                   onClose={() => setDetailsBucketId(null)}
                   onComplete={handleCompleteBucket}
                 />
-              )}
-            </AnimatePresence>,
-            document.body,
-          )}
-
-          {createPortal(
-            <AnimatePresence>
-              {dmRecipient && (
-                <DMThreadModal key="dm-thread" recipient={dmRecipient} onClose={() => setDmRecipient(null)} />
               )}
             </AnimatePresence>,
             document.body,

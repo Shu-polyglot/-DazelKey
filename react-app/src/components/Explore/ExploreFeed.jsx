@@ -11,7 +11,7 @@ import './Explore.css';
 // to people the user has an accepted friendship with (see useFriends'
 // statusWith). Matches on post.user.id (a real auth user id), not a
 // display handle -- see useFriends.js for why.
-function ExploreFeed({ onOpenDM }) {
+function ExploreFeed() {
   const { feed, toggleInspired } = useExploreFeed();
   const { statusWith, sendRequest, removeFriendship, friendships } = useFriends();
 
@@ -55,7 +55,6 @@ function ExploreFeed({ onOpenDM }) {
               post={post}
               index={index}
               onToggleInspired={toggleInspired}
-              onOpenDM={onOpenDM}
               friendStatus={statusWith(post.user.id)}
               onToggleFriend={() => handleToggleFriend(post.user.id)}
             />
