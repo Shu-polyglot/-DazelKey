@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { getCurrentUser, isSupabaseConfigured, supabase } from '../lib/supabase';
+import { supabase } from '../lib/supabase';
 
 // `legacyKey` is a one-time read-only fallback for data saved under the
 // app's pre-rename key (Life OS -> DazelKey): read once if `key` has
@@ -30,36 +30,32 @@ export function useLocalStorage(key, initialValueFn, legacyKey) {
     try {
       localStorage.setItem(key, JSON.stringify(value));
     } catch (error) {
-      // Most commonly QuotaExceededError. Left uncaught, this throws from
-      // inside a passive effect with no error boundary in the tree above
-      // it, which crashes the whole app to a blank screen. In-memory state
-      // (`value`) still holds the update, so the UI stays correct for this
-      // session even though the write didn't persist.
       console.warn(`Unable to persist value for "${key}".`, error);
     }
   }, [key, value]);
 
-  // localStorage remains an immediate offline cache. Once Supabase has been
-  // configured, the same state is also hydrated from and saved to a private
-  // row belonging to this installation's authenticated user.
-  const [remoteReady, setRemoteReady] = useState(!isSupabaseConfigured);
+  // localStorage remains an immediate offline cache. The same state is
+  // also hydrated from and saved to a private row belonging to the
+  // signed-in user (see lib/supabase.js + App.jsx's login gate -- by the
+  // time this hook runs, a user is always already authenticated).
+  const [remoteReady, setRemoteReady] = useState(false);
   const [remoteUserId, setRemoteUserId] = useState(null);
 
   useEffect(() => {
     let cancelled = false;
 
     async function hydrate() {
-      if (!supabase) {
-        return;
-      }
-
       try {
-        const user = await getCurrentUser();
+        const { data, error: userError } = await supabase.auth.getUser();
+        if (userError) {
+          throw userError;
+        }
+        const user = data?.user;
         if (!user || cancelled) {
           return;
         }
 
-        const { data, error } = await supabase
+        const { data: row, error } = await supabase
           .from('user_state')
           .select('value')
           .eq('user_id', user.id)
@@ -69,8 +65,8 @@ export function useLocalStorage(key, initialValueFn, legacyKey) {
           throw error;
         }
 
-        if (data?.value !== undefined && !cancelled) {
-          setValue(data.value);
+        if (row?.value !== undefined && !cancelled) {
+          setValue(row.value);
         }
         if (!cancelled) {
           setRemoteUserId(user.id);
@@ -90,7 +86,7 @@ export function useLocalStorage(key, initialValueFn, legacyKey) {
   }, [key]);
 
   useEffect(() => {
-    if (!supabase || !remoteReady || !remoteUserId) {
+    if (!remoteReady || !remoteUserId) {
       return;
     }
 

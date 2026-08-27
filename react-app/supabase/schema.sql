@@ -1,6 +1,6 @@
 -- DazelKey: private per-user application state
--- Run this in Supabase Dashboard -> SQL Editor, then enable Anonymous Sign-ins
--- in Authentication -> Providers -> Anonymous.
+-- Run this in Supabase Dashboard -> SQL Editor. Auth is email magic-link
+-- (Authentication -> Providers -> Email), not anonymous sign-in.
 
 create table if not exists public.user_state (
   user_id uuid not null references auth.users(id) on delete cascade,
