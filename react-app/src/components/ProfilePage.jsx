@@ -45,11 +45,50 @@ const PROFILE_TABS = [
 // Pure display of the same profile data BottomNav's avatar and
 // ProfilePanel already read/write -- editing still happens through that
 // existing modal (passed in via onEditProfile), not rebuilt here.
-function ProfilePage({ profile, buckets, onUpdateBucket, onDeleteBucket, onCompleteBucket, onEditProfile, onReplayTutorial }) {
+function ProfilePage({
+  profile,
+  publicProfile,
+  buckets,
+  onUpdateBucket,
+  onDeleteBucket,
+  onCompleteBucket,
+  onEditProfile,
+  onReplayTutorial,
+}) {
   const hasPhoto = Boolean(profile?.photo);
   const [activeTab, setActiveTab] = useState('buckets');
   const [isAboutOpen, setIsAboutOpen] = useState(false);
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
+  const [isShareMenuOpen, setIsShareMenuOpen] = useState(false);
+  const [linkCopied, setLinkCopied] = useState(false);
+
+  const inviteLink = publicProfile?.handle
+    ? `${window.location.origin}${window.location.pathname}#/add-friend/${publicProfile.handle}`
+    : null;
+
+  async function handleShareInvite() {
+    setIsShareMenuOpen(false);
+    if (!inviteLink) {
+      return;
+    }
+    if (navigator.share) {
+      try {
+        await navigator.share({ title: 'Add me on DazelKey', url: inviteLink });
+        return;
+      } catch {
+        // User cancelled the native share sheet -- fall through to copy.
+      }
+    }
+    navigator.clipboard.writeText(inviteLink).then(() => {
+      setLinkCopied(true);
+      setTimeout(() => setLinkCopied(false), 2000);
+    });
+  }
+
+  function handleOpenPreview() {
+    setIsShareMenuOpen(false);
+    setIsPreviewOpen(true);
+  }
 
   return (
     <motion.section
@@ -77,7 +116,7 @@ function ProfilePage({ profile, buckets, onUpdateBucket, onDeleteBucket, onCompl
         {profile?.socialLinks?.length > 0 && (
           <div className="profile-page-links">
             {profile.socialLinks.map((link) => (
-              <a
+                <a
                 key={link.id}
                 href={link.url}
                 target="_blank"
@@ -90,7 +129,7 @@ function ProfilePage({ profile, buckets, onUpdateBucket, onDeleteBucket, onCompl
           </div>
         )}
 
-        <div className="profile-page-actions">
+        <div className="profile-page-actions" style={{ position: 'relative' }}>
           <motion.button
             type="button"
             className="secondary-button profile-page-edit"
@@ -104,13 +143,65 @@ function ProfilePage({ profile, buckets, onUpdateBucket, onDeleteBucket, onCompl
           <motion.button
             type="button"
             className="icon-button profile-page-share"
-            aria-label="Preview shareable profile"
-            onClick={() => setIsPreviewOpen(true)}
+            aria-label="Share or preview profile"
+            onClick={() => setIsShareMenuOpen((prev) => !prev)}
             whileHover={{ y: -1, transition: spring.hover }}
             whileTap={{ y: 1, scale: 0.9, transition: spring.press }}
           >
             <ShareIcon />
           </motion.button>
+
+          {isShareMenuOpen && (
+            <div
+              style={{
+                position: 'absolute',
+                top: '100%',
+                right: 0,
+                marginTop: '8px',
+                background: 'var(--surface, #fff)',
+                border: '1px solid rgba(0,0,0,0.1)',
+                borderRadius: '12px',
+                boxShadow: '0 8px 24px rgba(0,0,0,0.12)',
+                overflow: 'hidden',
+                zIndex: 20,
+                minWidth: '200px',
+              }}
+            >
+              <button
+                type="button"
+                onClick={handleShareInvite}
+                disabled={!inviteLink}
+                style={{
+                  display: 'block',
+                  width: '100%',
+                  textAlign: 'left',
+                  padding: '12px 16px',
+                  border: 'none',
+                  background: 'none',
+                  cursor: inviteLink ? 'pointer' : 'not-allowed',
+                  opacity: inviteLink ? 1 : 0.5,
+                }}
+              >
+                {linkCopied ? 'Copied!' : inviteLink ? 'Share Invite Link' : 'Set a username first'}
+              </button>
+              <button
+                type="button"
+                onClick={handleOpenPreview}
+                style={{
+                  display: 'block',
+                  width: '100%',
+                  textAlign: 'left',
+                  padding: '12px 16px',
+                  border: 'none',
+                  borderTop: '1px solid rgba(0,0,0,0.08)',
+                  background: 'none',
+                  cursor: 'pointer',
+                }}
+              >
+                Preview Shareable Profile
+              </button>
+            </div>
+          )}
         </div>
 
         <button type="button" className="profile-page-about-link" onClick={() => setIsAboutOpen(true)}>

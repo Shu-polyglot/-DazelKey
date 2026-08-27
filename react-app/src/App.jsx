@@ -397,6 +397,7 @@ function App() {
             <div className={`tab-page${route === 'profile' ? ' is-active' : ''}`} aria-hidden={route !== 'profile'}>
               <ProfilePage
                 profile={profile}
+                publicProfile={publicProfile}
                 buckets={buckets}
                 onUpdateBucket={updateBucket}
                 onDeleteBucket={deleteBucket}
