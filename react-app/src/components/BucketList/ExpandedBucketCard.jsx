@@ -3,7 +3,7 @@ import { motion } from 'motion/react';
 import BucketPlanEditor from '../Modals/BucketPlanEditor';
 import CompletePrompt from '../shared/CompletePrompt';
 import CompletedPhotoHero from '../shared/CompletedPhotoHero';
-import { getStatusLabel, getWhenLabel, modeLabels } from '../../lib/buckets';
+import { getStatusLabel, getWhenLabel, sortPlanItems, formatPlanTime } from '../../lib/buckets';
 import { formatDate } from '../../lib/dates';
 import { spring, easing } from '../../styles/motion';
 import '../Modals/Modals.css';
@@ -73,16 +73,19 @@ function ExpandedCardView({ bucket, onEdit, onDelete, onClose, onComplete, readO
 
       {bucket.message && <p className="expanded-card-description">{bucket.message}</p>}
 
-      <div className="expanded-card-notes">
-        <p>
-          <span className="expanded-card-note-label">Place</span>
-          {bucket.place || 'Not set'}
-        </p>
-        <p>
-          <span className="expanded-card-note-label">Mode</span>
-          {modeLabels[bucket.mode]}
-        </p>
-      </div>
+      {bucket.planItems?.length > 0 && (
+        <div className="expanded-card-itinerary">
+          <span className="expanded-card-itinerary-heading">Itinerary</span>
+          <ul className="expanded-card-itinerary-list">
+            {sortPlanItems(bucket.planItems).map((item) => (
+              <li className="expanded-card-itinerary-row" key={item.id}>
+                <span className="expanded-card-itinerary-time">{formatPlanTime(item.time)}</span>
+                <span className="expanded-card-itinerary-text">{item.text}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
 
       {!readOnly && bucket.status !== 'completed' && <CompletePrompt bucketId={bucket.id} onComplete={onComplete} />}
 

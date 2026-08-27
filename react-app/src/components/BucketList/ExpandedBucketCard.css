@@ -72,25 +72,53 @@
   line-height: var(--leading-relaxed);
 }
 
-.expanded-card-notes {
+/* Replaces the old Place/Mode notes block -- this Bucket's own itinerary
+   (see BucketPlanEditor, reached via the "Plan" button below), read-only
+   here, same chronological order Plan itself keeps. Only rendered when
+   there's at least one stop, so an empty itinerary contributes no extra
+   height at all -- the card's own height already just follows its
+   content (see .expanded-card's overflow-y: auto), so more stops simply
+   make the card taller, same as the description/message above it. */
+.expanded-card-itinerary {
   display: grid;
-  gap: var(--space-xs);
+  gap: var(--space-sm);
   padding-top: var(--space-md);
   border-top: 1px solid var(--color-border);
 }
 
-.expanded-card-notes p {
-  margin: 0;
-  color: var(--color-text-secondary);
-  font-size: var(--font-size-body-sm);
-}
-
-.expanded-card-note-label {
-  color: var(--color-text-muted);
+.expanded-card-itinerary-heading {
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-primary);
+  font-size: 0.85rem;
   letter-spacing: var(--tracking-wide);
   text-transform: uppercase;
-  font-size: 0.68rem;
-  margin-right: var(--space-xs);
+}
+
+.expanded-card-itinerary-list {
+  display: grid;
+  gap: var(--space-xs);
+}
+
+.expanded-card-itinerary-row {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: baseline;
+  gap: var(--space-xs);
+}
+
+.expanded-card-itinerary-time {
+  flex-shrink: 0;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-body-sm);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.expanded-card-itinerary-text {
+  min-width: 0;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-body-sm);
+  line-height: var(--leading-normal);
 }
 
 .expanded-card-actions {
