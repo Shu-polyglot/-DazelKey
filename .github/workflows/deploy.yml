@@ -36,6 +36,11 @@ jobs:
 
       - name: Build
         working-directory: react-app
+        env:
+          # Both values are designed to be publicly available in a browser.
+          # Do not put a service_role or secret key in this workflow.
+          VITE_SUPABASE_URL: https://yrovrilfgaaewaashipy.supabase.co
+          VITE_SUPABASE_PUBLISHABLE_KEY: sb_publishable_cMTCTCrW-4VFuF1EyRZfuw_0xE53Clc
         run: npm run build
 
       - name: Upload Pages artifact

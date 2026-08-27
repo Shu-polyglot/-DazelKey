@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { getCurrentUser, isSupabaseConfigured, supabase } from '../lib/supabase';
 
 // `legacyKey` is a one-time read-only fallback for data saved under the
 // app's pre-rename key (Life OS -> DazelKey): read once if `key` has
@@ -37,6 +38,75 @@ export function useLocalStorage(key, initialValueFn, legacyKey) {
       console.warn(`Unable to persist value for "${key}".`, error);
     }
   }, [key, value]);
+
+  // localStorage remains an immediate offline cache. Once Supabase has been
+  // configured, the same state is also hydrated from and saved to a private
+  // row belonging to this installation's authenticated user.
+  const [remoteReady, setRemoteReady] = useState(!isSupabaseConfigured);
+  const [remoteUserId, setRemoteUserId] = useState(null);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    async function hydrate() {
+      if (!supabase) {
+        return;
+      }
+
+      try {
+        const user = await getCurrentUser();
+        if (!user || cancelled) {
+          return;
+        }
+
+        const { data, error } = await supabase
+          .from('user_state')
+          .select('value')
+          .eq('user_id', user.id)
+          .eq('state_key', key)
+          .maybeSingle();
+        if (error) {
+          throw error;
+        }
+
+        if (data?.value !== undefined && !cancelled) {
+          setValue(data.value);
+        }
+        if (!cancelled) {
+          setRemoteUserId(user.id);
+          setRemoteReady(true);
+        }
+      } catch (error) {
+        // A misconfigured/offline backend must never prevent the local-first
+        // app from opening. Keep the console detail for the developer.
+        console.warn(`Unable to sync saved value for "${key}".`, error);
+      }
+    }
+
+    hydrate();
+    return () => {
+      cancelled = true;
+    };
+  }, [key]);
+
+  useEffect(() => {
+    if (!supabase || !remoteReady || !remoteUserId) {
+      return;
+    }
+
+    const timeoutId = window.setTimeout(() => {
+      supabase
+        .from('user_state')
+        .upsert({ user_id: remoteUserId, state_key: key, value })
+        .then(({ error }) => {
+          if (error) {
+            console.warn(`Unable to back up saved value for "${key}".`, error);
+          }
+        });
+    }, 350);
+
+    return () => window.clearTimeout(timeoutId);
+  }, [key, remoteReady, remoteUserId, value]);
 
   return [value, setValue];
 }
