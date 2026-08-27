@@ -33,9 +33,12 @@ import { getTotalProgress } from './lib/doing';
 import { MAX_DOING_GOALS } from './lib/buckets';
 import { hasOpeningAchievements } from './data/openingSequence';
 import { transitions, easing } from './styles/motion';
+import { useAuth } from './hooks/useAuth';
+import LoginScreen from './components/Auth/LoginScreen';
 import './App.css';
 
 function App() {
+  const { user, loading } = useAuth();
   const { buckets, addBucket, updateBucket, deleteBucket, completeBucket, addAchievement } = useBuckets();
   const { profile, updateProfile, completeProfile } = useProfile();
   const { hasSeenTutorial, markTutorialSeen } = useOnboardingTutorial();
@@ -90,6 +93,13 @@ function App() {
   const isOverlayOpen = isStoryOpen || isWhatsAheadOpen;
 
   const detailsBucket = buckets.find((bucket) => bucket.id === detailsBucketId) || null;
+
+  if (loading) {
+    return null;
+  }
+  if (!user) {
+    return <LoginScreen />;
+  }
 
   function handleOnboardingComplete(patch) {
     if (patch) {
