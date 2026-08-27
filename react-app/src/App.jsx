@@ -28,7 +28,12 @@ import { usePublicProfile } from './hooks/usePublicProfile';
 import { useOnboardingTutorial } from './hooks/useOnboardingTutorial';
 import { useVotes } from './hooks/useVotes';
 import { useContributions } from './hooks/useContributions';
-import { useRoute, readAddFriendHandleFromHash } from './hooks/useRoute';
+import {
+  useRoute,
+  readAddFriendHandleFromHash,
+  storePendingInviteHandle,
+  consumePendingInviteHandle,
+} from './hooks/useRoute';
 import { todayIso } from './lib/dates';
 import { getTotalProgress } from './lib/doing';
 import { MAX_DOING_GOALS } from './lib/buckets';
@@ -50,6 +55,29 @@ function App() {
     window.addEventListener('hashchange', handleHashChange);
     return () => window.removeEventListener('hashchange', handleHashChange);
   }, []);
+
+  // Keep a stashed copy of any invite handle the moment it shows up, so
+  // it survives a LoginScreen -> magic-link-email -> back-to-the-app
+  // round trip (see useRoute's storePendingInviteHandle comment).
+  useEffect(() => {
+    if (addFriendHandle) {
+      storePendingInviteHandle(addFriendHandle);
+    }
+  }, [addFriendHandle]);
+
+  // Once actually logged in, replay a stashed invite if the current URL
+  // no longer carries one (the magic-link redirect always lands on a
+  // bare hash-less URL).
+  useEffect(() => {
+    if (!user || addFriendHandle) {
+      return;
+    }
+    const pending = consumePendingInviteHandle();
+    if (pending) {
+      setAddFriendHandle(pending);
+    }
+  }, [user, addFriendHandle]);
+
   const { buckets, addBucket, updateBucket, deleteBucket, completeBucket, addAchievement } = useBuckets();
   const { profile, updateProfile, completeProfile } = useProfile();
   const { publicProfile, saveHandleAndProfile } = usePublicProfile();
@@ -117,6 +145,7 @@ function App() {
       <AddFriendScreen
         handle={addFriendHandle}
         onDone={() => {
+          consumePendingInviteHandle();
           window.location.hash = '/profile';
           setAddFriendHandle(null);
         }}

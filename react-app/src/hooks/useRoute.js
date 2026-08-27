@@ -42,6 +42,36 @@ export function readAddFriendHandleFromHash(hash) {
   return match ? match[1] : null;
 }
 
+// An invite link opened while signed out shows LoginScreen first (see
+// App.jsx), and the magic-link email redirects back to a plain Site URL
+// with no hash at all -- the #/add-friend/handle the visitor started on
+// would otherwise just be gone once they're actually logged in. Stashing
+// it here lets App.jsx re-show AddFriendScreen right after login instead
+// of silently dropping the invite.
+const PENDING_INVITE_KEY = 'dazelkey-pending-invite-handle';
+
+export function storePendingInviteHandle(handle) {
+  try {
+    localStorage.setItem(PENDING_INVITE_KEY, handle);
+  } catch {
+    // No fallback -- worst case the invite doesn't survive the redirect.
+  }
+}
+
+// Reads and clears in one step: a stashed handle is only ever meant to
+// be replayed once, right after the login it was waiting on.
+export function consumePendingInviteHandle() {
+  try {
+    const handle = localStorage.getItem(PENDING_INVITE_KEY);
+    if (handle) {
+      localStorage.removeItem(PENDING_INVITE_KEY);
+    }
+    return handle;
+  } catch {
+    return null;
+  }
+}
+
 export function useRoute() {
   const [route, setRoute] = useState(() => readRouteFromHash(window.location.hash) || DEFAULT_ROUTE);
 
