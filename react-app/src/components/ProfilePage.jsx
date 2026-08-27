@@ -152,52 +152,16 @@ function ProfilePage({
           </motion.button>
 
           {isShareMenuOpen && (
-            <div
-              style={{
-                position: 'absolute',
-                top: '100%',
-                right: 0,
-                marginTop: '8px',
-                background: 'var(--surface, #fff)',
-                border: '1px solid rgba(0,0,0,0.1)',
-                borderRadius: '12px',
-                boxShadow: '0 8px 24px rgba(0,0,0,0.12)',
-                overflow: 'hidden',
-                zIndex: 20,
-                minWidth: '200px',
-              }}
-            >
+            <div className="profile-share-menu">
               <button
                 type="button"
+                className="profile-share-menu-item"
                 onClick={handleShareInvite}
                 disabled={!inviteLink}
-                style={{
-                  display: 'block',
-                  width: '100%',
-                  textAlign: 'left',
-                  padding: '12px 16px',
-                  border: 'none',
-                  background: 'none',
-                  cursor: inviteLink ? 'pointer' : 'not-allowed',
-                  opacity: inviteLink ? 1 : 0.5,
-                }}
               >
                 {linkCopied ? 'Copied!' : inviteLink ? 'Share Invite Link' : 'Set a username first'}
               </button>
-              <button
-                type="button"
-                onClick={handleOpenPreview}
-                style={{
-                  display: 'block',
-                  width: '100%',
-                  textAlign: 'left',
-                  padding: '12px 16px',
-                  border: 'none',
-                  borderTop: '1px solid rgba(0,0,0,0.08)',
-                  background: 'none',
-                  cursor: 'pointer',
-                }}
-              >
+              <button type="button" className="profile-share-menu-item" onClick={handleOpenPreview}>
                 Preview Shareable Profile
               </button>
             </div>

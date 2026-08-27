@@ -104,6 +104,48 @@
   color: var(--color-text-primary);
 }
 
+.profile-share-menu {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  margin-top: var(--space-xs);
+  background: var(--color-surface-elevated);
+  backdrop-filter: blur(var(--blur-md));
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-medium);
+  overflow: hidden;
+  z-index: 20;
+  min-width: 200px;
+}
+
+.profile-share-menu-item {
+  display: block;
+  width: 100%;
+  text-align: left;
+  padding: var(--space-sm) var(--space-md);
+  border: none;
+  border-top: 1px solid var(--color-border);
+  background: none;
+  color: var(--color-text-primary);
+  font-size: var(--font-size-body-sm);
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.profile-share-menu-item:first-child {
+  border-top: none;
+}
+
+.profile-share-menu-item:hover {
+  background: rgba(var(--color-mist-rgb), 0.08);
+}
+
+.profile-share-menu-item:disabled {
+  color: var(--color-text-muted);
+  cursor: not-allowed;
+}
+
 /* Quiet by design -- an occasional read, not an action competing with
    Edit profile for attention. Same recipe as Strategy's History link. */
 .profile-page-about-link {
