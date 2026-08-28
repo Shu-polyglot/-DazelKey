@@ -3,6 +3,7 @@ import { motion } from 'motion/react';
 import { supabase } from '../../lib/supabase';
 import { easing, spring } from '../../styles/motion';
 import dazelkeyLockup from '../../assets/logo/dazelkey-lockup-full.png';
+import InstallHint from './InstallHint';
 import './Auth.css';
 
 export default function LoginScreen() {
@@ -78,6 +79,8 @@ export default function LoginScreen() {
           {status === 'error' && <p className="login-error">{errorMessage}</p>}
         </motion.form>
       )}
+
+      <InstallHint />
     </div>
   );
 }
