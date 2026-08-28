@@ -1,0 +1,91 @@
+.login-screen {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-lg);
+  padding: var(--space-xl) var(--space-lg);
+  text-align: center;
+}
+
+.login-logo-wrap {
+  filter: drop-shadow(0 4px 32px rgba(var(--color-void-1-rgb), 0.65));
+}
+
+.login-logo {
+  width: clamp(180px, 34vw, 280px);
+  height: auto;
+}
+
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  width: 100%;
+  max-width: 320px;
+}
+
+.login-input {
+  width: 100%;
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-sm);
+  background: rgba(var(--color-void-1-rgb), 0.6);
+  color: var(--color-text-primary);
+  padding: var(--space-sm) var(--space-md);
+  font-size: var(--font-size-body);
+  font-family: inherit;
+}
+
+.login-input::placeholder {
+  color: var(--color-text-muted);
+}
+
+.login-input:focus-visible {
+  outline: none;
+  border-color: var(--color-accent);
+  box-shadow: 0 0 0 3px var(--color-accent-subtle);
+}
+
+.login-submit {
+  appearance: none;
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-pill);
+  background: rgba(var(--color-void-1-rgb), 0.28);
+  color: var(--color-text-primary);
+  padding: var(--space-sm) var(--space-xl);
+  font-size: var(--font-size-body-sm);
+  font-weight: var(--font-weight-semibold);
+  letter-spacing: var(--tracking-wide);
+  cursor: pointer;
+  transition: border-color 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
+}
+
+.login-submit:hover {
+  border-color: rgba(var(--color-mist-rgb), 0.4);
+  background: rgba(var(--color-void-1-rgb), 0.4);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06), 0 10px 32px rgba(var(--color-void-1-rgb), 0.45);
+}
+
+.login-submit:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px var(--color-accent-subtle);
+}
+
+.login-submit:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.login-message {
+  max-width: 320px;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-body-sm);
+  line-height: var(--leading-relaxed);
+}
+
+.login-error {
+  max-width: 320px;
+  color: var(--color-danger);
+  font-size: var(--font-size-caption);
+}
