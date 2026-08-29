@@ -1,6 +1,5 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { motion } from 'motion/react';
-import { getRandomQuote } from '../data/quotes';
 import { easing } from '../styles/motion';
 import './TransitionRitual.css';
 
@@ -39,8 +38,25 @@ const attributionVariants = {
  * beat before the next screen appears.
  */
 function TransitionRitual({ onContinue }) {
-  const quote = useMemo(() => getRandomQuote(), []);
+  // The quote library keeps growing (100+ entries and counting) and is
+  // otherwise dead weight in every visitor's initial bundle for a widget
+  // that shows exactly one line of it per mount -- a dynamic import gives
+  // it its own chunk, fetched (and then cached by the PWA service worker)
+  // only once this ritual actually appears.
+  const [quote, setQuote] = useState(null);
   const [canContinue, setCanContinue] = useState(false);
+
+  useEffect(() => {
+    let cancelled = false;
+    import('../data/quotes').then(({ getRandomQuote }) => {
+      if (!cancelled) {
+        setQuote(getRandomQuote());
+      }
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   useEffect(() => {
     const timer = setTimeout(() => setCanContinue(true), ENABLE_DELAY_MS);
@@ -75,13 +91,17 @@ function TransitionRitual({ onContinue }) {
       style={{ cursor: canContinue ? 'pointer' : 'default' }}
     >
       <div className="transition-ritual-content">
-        <motion.p className="transition-ritual-quote" variants={quoteVariants}>
-          &ldquo;{quote.text}&rdquo;
-        </motion.p>
-        <motion.p className="transition-ritual-attribution" variants={attributionVariants}>
-          {quote.author}
-          {quote.source ? <span className="transition-ritual-source"> &mdash; {quote.source}</span> : null}
-        </motion.p>
+        {quote && (
+          <>
+            <motion.p className="transition-ritual-quote" variants={quoteVariants}>
+              &ldquo;{quote.text}&rdquo;
+            </motion.p>
+            <motion.p className="transition-ritual-attribution" variants={attributionVariants}>
+              {quote.author}
+              {quote.source ? <span className="transition-ritual-source"> &mdash; {quote.source}</span> : null}
+            </motion.p>
+          </>
+        )}
       </div>
 
       <motion.p
