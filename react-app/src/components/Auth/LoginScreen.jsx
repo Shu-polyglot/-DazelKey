@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { motion } from 'motion/react';
 import { supabase } from '../../lib/supabase';
 import { easing, spring } from '../../styles/motion';
-import dazelkeyLockup from '../../assets/logo/dazelkey-lockup-full.png';
+import dazelkeyLockup from '../../assets/logo/dazelkey-lockup-full.webp';
 import InstallHint from './InstallHint';
 import './Auth.css';
 
@@ -18,7 +18,18 @@ export default function LoginScreen() {
     }
     setStatus('sending');
     setErrorMessage('');
-    const { error } = await supabase.auth.signInWithOtp({ email: email.trim() });
+    // Explicit, not left to Supabase's dashboard-configured Site URL:
+    // GitHub Pages serves this app under a repo subpath (see vite.config's
+    // `base`), and Site URL alone has proven unreliable for carrying that
+    // path through -- particularly on an error redirect (expired/reused
+    // link), where Supabase falls back to Site URL's bare origin and drops
+    // it. `origin + BASE_URL` resolves correctly in every environment this
+    // app ships to (GitHub Pages subpath, Vercel root, local dev).
+    const redirectTo = `${window.location.origin}${import.meta.env.BASE_URL}`;
+    const { error } = await supabase.auth.signInWithOtp({
+      email: email.trim(),
+      options: { emailRedirectTo: redirectTo },
+    });
     if (error) {
       setStatus('error');
       setErrorMessage(error.message);
