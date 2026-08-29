@@ -1,6 +1,6 @@
 import { motion } from 'motion/react';
 import { spring, easing, transitions } from '../../styles/motion';
-import dazelkeyLockup from '../../assets/logo/dazelkey-lockup-full.png';
+import dazelkeyLockup from '../../assets/logo/dazelkey-lockup-full.webp';
 
 const sequenceVariants = {
   hidden: { opacity: 1 },

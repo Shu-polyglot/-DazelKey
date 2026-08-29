@@ -1,6 +1,6 @@
 import { motion } from 'motion/react';
 import { dashboardEntrance, entranceTransition } from '../styles/motion';
-import dazelkeyLockup from '../assets/logo/dazelkey-lockup-compact.png';
+import dazelkeyLockup from '../assets/logo/dazelkey-lockup-compact.webp';
 import './Header.css';
 
 // "+ Add to The Bucket List" used to live here, shown on every tab --

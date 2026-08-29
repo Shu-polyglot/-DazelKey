@@ -3,7 +3,7 @@ import { AnimatePresence, motion } from 'motion/react';
 import { manifestoParagraphs } from '../../data/manifesto';
 import { useNarration } from '../../hooks/useNarration';
 import { easing } from '../../styles/motion';
-import dazelkeyLockup from '../../assets/logo/dazelkey-lockup-full.png';
+import dazelkeyLockup from '../../assets/logo/dazelkey-lockup-full.webp';
 import '../TransitionRitual.css';
 import './AboutManifesto.css';
 
