@@ -100,37 +100,64 @@
   box-shadow: var(--shadow-medium);
 }
 
+.year-progress-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-2xs) var(--space-sm);
+  margin-bottom: var(--space-sm);
+}
+
 .year-progress-heading {
-  margin-bottom: var(--space-md);
   font-family: var(--font-family-display);
   font-weight: var(--font-weight-regular);
   font-size: var(--font-size-h3);
   color: var(--color-text-primary);
 }
 
-.year-progress-dots {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-2xs);
+.year-progress-caption {
+  flex-shrink: 0;
+  font-size: var(--font-size-caption);
+  color: var(--color-text-muted);
+  font-variant-numeric: tabular-nums;
 }
 
-/* Same "GitHub contribution-graph square" recipe .priority-vote-cell
-   already uses elsewhere on this page, just its own class -- a
-   deliberate duplicate (see this file's own header comment), not
-   reused directly, since .priority-vote-cell also carries habit-log
-   tap/badge behavior this widget has none of. */
-.year-progress-dot {
-  box-sizing: border-box;
-  width: 12px;
-  height: 12px;
-  border-radius: 3px;
-  background: rgba(var(--color-mist-rgb), 0.08);
+/* The whole widget, now: a filled pill tracking `percentage` directly,
+   with a week-boundary tick underneath (see .year-progress-bar-ticks)
+   standing in for the old day-by-day dot grid. */
+.year-progress-bar-track {
+  position: relative;
+  height: 8px;
+  border-radius: var(--radius-pill);
   border: 1px solid var(--color-border);
+  background: rgba(var(--color-void-1-rgb), 0.4);
+  overflow: hidden;
 }
 
-.year-progress-dot.is-elapsed {
-  background: var(--color-text-primary);
-  border-color: var(--color-text-primary);
+.year-progress-bar-fill {
+  height: 100%;
+  border-radius: var(--radius-pill);
+  background: linear-gradient(90deg, var(--color-accent), var(--color-accent-strong));
+  box-shadow: 0 0 10px rgba(var(--color-glow-rgb), 0.55);
+}
+
+.year-progress-bar-ticks {
+  position: absolute;
+  inset: 0;
+}
+
+/* `difference` inverts whatever's underneath, so one white line reads
+   at consistent contrast whether it's sitting over the dark track or
+   the light accent fill, rather than needing two colors for the two
+   zones. */
+.year-progress-bar-tick {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  background: rgba(255, 255, 255, 0.9);
+  mix-blend-mode: difference;
 }
 
 /* Quiet, centered note shown in place of the heading's add icon once the

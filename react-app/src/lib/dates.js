@@ -29,38 +29,23 @@ export function todayIso() {
 
 const MS_PER_DAY = 24 * 60 * 60 * 1000;
 
-// Monday of the week containing `date` (local time) -- same Mon-start
-// convention as every other week view in this app (CalendarPanel's day
-// grid).
-function startOfWeek(date) {
-  const start = new Date(date.getFullYear(), date.getMonth(), date.getDate());
-  const day = start.getDay(); // 0 = Sun ... 6 = Sat
-  const diffToMonday = day === 0 ? -6 : 1 - day;
-  start.setDate(start.getDate() + diffToMonday);
-  return start;
+function isLeapYear(year) {
+  return (year % 4 === 0 && year % 100 !== 0) || year % 400 === 0;
 }
 
-function weeksBetween(a, b) {
-  return Math.round((b - a) / MS_PER_DAY / 7);
-}
-
-// A calendar year's progress in Mon-start weeks, for the Core page's year
-// progress widget. `year`'s first/last week each anchor to the Monday on
-// or before Jan 1 / Dec 31 (so, like any Mon-start week grid, a few days
-// of the neighboring year can share dot 1 or the last dot) -- totalWeeks
-// is the count of those weeks end to end, always 52 or 53. elapsedWeeks
-// counts every week whose Monday has arrived by `now`, current week
-// included, so today always lands on a filled dot.
-export function getYearWeekProgress(now = new Date()) {
+// A calendar year's progress in days, for the Core page's year progress
+// widget. totalDays is 365 or 366 depending on leap year; elapsedDays is
+// today's 1-based day-of-year, so today always lands on the last filled
+// box.
+export function getYearDayProgress(now = new Date()) {
   const year = now.getFullYear();
-  const firstWeekStart = startOfWeek(new Date(year, 0, 1));
-  const lastWeekStart = startOfWeek(new Date(year, 11, 31));
-  const totalWeeks = weeksBetween(firstWeekStart, lastWeekStart) + 1;
+  const totalDays = isLeapYear(year) ? 366 : 365;
 
-  const currentWeekStart = startOfWeek(now);
-  const elapsedWeeks = Math.min(totalWeeks, Math.max(0, weeksBetween(firstWeekStart, currentWeekStart) + 1));
+  const startOfYear = new Date(year, 0, 1);
+  const startOfToday = new Date(year, now.getMonth(), now.getDate());
+  const elapsedDays = Math.min(totalDays, Math.round((startOfToday - startOfYear) / MS_PER_DAY) + 1);
 
-  const percentage = totalWeeks ? Math.round((elapsedWeeks / totalWeeks) * 100) : 0;
+  const percentage = totalDays ? Math.round((elapsedDays / totalDays) * 100) : 0;
 
-  return { year, totalWeeks, elapsedWeeks, percentage };
+  return { year, totalDays, elapsedDays, percentage };
 }
