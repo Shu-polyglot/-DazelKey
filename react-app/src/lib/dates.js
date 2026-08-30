@@ -49,3 +49,18 @@ export function getYearDayProgress(now = new Date()) {
 
   return { year, totalDays, elapsedDays, percentage };
 }
+
+// Bar-position percentages for the start of each month after January
+// (Feb 1 through Dec 1) -- the year progress bar's month-boundary
+// ticks. January's own start is the bar's left edge, so it isn't
+// included as a tick.
+export function getMonthBoundaryPercentages(year, totalDays) {
+  const startOfYear = new Date(year, 0, 1);
+  const percentages = [];
+  for (let month = 1; month < 12; month += 1) {
+    const monthStart = new Date(year, month, 1);
+    const dayOfYear = Math.round((monthStart - startOfYear) / MS_PER_DAY) + 1;
+    percentages.push(((dayOfYear - 1) / totalDays) * 100);
+  }
+  return percentages;
+}
