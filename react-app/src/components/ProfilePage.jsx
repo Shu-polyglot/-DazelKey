@@ -160,7 +160,7 @@ function ProfilePage({
                 onClick={handleShareInvite}
                 disabled={!inviteLink}
               >
-                {linkCopied ? 'Copied!' : inviteLink ? 'Share Invite Link' : 'Set a username first'}
+                {linkCopied ? 'Copied!' : inviteLink ? 'Share Invite Link' : 'Setting up your invite link…'}
               </button>
               <button type="button" className="profile-share-menu-item" onClick={handleOpenPreview}>
                 Preview Shareable Profile

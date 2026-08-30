@@ -51,6 +51,17 @@ export function useFriends() {
     return { error };
   }
 
+  async function upgradeToAccepted(row) {
+    if (row.status === 'accepted') {
+      return { error: null };
+    }
+    const { error } = await supabase.from('friendships').update({ status: 'accepted' }).eq('id', row.id);
+    if (!error) {
+      await refresh();
+    }
+    return { error };
+  }
+
   // For AddFriendScreen's invite-link flow specifically -- tapping
   // someone's own invite link is itself the consent handshake, so this
   // skips the pending/accept step sendRequest above goes through for
@@ -68,22 +79,37 @@ export function useFriends() {
       (f) => f.requester_id === otherUserId || f.addressee_id === otherUserId,
     );
     if (existing) {
-      if (existing.status === 'accepted') {
-        return { error: null };
-      }
-      const { error } = await supabase.from('friendships').update({ status: 'accepted' }).eq('id', existing.id);
-      if (!error) {
-        await refresh();
-      }
-      return { error };
+      return upgradeToAccepted(existing);
     }
     const { error } = await supabase
       .from('friendships')
       .insert({ requester_id: currentUserId, addressee_id: otherUserId, status: 'accepted' });
     if (!error) {
       await refresh();
+      return { error: null };
     }
-    return { error };
+    if (error.code !== '23505') {
+      return { error };
+    }
+    // Local `friendships` state was stale -- the same invite link
+    // tapped twice in a row (e.g. a page refresh), or this insert lost
+    // a race with the initial fetch this hook's own mount kicked off.
+    // A row genuinely exists server-side even though we didn't find it
+    // above; look it up directly rather than trusting `friendships`
+    // again, and upgrade whatever's there instead of surfacing this as
+    // a failure.
+    const { data: row, error: fetchError } = await supabase
+      .from('friendships')
+      .select('*')
+      .or(
+        `and(requester_id.eq.${currentUserId},addressee_id.eq.${otherUserId}),` +
+          `and(requester_id.eq.${otherUserId},addressee_id.eq.${currentUserId})`,
+      )
+      .maybeSingle();
+    if (fetchError || !row) {
+      return { error: fetchError || error };
+    }
+    return upgradeToAccepted(row);
   }
 
   async function respondToRequest(friendshipId, accept) {
