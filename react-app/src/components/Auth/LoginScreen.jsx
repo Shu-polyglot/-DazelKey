@@ -6,7 +6,7 @@ import dazelkeyLockup from '../../assets/logo/dazelkey-lockup-full.webp';
 import InstallHint from './InstallHint';
 import './Auth.css';
 
-export default function LoginScreen() {
+export default function LoginScreen({ pendingInviteHandle }) {
   const [email, setEmail] = useState('');
   const [status, setStatus] = useState('idle'); // idle | sending | sent | error
   const [errorMessage, setErrorMessage] = useState('');
@@ -25,7 +25,16 @@ export default function LoginScreen() {
     // link), where Supabase falls back to Site URL's bare origin and drops
     // it. `origin + BASE_URL` resolves correctly in every environment this
     // app ships to (GitHub Pages subpath, Vercel root, local dev).
-    const redirectTo = `${window.location.origin}${import.meta.env.BASE_URL}`;
+    //
+    // A pending invite rides along as `?invite=` (never the hash --
+    // Supabase appends the session tokens there, and our own fragment
+    // ahead of them would break its own parsing) so it survives even
+    // when the magic-link click opens in a different browser/app than
+    // this form was submitted from -- see useRoute's
+    // readAddFriendHandleFromQuery.
+    const redirectTo = pendingInviteHandle
+      ? `${window.location.origin}${import.meta.env.BASE_URL}?invite=${pendingInviteHandle}`
+      : `${window.location.origin}${import.meta.env.BASE_URL}`;
     const { error } = await supabase.auth.signInWithOtp({
       email: email.trim(),
       options: { emailRedirectTo: redirectTo },

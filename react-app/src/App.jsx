@@ -28,12 +28,7 @@ import { usePublicProfile } from './hooks/usePublicProfile';
 import { useOnboardingTutorial } from './hooks/useOnboardingTutorial';
 import { useVotes } from './hooks/useVotes';
 import { useContributions } from './hooks/useContributions';
-import {
-  useRoute,
-  readAddFriendHandleFromHash,
-  storePendingInviteHandle,
-  consumePendingInviteHandle,
-} from './hooks/useRoute';
+import { useRoute, readAddFriendHandleFromHash, readAddFriendHandleFromQuery } from './hooks/useRoute';
 import { todayIso } from './lib/dates';
 import { getTotalProgress } from './lib/doing';
 import { MAX_DOING_GOALS } from './lib/buckets';
@@ -46,7 +41,14 @@ import './App.css';
 
 function App() {
   const { user, loading } = useAuth();
-  const [addFriendHandle, setAddFriendHandle] = useState(() => readAddFriendHandleFromHash(window.location.hash));
+  // A raw share link (#/add-friend/handle) covers someone already signed
+  // in; ?invite=handle covers the LoginScreen -> magic-link-email ->
+  // back-to-the-app round trip instead (see useRoute's
+  // readAddFriendHandleFromQuery comment for why that can't just be the
+  // hash too).
+  const [addFriendHandle, setAddFriendHandle] = useState(
+    () => readAddFriendHandleFromHash(window.location.hash) || readAddFriendHandleFromQuery(window.location.search),
+  );
 
   useEffect(() => {
     function handleHashChange() {
@@ -56,27 +58,17 @@ function App() {
     return () => window.removeEventListener('hashchange', handleHashChange);
   }, []);
 
-  // Keep a stashed copy of any invite handle the moment it shows up, so
-  // it survives a LoginScreen -> magic-link-email -> back-to-the-app
-  // round trip (see useRoute's storePendingInviteHandle comment).
+  // The ?invite= param has done its job once read into state above --
+  // drop it from the visible URL so it doesn't linger through
+  // in-app navigation or get resent on a manual reload.
   useEffect(() => {
-    if (addFriendHandle) {
-      storePendingInviteHandle(addFriendHandle);
-    }
-  }, [addFriendHandle]);
-
-  // Once actually logged in, replay a stashed invite if the current URL
-  // no longer carries one (the magic-link redirect always lands on a
-  // bare hash-less URL).
-  useEffect(() => {
-    if (!user || addFriendHandle) {
+    if (!window.location.search.includes('invite=')) {
       return;
     }
-    const pending = consumePendingInviteHandle();
-    if (pending) {
-      setAddFriendHandle(pending);
-    }
-  }, [user, addFriendHandle]);
+    const url = new URL(window.location.href);
+    url.searchParams.delete('invite');
+    window.history.replaceState(null, '', url);
+  }, []);
 
   const { buckets, addBucket, updateBucket, deleteBucket, completeBucket, addAchievement } = useBuckets();
   const { profile, updateProfile, completeProfile } = useProfile();
@@ -138,14 +130,13 @@ function App() {
     return null;
   }
   if (!user) {
-    return <LoginScreen />;
+    return <LoginScreen pendingInviteHandle={addFriendHandle} />;
   }
   if (addFriendHandle) {
     return (
       <AddFriendScreen
         handle={addFriendHandle}
         onDone={() => {
-          consumePendingInviteHandle();
           window.location.hash = '/profile';
           setAddFriendHandle(null);
         }}

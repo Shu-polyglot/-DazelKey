@@ -33,43 +33,30 @@ function readRouteFromHash(hash) {
   return null;
 }
 
+const HANDLE_PATTERN = '[a-z0-9_]{3,20}';
+
 // A shared invite link (#/add-friend/somehandle) isn't one of the five
 // tabs above -- it's a standalone screen (see AddFriendScreen) that
 // takes over instead of the tab shell. Returns the handle, or null if
 // the hash isn't an invite link.
 export function readAddFriendHandleFromHash(hash) {
-  const match = hash.match(/^#\/add-friend\/([a-z0-9_]{3,20})\b/);
+  const match = hash.match(new RegExp(`^#/add-friend/(${HANDLE_PATTERN})\\b`));
   return match ? match[1] : null;
 }
 
 // An invite link opened while signed out shows LoginScreen first (see
-// App.jsx), and the magic-link email redirects back to a plain Site URL
-// with no hash at all -- the #/add-friend/handle the visitor started on
-// would otherwise just be gone once they're actually logged in. Stashing
-// it here lets App.jsx re-show AddFriendScreen right after login instead
-// of silently dropping the invite.
-const PENDING_INVITE_KEY = 'dazelkey-pending-invite-handle';
-
-export function storePendingInviteHandle(handle) {
-  try {
-    localStorage.setItem(PENDING_INVITE_KEY, handle);
-  } catch {
-    // No fallback -- worst case the invite doesn't survive the redirect.
-  }
-}
-
-// Reads and clears in one step: a stashed handle is only ever meant to
-// be replayed once, right after the login it was waiting on.
-export function consumePendingInviteHandle() {
-  try {
-    const handle = localStorage.getItem(PENDING_INVITE_KEY);
-    if (handle) {
-      localStorage.removeItem(PENDING_INVITE_KEY);
-    }
-    return handle;
-  } catch {
-    return null;
-  }
+// App.jsx), and a magic-link click can land back in a completely
+// different browser/app than the one the visitor started in (Mail's
+// in-app browser vs. Safari, a Gmail webview vs. Chrome, etc.) --
+// localStorage wouldn't survive that handoff. So instead of stashing
+// the pending handle client-side, LoginScreen bakes it into
+// emailRedirectTo as a query param (never the hash -- Supabase appends
+// the session tokens there, and a second `#/add-friend/...` fragment
+// ahead of them would break its own parsing). Query params survive
+// that redirect untouched, so this reads it back on the other side.
+export function readAddFriendHandleFromQuery(search) {
+  const value = new URLSearchParams(search).get('invite');
+  return value && new RegExp(`^${HANDLE_PATTERN}$`).test(value) ? value : null;
 }
 
 export function useRoute() {
