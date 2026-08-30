@@ -90,6 +90,21 @@
   font-size: var(--font-size-caption);
 }
 
+.login-link-button {
+  appearance: none;
+  border: none;
+  background: none;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-caption);
+  text-decoration: underline;
+  cursor: pointer;
+  padding: var(--space-2xs);
+}
+
+.login-link-button:hover {
+  color: var(--color-text-secondary);
+}
+
 .install-hint {
   position: fixed;
   left: var(--space-lg);
