@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import { motion } from 'motion/react';
-import CameraCapture from './CameraCapture';
+import PhotoPickerButton from './PhotoPickerButton';
 import { spring } from '../../styles/motion';
-import { MAX_PHOTO_BYTES, resizeImageToDataUrl, supportsCamera } from '../../lib/photo';
+import { MAX_PHOTO_BYTES, resizeImageToDataUrl } from '../../lib/photo';
 
 const commitTapProps = {
   whileHover: { y: -2, transition: spring.hover },
@@ -16,7 +16,6 @@ const commitTapProps = {
 function CompletePrompt({ bucketId, onComplete }) {
   const [completeDate, setCompleteDate] = useState('');
   const [photo, setPhoto] = useState(null);
-  const [isCameraOpen, setIsCameraOpen] = useState(false);
 
   async function processPhotoFile(file) {
     if (file.size > MAX_PHOTO_BYTES) {
@@ -29,20 +28,6 @@ function CompletePrompt({ bucketId, onComplete }) {
       console.warn('Unable to process photo.', error);
       alert('Could not read that photo. Try a different file.');
     }
-  }
-
-  async function handlePhotoChange(event) {
-    const file = event.target.files?.[0];
-    event.target.value = '';
-    if (!file) {
-      return;
-    }
-    await processPhotoFile(file);
-  }
-
-  function handleCameraCapture(blob) {
-    setIsCameraOpen(false);
-    processPhotoFile(blob);
   }
 
   function handleComplete() {
@@ -77,32 +62,13 @@ function CompletePrompt({ bucketId, onComplete }) {
             </button>
           </div>
         ) : (
-          <div className="achieve-photo-actions">
-            {supportsCamera ? (
-              <button type="button" className="achieve-photo-upload" onClick={() => setIsCameraOpen(true)}>
-                Take Photo
-              </button>
-            ) : (
-              <span className="achieve-photo-upload">
-                Take Photo
-                <input type="file" accept="image/*" capture="environment" onChange={handlePhotoChange} />
-              </span>
-            )}
-            <span className="achieve-photo-upload">
-              Choose from Library
-              <input type="file" accept="image/*" onChange={handlePhotoChange} />
-            </span>
-          </div>
+          <PhotoPickerButton onPhotoFile={processPhotoFile} />
         )}
       </div>
 
       <motion.button type="button" className="achieve-button" onClick={handleComplete} {...commitTapProps}>
         Complete
       </motion.button>
-
-      {isCameraOpen && (
-        <CameraCapture onCapture={handleCameraCapture} onClose={() => setIsCameraOpen(false)} />
-      )}
     </div>
   );
 }

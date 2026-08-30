@@ -245,29 +245,87 @@
   gap: var(--space-2xs);
 }
 
-.achieve-photo-upload {
+/* PhotoPickerButton: one camera-icon button standing in for the old
+   side-by-side "Take Photo" / "Choose from Library" text buttons (see
+   that component's own header comment) -- tapping it reveals both as a
+   small menu, same recipe as ProfilePage's own share-icon menu. */
+.photo-picker {
   position: relative;
-  display: inline-flex;
-  align-items: center;
-  gap: var(--space-2xs);
-  padding: var(--space-2xs) var(--space-sm);
+  display: inline-block;
+}
+
+.photo-picker-button {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
   border: 1px dashed var(--color-border-strong);
-  border-radius: var(--radius-sm);
   background: transparent;
   color: var(--color-text-secondary);
-  font-size: var(--font-size-body-sm);
-  text-transform: none;
-  letter-spacing: normal;
   cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   transition: border-color 0.2s ease, color 0.2s ease;
 }
 
-.achieve-photo-upload:hover {
+.photo-picker-button:hover {
   border-color: rgba(var(--color-glow-rgb), 0.4);
   color: var(--color-text-primary);
 }
 
-.achieve-photo-upload input {
+.photo-picker-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.photo-picker-menu {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  margin-top: var(--space-xs);
+  background: var(--color-surface-elevated);
+  backdrop-filter: blur(var(--blur-md));
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-medium);
+  overflow: hidden;
+  z-index: 20;
+  min-width: 180px;
+}
+
+.photo-picker-menu-item {
+  position: relative;
+  display: block;
+  width: 100%;
+  text-align: left;
+  padding: var(--space-sm) var(--space-md);
+  border: none;
+  border-top: 1px solid var(--color-border);
+  background: none;
+  color: var(--color-text-primary);
+  font-size: var(--font-size-body-sm);
+  /* Reset, not inherited default: a <button> here gets these for free
+     from the UA stylesheet, but the <label> variant (the file-input-
+     backed items) doesn't, and would otherwise pick up UPPERCASE from
+     .achieve-photo-field's own heading-style text-transform. */
+  text-transform: none;
+  letter-spacing: normal;
+  cursor: pointer;
+}
+
+.photo-picker-menu-item:first-child {
+  border-top: none;
+}
+
+.photo-picker-menu-item:hover {
+  background: rgba(var(--color-mist-rgb), 0.08);
+}
+
+/* Only <label> variants (the file-input-backed items) carry one of
+   these -- absolutely covering the label's own padded box (see
+   `inset: 0` against the `position: relative` above) as an invisible
+   click target, same recipe .achieve-photo-upload used before this. */
+.photo-picker-menu-item input {
   position: absolute;
   inset: 0;
   opacity: 0;

@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import { motion } from 'motion/react';
 import Modal from '../../components/Modals/Modal';
-import CameraCapture from '../../components/shared/CameraCapture';
-import { MAX_PHOTO_BYTES, resizeImageToDataUrl, supportsCamera } from '../../lib/photo';
+import PhotoPickerButton from '../../components/shared/PhotoPickerButton';
+import { MAX_PHOTO_BYTES, resizeImageToDataUrl } from '../../lib/photo';
 import { formatDate, todayIso } from '../../lib/dates';
 import { spring } from '../../styles/motion';
 import '../../components/Modals/Modals.css';
@@ -37,7 +37,6 @@ function ActionRecordModal({ priorityTitle, action, readOnly = false, onRecord, 
   const [isEditing, setIsEditing] = useState(!isExisting);
   const [photo, setPhoto] = useState(action?.photo || null);
   const [journal, setJournal] = useState(action?.journal || '');
-  const [isCameraOpen, setIsCameraOpen] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
 
   const date = isExisting ? action.time.slice(0, 10) : todayIso();
@@ -57,20 +56,6 @@ function ActionRecordModal({ priorityTitle, action, readOnly = false, onRecord, 
     } finally {
       setIsProcessing(false);
     }
-  }
-
-  async function handlePhotoChange(event) {
-    const file = event.target.files?.[0];
-    event.target.value = '';
-    if (!file) {
-      return;
-    }
-    await processPhotoFile(file);
-  }
-
-  function handleCameraCapture(blob) {
-    setIsCameraOpen(false);
-    processPhotoFile(blob);
   }
 
   function handleRecord() {
@@ -123,20 +108,7 @@ function ActionRecordModal({ priorityTitle, action, readOnly = false, onRecord, 
           ) : (
             !readOnly && (
               <div className="achieve-photo-actions">
-                {supportsCamera ? (
-                  <button type="button" className="achieve-photo-upload" onClick={() => setIsCameraOpen(true)} disabled={isProcessing}>
-                    Take Photo
-                  </button>
-                ) : (
-                  <span className="achieve-photo-upload">
-                    Take Photo
-                    <input type="file" accept="image/*" capture="environment" onChange={handlePhotoChange} disabled={isProcessing} />
-                  </span>
-                )}
-                <span className="achieve-photo-upload">
-                  Choose from Library
-                  <input type="file" accept="image/*" onChange={handlePhotoChange} disabled={isProcessing} />
-                </span>
+                <PhotoPickerButton onPhotoFile={processPhotoFile} disabled={isProcessing} />
               </div>
             )
           )}
@@ -192,8 +164,6 @@ function ActionRecordModal({ priorityTitle, action, readOnly = false, onRecord, 
           )}
         </>
       )}
-
-      {isCameraOpen && <CameraCapture onCapture={handleCameraCapture} onClose={() => setIsCameraOpen(false)} />}
     </Modal>
   );
 }

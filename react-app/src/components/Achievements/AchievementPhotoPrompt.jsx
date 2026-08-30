@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { motion } from 'motion/react';
-import CameraCapture from '../shared/CameraCapture';
-import { MAX_PHOTO_BYTES, resizeImageToDataUrl, supportsCamera } from '../../lib/photo';
+import PhotoPickerButton from '../shared/PhotoPickerButton';
+import { MAX_PHOTO_BYTES, resizeImageToDataUrl } from '../../lib/photo';
 import { easing, spring } from '../../styles/motion';
 import '../Modals/Modals.css';
 import '../TransitionRitual.css';
@@ -28,7 +28,6 @@ const overlayVariants = {
  * to turn it into an Achievement entry.
  */
 function AchievementPhotoPrompt({ title, onDone }) {
-  const [isCameraOpen, setIsCameraOpen] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
 
   async function processPhotoFile(file) {
@@ -47,20 +46,6 @@ function AchievementPhotoPrompt({ title, onDone }) {
     }
   }
 
-  async function handlePhotoChange(event) {
-    const file = event.target.files?.[0];
-    event.target.value = '';
-    if (!file) {
-      return;
-    }
-    await processPhotoFile(file);
-  }
-
-  function handleCameraCapture(blob) {
-    setIsCameraOpen(false);
-    processPhotoFile(blob);
-  }
-
   return (
     <motion.div
       className="transition-ritual achievement-photo-prompt"
@@ -74,25 +59,7 @@ function AchievementPhotoPrompt({ title, onDone }) {
         <p className="transition-ritual-quote">Add a photo to remember this?</p>
 
         <div className="achievement-photo-prompt-actions">
-          {supportsCamera ? (
-            <button
-              type="button"
-              className="achieve-photo-upload"
-              onClick={() => setIsCameraOpen(true)}
-              disabled={isProcessing}
-            >
-              Take Photo
-            </button>
-          ) : (
-            <span className="achieve-photo-upload">
-              Take Photo
-              <input type="file" accept="image/*" capture="environment" onChange={handlePhotoChange} disabled={isProcessing} />
-            </span>
-          )}
-          <span className="achieve-photo-upload">
-            Choose from Library
-            <input type="file" accept="image/*" onChange={handlePhotoChange} disabled={isProcessing} />
-          </span>
+          <PhotoPickerButton onPhotoFile={processPhotoFile} disabled={isProcessing} />
         </div>
 
         <motion.button
@@ -106,8 +73,6 @@ function AchievementPhotoPrompt({ title, onDone }) {
           Skip
         </motion.button>
       </div>
-
-      {isCameraOpen && <CameraCapture onCapture={handleCameraCapture} onClose={() => setIsCameraOpen(false)} />}
     </motion.div>
   );
 }
