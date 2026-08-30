@@ -209,7 +209,7 @@ function ProfilePanel({ profile, publicProfile, onSaveTraitQuiz, onClose, onSave
             placeholder="e.g. taro_yamada"
           />
           <span className="profile-share-hint">
-            Lets others find you (lowercase letters, numbers, underscores, 3-20 characters). Leave blank and nobody can find you yet.
+            Lets others find you (lowercase letters, numbers, underscores, 3-20 characters). You were given a random one to start -- change it any time.
           </span>
           {handleError && <span className="profile-share-hint" style={{ color: '#d33' }}>{handleError}</span>}
         </label>

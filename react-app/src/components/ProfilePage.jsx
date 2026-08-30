@@ -107,6 +107,7 @@ function ProfilePage({
 
         <div className="profile-page-info">
           <h2 className="profile-page-name">{profile?.name || 'Your name'}</h2>
+          {publicProfile?.handle ? <p className="profile-page-handle">@{publicProfile.handle}</p> : null}
           {profile?.role ? <p className="profile-page-role">{profile.role}</p> : null}
           {profile?.age ? <p className="profile-page-age">{profile.age} years old</p> : null}
         </div>

@@ -7,6 +7,43 @@ export function isValidHandle(handle) {
   return HANDLE_PATTERN.test(handle || '');
 }
 
+// Small, curated word lists (not a full username generator) -- just
+// enough that a brand-new user's auto-assigned handle reads as a name
+// rather than an opaque id, while every combination still fits the
+// 20-character limit above with room to spare.
+const HANDLE_ADJECTIVES = ['quiet', 'calm', 'swift', 'bright', 'gentle', 'bold', 'warm', 'steady', 'clear', 'still'];
+const HANDLE_NOUNS = ['harbor', 'river', 'ember', 'meadow', 'summit', 'horizon', 'lantern', 'compass', 'tide', 'maple'];
+
+function generateRandomHandle() {
+  const adjective = HANDLE_ADJECTIVES[Math.floor(Math.random() * HANDLE_ADJECTIVES.length)];
+  const noun = HANDLE_NOUNS[Math.floor(Math.random() * HANDLE_NOUNS.length)];
+  const suffix = Math.floor(Math.random() * 900 + 100);
+  return `${adjective}_${noun}${suffix}`;
+}
+
+// Retries on a handle collision (Postgres unique_violation, 23505) --
+// astronomically unlikely with this word-list size, but cheap to
+// handle. Gives up and returns null after a few tries rather than
+// looping forever.
+async function createProfileWithRandomHandle(userId, attemptsLeft = 5) {
+  if (attemptsLeft <= 0) {
+    return null;
+  }
+  const { data, error } = await supabase
+    .from('public_profiles')
+    .insert({ user_id: userId, handle: generateRandomHandle() })
+    .select()
+    .single();
+  if (error) {
+    if (error.code === '23505') {
+      return createProfileWithRandomHandle(userId, attemptsLeft - 1);
+    }
+    console.warn('Unable to auto-create public profile.', error);
+    return null;
+  }
+  return data;
+}
+
 // Manages the signed-in user's OWN public_profiles row: whether one
 // exists yet, and create/update/checking a handle's availability.
 // Reading someone ELSE's public profile by handle is a separate,
@@ -32,7 +69,17 @@ export function usePublicProfile() {
     if (error) {
       console.warn('Unable to load public profile.', error);
     }
-    setPublicProfile(data || null);
+    if (data) {
+      setPublicProfile(data);
+      setLoading(false);
+      return;
+    }
+    // No row yet -- brand-new user, or an existing one who never set a
+    // username. Auto-assign a random handle immediately so invite links
+    // and the friends system work without a trip to Settings first;
+    // saveHandleAndProfile below still lets anyone rename it.
+    const created = await createProfileWithRandomHandle(user.id);
+    setPublicProfile(created);
     setLoading(false);
   }, []);
 
