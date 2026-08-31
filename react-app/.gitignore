@@ -23,3 +23,7 @@ dist-ssr
 *.sln
 *.sw?
 .env
+
+# Supabase CLI's local project link cache (`supabase link`) -- machine-
+# specific, regenerated on demand, not something to share via git.
+supabase/.temp

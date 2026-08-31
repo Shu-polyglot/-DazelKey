@@ -1,6 +1,8 @@
 import { useState } from 'react';
+import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'motion/react';
 import Modal from '../Modals/Modal';
+import GoalPlanChat from './GoalPlanChat';
 import { spring, transitions } from '../../styles/motion';
 import '../Modals/Modals.css';
 import '../Modals/BucketStepEditor.css';
@@ -35,10 +37,31 @@ function AddGoalFlow({ eligibleBuckets, onSave, onClose }) {
   const [newItemLabel, setNewItemLabel] = useState('');
   const [newItemIsMilestone, setNewItemIsMilestone] = useState(false);
   const [[step, direction], setStep] = useState([0, 0]);
+  const [isPlanChatOpen, setIsPlanChatOpen] = useState(false);
 
   const stepKey = STEPS[step];
   const isLastStep = step === STEPS.length - 1;
   const goalAmountValid = Number(goalAmount) > 0;
+  const selectedBucket = eligibleBuckets.find((bucket) => bucket.id === bucketId);
+
+  // Fills this form's own amount/checklist state from GoalPlanChat's
+  // finalized plan, exactly as if the person had typed those values
+  // themselves -- so everything downstream (validation, the checklist
+  // step's preview, handleSave) works unchanged. Ids are generated the
+  // same way handleAddChecklistItem's manual entries already are.
+  function handleApplyPlan(plan) {
+    setGoalAmount(String(plan.goalAmount));
+    setChecklist(
+      plan.checklist.map((item, index) => ({
+        id: `item-${Date.now()}-${index}`,
+        label: item.label,
+        isMilestone: Boolean(item.isMilestone),
+        done: false,
+      })),
+    );
+    setIsPlanChatOpen(false);
+    goNext();
+  }
 
   function goNext() {
     setStep(([current]) => [Math.min(current + 1, STEPS.length - 1), 1]);
@@ -135,6 +158,9 @@ function AddGoalFlow({ eligibleBuckets, onSave, onClose }) {
                 autoFocus
               />
             </label>
+            <motion.button type="button" className="secondary-button" onClick={() => setIsPlanChatOpen(true)} {...tapProps}>
+              🪄 Ask AI to help plan this
+            </motion.button>
           </div>
         );
 
@@ -244,6 +270,16 @@ function AddGoalFlow({ eligibleBuckets, onSave, onClose }) {
           )}
         </div>
       </div>
+
+      {isPlanChatOpen &&
+        createPortal(
+          <GoalPlanChat
+            goalTitle={selectedBucket?.title || 'this goal'}
+            onApply={handleApplyPlan}
+            onClose={() => setIsPlanChatOpen(false)}
+          />,
+          document.body,
+        )}
     </Modal>
   );
 }

@@ -538,3 +538,92 @@
   font-size: var(--font-size-body-sm);
   color: var(--color-text-secondary);
 }
+
+/* GoalPlanChat -- the "🪄 Ask AI" chat inside AddGoalFlow's amount step
+   (see that component's own comment). Reuses step-editor-modal's shell;
+   everything below is specific to the chat thread and plan summary. */
+.goal-plan-chat-modal {
+  height: min(80vh, 640px);
+}
+
+.goal-plan-chat-thread {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  padding: var(--space-sm) 0;
+}
+
+.goal-plan-chat-hint {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-body-sm);
+  text-align: center;
+  margin: auto 0;
+}
+
+.goal-plan-chat-bubble {
+  max-width: 85%;
+  padding: var(--space-sm) var(--space-md);
+  border-radius: var(--radius-lg);
+  font-size: var(--font-size-body-sm);
+  line-height: 1.5;
+  white-space: pre-wrap;
+}
+
+.goal-plan-chat-bubble.is-user {
+  align-self: flex-end;
+  background: var(--color-accent-subtle);
+  color: var(--color-text-primary);
+}
+
+.goal-plan-chat-bubble.is-assistant {
+  align-self: flex-start;
+  background: rgba(var(--color-mist-rgb), 0.06);
+  color: var(--color-text-secondary);
+  border: 1px solid var(--color-border);
+}
+
+.goal-plan-chat-bubble.is-thinking {
+  color: var(--color-text-muted);
+}
+
+.goal-plan-chat-input {
+  flex: 1;
+  max-width: none;
+}
+
+.goal-plan-chat-error {
+  color: var(--color-danger);
+  font-size: var(--font-size-body-sm);
+  text-align: center;
+}
+
+.goal-plan-chat-summary {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  padding: var(--space-md) 0;
+}
+
+.goal-plan-chat-summary-text {
+  color: var(--color-text-secondary);
+  font-style: italic;
+}
+
+.goal-plan-chat-summary-amount {
+  font-size: var(--font-size-h3);
+  font-weight: 600;
+}
+
+.goal-plan-chat-summary-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+  padding-left: var(--space-lg);
+  color: var(--color-text-secondary);
+}
