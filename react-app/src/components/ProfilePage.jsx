@@ -5,6 +5,8 @@ import BucketListPanel from './BucketList/BucketListPanel';
 import AchievementGallery from './Achievements/AchievementGallery';
 import AboutManifesto from './shared/AboutManifesto';
 import PreviewProfile from './shared/PreviewProfile';
+import FriendsScreen from './Friends/FriendsScreen';
+import { useFriends } from '../hooks/useFriends';
 import { getInitials, getSocialPlatformLabel } from '../lib/profile';
 import { entranceTransition, spring } from '../styles/motion';
 import './ProfilePage.css';
@@ -37,6 +39,39 @@ function ShareIcon() {
   );
 }
 
+// Two overlapping head-and-shoulders glyphs -- the same
+// everywhere-recognizable "people" motif, drawn in the app's own
+// thin-stroke line style (see ShareIcon above and BottomNav's icon
+// comment) rather than a filled/solid people icon.
+function FriendsIcon() {
+  return (
+    <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+      <circle cx="9" cy="8" r="3" fill="none" stroke="currentColor" strokeWidth="1.6" />
+      <path
+        d="M4 19 C4 15.5 6.2 13.5 9 13.5 C11.8 13.5 14 15.5 14 19"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.6"
+        strokeLinecap="round"
+      />
+      <path
+        d="M15.5 9.5 C16.9 9.5 18 8.4 18 7 C18 5.6 16.9 4.5 15.5 4.5"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.6"
+        strokeLinecap="round"
+      />
+      <path
+        d="M16 13.7 C18.4 14.1 20 15.9 20 19"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.6"
+        strokeLinecap="round"
+      />
+    </svg>
+  );
+}
+
 const PROFILE_TABS = [
   { id: 'buckets', label: 'The Bucket Lists' },
   { id: 'achievements', label: 'The Achievement' },
@@ -59,8 +94,10 @@ function ProfilePage({
   const [activeTab, setActiveTab] = useState('buckets');
   const [isAboutOpen, setIsAboutOpen] = useState(false);
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
+  const [isFriendsOpen, setIsFriendsOpen] = useState(false);
   const [isShareMenuOpen, setIsShareMenuOpen] = useState(false);
   const [linkCopied, setLinkCopied] = useState(false);
+  const { friendships } = useFriends();
 
   const inviteLink = publicProfile?.handle
     ? `${window.location.origin}${window.location.pathname}#/add-friend/${publicProfile.handle}`
@@ -139,6 +176,17 @@ function ProfilePage({
             whileTap={{ y: 1, scale: 0.97, transition: spring.press }}
           >
             Edit profile
+          </motion.button>
+
+          <motion.button
+            type="button"
+            className="secondary-button profile-page-friends"
+            onClick={() => setIsFriendsOpen(true)}
+            whileHover={{ y: -1, transition: spring.hover }}
+            whileTap={{ y: 1, scale: 0.97, transition: spring.press }}
+          >
+            <FriendsIcon />
+            Friends{friendships.length > 0 ? ` (${friendships.length})` : ''}
           </motion.button>
 
           <motion.button
@@ -227,6 +275,13 @@ function ProfilePage({
           {isPreviewOpen && (
             <PreviewProfile key="preview-profile" profile={profile} buckets={buckets} onClose={() => setIsPreviewOpen(false)} />
           )}
+        </AnimatePresence>,
+        document.body,
+      )}
+
+      {createPortal(
+        <AnimatePresence>
+          {isFriendsOpen && <FriendsScreen key="friends-screen" onClose={() => setIsFriendsOpen(false)} />}
         </AnimatePresence>,
         document.body,
       )}

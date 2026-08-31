@@ -97,6 +97,13 @@
   margin-top: 0;
 }
 
+.profile-page-friends {
+  margin-top: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-xs);
+}
+
 .icon-button.profile-page-share {
   width: 40px;
   height: 40px;
