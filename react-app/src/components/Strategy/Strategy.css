@@ -610,6 +610,54 @@
   padding: var(--space-md) 0;
 }
 
+.goal-plan-chat-plan-options {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--space-xs);
+}
+
+/* Same pill shape/states as .step-editor-chip (BucketStepEditor.css,
+   imported above), stacked into a small card so it can also carry the
+   amount and the recommended badge. */
+.goal-plan-chat-plan-option {
+  appearance: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2xs);
+  padding: var(--space-xs) var(--space-md);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-border);
+  background: rgba(var(--color-mist-rgb), 0.04);
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+}
+
+.goal-plan-chat-plan-option.is-selected {
+  background: rgba(var(--color-glow-rgb), 0.14);
+  border-color: rgba(var(--color-glow-rgb), 0.4);
+  color: var(--color-text-primary);
+}
+
+.goal-plan-chat-plan-badge {
+  font-size: var(--font-size-caption);
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: var(--color-accent-strong);
+}
+
+.goal-plan-chat-plan-option-label {
+  font-size: var(--font-size-body);
+  font-weight: 600;
+}
+
+.goal-plan-chat-plan-option-amount {
+  font-size: var(--font-size-body-sm);
+  color: var(--color-text-muted);
+}
+
 .goal-plan-chat-summary-text {
   color: var(--color-text-secondary);
   font-style: italic;

@@ -27,14 +27,18 @@ const tapProps = {
      left blank just tells Gemini to use its best judgment.
   3. Submitting asks for the actual plan (phase: 'plan'), passing the
      questions and answers back so Gemini can ground its estimate in
-     them, and shows the result for the person to accept or revise.
+     them. The function returns 2-3 alternative plans rather than one
+     fixed number -- the person picks among them (defaulting to
+     whichever one Gemini flagged `isRecommended`) before accepting or
+     going back to revise their answers.
 */
 function GoalPlanChat({ goalTitle, onApply, onClose }) {
   const [questions, setQuestions] = useState([]);
   const [answers, setAnswers] = useState([]);
   const [isSending, setIsSending] = useState(false);
   const [error, setError] = useState('');
-  const [plan, setPlan] = useState(null);
+  const [plans, setPlans] = useState(null);
+  const [selectedPlanIndex, setSelectedPlanIndex] = useState(0);
 
   async function callFunction(payload) {
     const { data, error: invokeError } = await supabase.functions.invoke('plan-goal-chat', {
@@ -84,7 +88,14 @@ function GoalPlanChat({ goalTitle, onApply, onClose }) {
     try {
       const qa = questions.map((question, index) => ({ question: question.question, answer: answers[index] }));
       const data = await callFunction({ phase: 'plan', answers: qa });
-      setPlan(data.plan);
+      const nextPlans = data.plans;
+      // Gemini is asked to flag exactly one option, but structured output
+      // only guarantees the type is a boolean, not that it followed that
+      // rule -- fall back to the first option if none (or more than one)
+      // came back marked.
+      const recommendedIndex = nextPlans.findIndex((candidate) => candidate.isRecommended);
+      setSelectedPlanIndex(recommendedIndex >= 0 ? recommendedIndex : 0);
+      setPlans(nextPlans);
     } catch (err) {
       setError(err.message);
     } finally {
@@ -93,10 +104,11 @@ function GoalPlanChat({ goalTitle, onApply, onClose }) {
   }
 
   function handleApply() {
-    onApply(plan);
+    onApply(plans[selectedPlanIndex]);
   }
 
   const hasQuestions = questions.length > 0;
+  const selectedPlan = plans?.[selectedPlanIndex];
 
   return (
     <Modal onClose={onClose} className="step-editor-modal goal-plan-chat-modal">
@@ -115,13 +127,30 @@ function GoalPlanChat({ goalTitle, onApply, onClose }) {
           </motion.button>
         </div>
 
-        {plan ? (
+        {plans ? (
           <div className="goal-plan-chat-summary">
-            <p className="goal-plan-chat-summary-text">{plan.summary}</p>
-            <p className="goal-plan-chat-summary-amount">Estimated total: ¥{Number(plan.goalAmount).toLocaleString('en-US')}</p>
-            {plan.checklist.length > 0 && (
+            {plans.length > 1 && (
+              <div className="goal-plan-chat-plan-options">
+                {plans.map((candidate, index) => (
+                  <motion.button
+                    type="button"
+                    key={candidate.label}
+                    className={`goal-plan-chat-plan-option ${index === selectedPlanIndex ? 'is-selected' : ''}`}
+                    onClick={() => setSelectedPlanIndex(index)}
+                    {...tapProps}
+                  >
+                    {candidate.isRecommended && <span className="goal-plan-chat-plan-badge">Recommended</span>}
+                    <span className="goal-plan-chat-plan-option-label">{candidate.label}</span>
+                    <span className="goal-plan-chat-plan-option-amount">¥{Number(candidate.goalAmount).toLocaleString('en-US')}</span>
+                  </motion.button>
+                ))}
+              </div>
+            )}
+            <p className="goal-plan-chat-summary-text">{selectedPlan.summary}</p>
+            <p className="goal-plan-chat-summary-amount">Estimated total: ¥{Number(selectedPlan.goalAmount).toLocaleString('en-US')}</p>
+            {selectedPlan.checklist.length > 0 && (
               <ul className="goal-plan-chat-summary-list">
-                {plan.checklist.map((item) => (
+                {selectedPlan.checklist.map((item) => (
                   <li key={item.label}>
                     {item.isMilestone ? '★ ' : ''}
                     {item.label}
@@ -157,9 +186,9 @@ function GoalPlanChat({ goalTitle, onApply, onClose }) {
         {error && <p className="goal-plan-chat-error">{error}</p>}
 
         <div className="step-editor-footer">
-          {plan ? (
+          {plans ? (
             <>
-              <motion.button type="button" className="secondary-button" onClick={() => setPlan(null)} {...tapProps}>
+              <motion.button type="button" className="secondary-button" onClick={() => setPlans(null)} {...tapProps}>
                 Answer differently
               </motion.button>
               <motion.button type="button" className="primary-button" onClick={handleApply} {...tapProps}>

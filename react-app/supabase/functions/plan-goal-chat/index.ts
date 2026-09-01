@@ -15,9 +15,12 @@
 //    quality tier, duration, ...). The person answers them in a form
 //    (see GoalPlanChat) rather than free-typing into a chat.
 //  - 'plan': given the goal title plus those questions and the person's
-//    answers, asks Gemini for a JSON object matching PLAN_SCHEMA -- see
-//    GoalPlanChat's own comment for how that maps onto a Realize goal's
-//    doingGoalAmount/doingChecklist fields.
+//    answers, asks Gemini for a JSON object matching PLAN_SCHEMA -- 2-3
+//    alternative plans (e.g. budget/standard/premium) with one flagged
+//    as `isRecommended`, so the person picks rather than only ever
+//    getting a single number. See GoalPlanChat's own comment for how a
+//    chosen plan maps onto a Realize goal's doingGoalAmount/
+//    doingChecklist fields.
 //
 // Requires the caller to be a logged-in DazelKey user (checked against
 // their own Supabase session below) purely to keep this key from being
@@ -53,11 +56,14 @@ You work in two steps for a given goal:
    size, timeline, etc.) that would most change the cost estimate or
    checklist for *this exact* goal, not generic ones any goal could get.
 2. Then, given the person's answers -- some may be left blank, in which
-   case use your best judgment -- you produce the final plan: an
-   estimated total cost and an ordered checklist. If the goal itself
-   sounds likely to cause burnout or is still too vague to plan even
-   with the answers given, say so gently in the plan's summary rather
-   than estimating blindly.
+   case use your best judgment -- you produce 2-3 alternative plans for
+   the same goal (e.g. a leaner budget option, a standard option, and a
+   more ambitious one), each with its own estimated total cost and
+   ordered checklist. Vary them meaningfully in scope and cost, not just
+   in wording. Mark exactly one as your recommendation for this person,
+   based on their answers. If the goal itself sounds likely to cause
+   burnout or is still too vague to plan even with the answers given,
+   say so gently in that plan's summary rather than estimating blindly.
 
 Yen estimates are easy to get wrong by a whole order of magnitude
 (confusing 万円 and 十万円, or thousands and tens of thousands). Before
@@ -94,31 +100,52 @@ const QUESTIONS_SCHEMA = {
 const PLAN_SCHEMA = {
   type: 'object',
   properties: {
-    goalAmount: {
-      type: 'integer',
-      description: 'Estimated total cost in yen for the whole goal.',
-    },
-    checklist: {
+    plans: {
       type: 'array',
-      description: 'Ordered steps or milestones toward the goal, roughly 2-6 items.',
+      description:
+        '2-3 alternative plans for this goal, meaningfully different in scope and cost (e.g. a leaner budget option vs. a more ambitious one) -- not just reworded copies of the same numbers.',
       items: {
         type: 'object',
         properties: {
-          label: { type: 'string' },
-          isMilestone: {
+          label: {
+            type: 'string',
+            description:
+              'A short name for this option (e.g. "Budget" / "Standard" / "Premium"), in the same language as the goal title.',
+          },
+          goalAmount: {
+            type: 'integer',
+            description: 'Estimated total cost in yen for this plan option.',
+          },
+          checklist: {
+            type: 'array',
+            description: 'Ordered steps or milestones toward the goal under this option, roughly 2-6 items.',
+            items: {
+              type: 'object',
+              properties: {
+                label: { type: 'string' },
+                isMilestone: {
+                  type: 'boolean',
+                  description: 'True for a major checkpoint worth celebrating, false for a routine step.',
+                },
+              },
+              required: ['label', 'isMilestone'],
+            },
+          },
+          summary: {
+            type: 'string',
+            description: 'One encouraging sentence summarizing this specific option, in the same language as the conversation.',
+          },
+          isRecommended: {
             type: 'boolean',
-            description: 'True for a major checkpoint worth celebrating, false for a routine step.',
+            description:
+              'True for the one plan option you would recommend most for this person given their answers. Exactly one plan across the array should be true.',
           },
         },
-        required: ['label', 'isMilestone'],
+        required: ['label', 'goalAmount', 'checklist', 'summary', 'isRecommended'],
       },
     },
-    summary: {
-      type: 'string',
-      description: 'One encouraging sentence summarizing the plan, in the same language as the conversation.',
-    },
   },
-  required: ['goalAmount', 'checklist', 'summary'],
+  required: ['plans'],
 };
 
 Deno.serve(async (req) => {
@@ -247,17 +274,24 @@ Deno.serve(async (req) => {
     }
 
     const isValidPlan =
-      Number.isFinite(parsed?.goalAmount) &&
-      parsed.goalAmount > 0 &&
-      Array.isArray(parsed?.checklist) &&
-      parsed.checklist.length > 0;
+      Array.isArray(parsed?.plans) &&
+      parsed.plans.length > 0 &&
+      parsed.plans.every(
+        (candidate: Record<string, unknown>) =>
+          typeof candidate?.label === 'string' &&
+          candidate.label.trim().length > 0 &&
+          Number.isFinite(candidate?.goalAmount) &&
+          (candidate.goalAmount as number) > 0 &&
+          Array.isArray(candidate?.checklist) &&
+          (candidate.checklist as unknown[]).length > 0,
+      );
     if (!isValidPlan) {
       return new Response(JSON.stringify({ error: 'Gemini returned an incomplete plan.' }), {
         status: 502,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
     }
-    return new Response(JSON.stringify({ plan: parsed }), {
+    return new Response(JSON.stringify({ plans: parsed.plans }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
   } catch (error) {
