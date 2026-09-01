@@ -1,4 +1,4 @@
-// Realize's "🪄 Ask AI" goal-planning chat -- called from
+// Realize's "🪄 Ask AI" goal-planning assistant -- called from
 // src/components/Strategy/GoalPlanChat.jsx via supabase.functions.invoke.
 //
 // Runs server-side (not in the browser) for one reason: the Gemini API
@@ -8,15 +8,16 @@
 // dashboard -- never committed, never sent to the client) and is the
 // only thing that ever calls Gemini directly.
 //
-// Two modes, chosen by the request body's `finalize` flag:
-//  - false (default): an ordinary back-and-forth chat turn. Takes the
-//    conversation so far and returns Gemini's next free-text reply, so
-//    the person can talk through their goal before committing to a plan.
-//  - true: the person is done talking and wants the actual plan. Same
-//    conversation history, but this call asks Gemini for a JSON object
-//    matching PLAN_SCHEMA instead of prose -- see GoalPlanChat's own
-//    comment for how that maps onto a Realize goal's doingGoalAmount/
-//    doingChecklist fields.
+// Two phases, chosen by the request body's `phase` field:
+//  - 'questions': given just the goal title, asks Gemini for a short
+//    list of clarifying questions -- the specifics that would most
+//    change the cost estimate or checklist for *this* goal (destination,
+//    quality tier, duration, ...). The person answers them in a form
+//    (see GoalPlanChat) rather than free-typing into a chat.
+//  - 'plan': given the goal title plus those questions and the person's
+//    answers, asks Gemini for a JSON object matching PLAN_SCHEMA -- see
+//    GoalPlanChat's own comment for how that maps onto a Realize goal's
+//    doingGoalAmount/doingChecklist fields.
 //
 // Requires the caller to be a logged-in DazelKey user (checked against
 // their own Supabase session below) purely to keep this key from being
@@ -33,18 +34,62 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-const SYSTEM_INSTRUCTION = `You are the goal-planning assistant inside DazelKey, an app where people track
+// A function, not a constant, so every request grounds the model in the
+// actual current date -- without this, cost estimates drift toward
+// whatever prices were common in Gemini's training data instead of
+// today's, and that gap only grows over time.
+function buildSystemInstruction(): string {
+  const today = new Date().toISOString().slice(0, 10);
+  return `You are the goal-planning assistant inside DazelKey, an app where people track
 "Realize" goals -- Bucket List items with a total cost in yen and an
 optional checklist of steps/milestones toward it.
 
-Talk with the person about the specific goal they named. Help them think
-through what it will actually cost and what steps get them there. Keep
-replies short (a few sentences) and conversational -- this is a chat,
-not an essay. Ask at most one question at a time. Be encouraging but
-realistic: if a goal sounds likely to cause burnout or feels too vague
-to plan, say so gently and suggest breaking it down further.
+Today's date is ${today}. Estimate costs using real-world, present-day
+pricing, not figures that may be years out of date.
 
-Respond in the same language the person is writing in.`;
+You work in two steps for a given goal:
+1. First you're asked for a short list of clarifying questions -- the
+   handful of specifics (destination, quality tier, duration, group
+   size, timeline, etc.) that would most change the cost estimate or
+   checklist for *this exact* goal, not generic ones any goal could get.
+2. Then, given the person's answers -- some may be left blank, in which
+   case use your best judgment -- you produce the final plan: an
+   estimated total cost and an ordered checklist. If the goal itself
+   sounds likely to cause burnout or is still too vague to plan even
+   with the answers given, say so gently in the plan's summary rather
+   than estimating blindly.
+
+Yen estimates are easy to get wrong by a whole order of magnitude
+(confusing 万円 and 十万円, or thousands and tens of thousands). Before
+finalizing an amount, sanity-check its scale against a comparable
+everyday purchase.
+
+Respond in the same language as the goal title.`;
+}
+
+const QUESTIONS_SCHEMA = {
+  type: 'object',
+  properties: {
+    questions: {
+      type: 'array',
+      description:
+        '2-4 short, specific questions whose answers would most change the cost estimate or checklist for this exact goal.',
+      items: {
+        type: 'object',
+        properties: {
+          question: { type: 'string', description: 'A single, specific question about this goal.' },
+          placeholder: {
+            type: 'string',
+            description:
+              'A short example answer for this question, shown as input placeholder text, in the same language as the goal title.',
+          },
+        },
+        required: ['question', 'placeholder'],
+      },
+    },
+  },
+  required: ['questions'],
+};
 
 const PLAN_SCHEMA = {
   type: 'object',
@@ -106,48 +151,70 @@ Deno.serve(async (req) => {
       });
     }
 
-    const { goalTitle, messages, finalize } = await req.json();
-    if (!goalTitle || !Array.isArray(messages)) {
-      return new Response(JSON.stringify({ error: 'goalTitle and messages are required.' }), {
+    const { goalTitle, phase, answers } = await req.json();
+    if (!goalTitle || (phase !== 'questions' && phase !== 'plan')) {
+      return new Response(JSON.stringify({ error: 'goalTitle and a valid phase are required.' }), {
+        status: 400,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+    if (phase === 'plan' && !Array.isArray(answers)) {
+      return new Response(JSON.stringify({ error: 'answers are required to build a plan.' }), {
         status: 400,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
     }
 
-    const contents = [
-      // The goal title as the opening turn of context -- not shown in
-      // the visible chat history itself (see GoalPlanChat), just what
-      // grounds every reply in the specific thing being planned.
-      { role: 'user', parts: [{ text: `The goal is: "${goalTitle}"` }] },
-      { role: 'model', parts: [{ text: "Got it — let's plan that out." }] },
-      ...messages.map((message: { role: string; content: string }) => ({
-        role: message.role === 'assistant' ? 'model' : 'user',
-        parts: [{ text: message.content }],
-      })),
-    ];
+    let contents: Array<{ role: string; parts: Array<{ text: string }> }>;
+    let generationConfig: Record<string, unknown>;
 
-    if (finalize) {
-      contents.push({
-        role: 'user',
-        parts: [{ text: 'Please finalize the plan now based on everything discussed.' }],
-      });
-    }
-
-    const body: Record<string, unknown> = {
-      systemInstruction: { parts: [{ text: SYSTEM_INSTRUCTION }] },
-      contents,
-    };
-    if (finalize) {
-      body.generationConfig = {
+    if (phase === 'questions') {
+      contents = [
+        {
+          role: 'user',
+          parts: [
+            {
+              text: `The goal is: "${goalTitle}". What are the clarifying questions you'd ask before planning it?`,
+            },
+          ],
+        },
+      ];
+      generationConfig = {
+        responseMimeType: 'application/json',
+        responseSchema: QUESTIONS_SCHEMA,
+      };
+    } else {
+      contents = [
+        // The goal title as the opening turn of context, followed by each
+        // question/answer pair as its own model/user turn -- mirrors how
+        // this would read as a real back-and-forth, even though the
+        // person actually answered them all at once in a form.
+        { role: 'user', parts: [{ text: `The goal is: "${goalTitle}"` }] },
+        { role: 'model', parts: [{ text: "Got it — let's plan that out." }] },
+        ...(answers as Array<{ question: string; answer: string }>).flatMap(({ question, answer }) => [
+          { role: 'model', parts: [{ text: question }] },
+          { role: 'user', parts: [{ text: answer?.trim() ? answer : '(left blank -- use your best judgment)' }] },
+        ]),
+        { role: 'user', parts: [{ text: 'Please finalize the plan now based on everything discussed.' }] },
+      ];
+      generationConfig = {
         responseMimeType: 'application/json',
         responseSchema: PLAN_SCHEMA,
+        // Finalizing is a numeric-estimate task, not a creative one -- a
+        // low temperature keeps repeated plan calls for the same answers
+        // from swinging wildly on goalAmount.
+        temperature: 0.3,
       };
     }
 
     const geminiResponse = await fetch(`${GEMINI_URL}?key=${geminiKey}`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(body),
+      body: JSON.stringify({
+        systemInstruction: { parts: [{ text: buildSystemInstruction() }] },
+        contents,
+        generationConfig,
+      }),
     });
 
     if (!geminiResponse.ok) {
@@ -160,15 +227,37 @@ Deno.serve(async (req) => {
 
     const geminiData = await geminiResponse.json();
     const text = geminiData?.candidates?.[0]?.content?.parts?.[0]?.text ?? '';
+    const parsed = JSON.parse(text);
 
-    if (finalize) {
-      const plan = JSON.parse(text);
-      return new Response(JSON.stringify({ plan }), {
+    // Gemini's structured-output mode guarantees valid JSON matching the
+    // schema's types, not sane values -- an empty question list or a
+    // malformed plan (zero/negative amount, empty checklist) would
+    // otherwise flow straight into the UI unchecked.
+    if (phase === 'questions') {
+      const isValid = Array.isArray(parsed?.questions) && parsed.questions.length > 0;
+      if (!isValid) {
+        return new Response(JSON.stringify({ error: 'Gemini did not return any questions.' }), {
+          status: 502,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
+      }
+      return new Response(JSON.stringify({ questions: parsed.questions }), {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
     }
 
-    return new Response(JSON.stringify({ reply: text }), {
+    const isValidPlan =
+      Number.isFinite(parsed?.goalAmount) &&
+      parsed.goalAmount > 0 &&
+      Array.isArray(parsed?.checklist) &&
+      parsed.checklist.length > 0;
+    if (!isValidPlan) {
+      return new Response(JSON.stringify({ error: 'Gemini returned an incomplete plan.' }), {
+        status: 502,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+    return new Response(JSON.stringify({ plan: parsed }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
   } catch (error) {

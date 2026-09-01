@@ -627,3 +627,46 @@
   padding-left: var(--space-lg);
   color: var(--color-text-secondary);
 }
+
+.goal-plan-chat-questions {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg);
+  padding: var(--space-sm) 0;
+}
+
+.goal-plan-chat-question {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+  text-align: left;
+}
+
+.goal-plan-chat-question-label {
+  font-size: var(--font-size-body-sm);
+  color: var(--color-text-secondary);
+}
+
+.goal-plan-chat-question-input {
+  width: 100%;
+  border: none;
+  border-bottom: 1px solid var(--color-border-strong);
+  background: transparent;
+  padding: var(--space-xs) 0;
+  font-family: inherit;
+  font-size: var(--font-size-body);
+  color: var(--color-text-primary);
+  transition: border-color 0.25s ease;
+}
+
+.goal-plan-chat-question-input::placeholder {
+  color: var(--color-text-muted);
+}
+
+.goal-plan-chat-question-input:focus {
+  outline: none;
+  border-bottom-color: var(--color-accent);
+}

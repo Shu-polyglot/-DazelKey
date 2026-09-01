@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { motion } from 'motion/react';
 import Modal from '../Modals/Modal';
 import { supabase } from '../../lib/supabase';
@@ -13,26 +13,32 @@ const tapProps = {
 };
 
 /*
-  A short back-and-forth with Gemini (see supabase/functions/plan-goal-
+  A three-step exchange with Gemini (see supabase/functions/plan-goal-
   chat) about one specific Realize goal, ending in a structured plan the
   person can drop straight into AddGoalFlow's amount/checklist steps.
   This component only ever talks to that one Edge Function -- it has no
   idea Gemini is what's on the other end, and never sees an API key.
 
-  `messages` is kept in the shape the Edge Function already expects
-  ({ role: 'user' | 'assistant', content }) so it can be forwarded
-  as-is on every call rather than translated back and forth.
+  1. On open, it reads the goal title and asks the function for a
+     handful of clarifying questions (phase: 'questions') -- the
+     specifics that would most change the estimate, e.g. destination or
+     quality tier -- rather than starting from a blank chat.
+  2. The person answers as many as they want in a plain form; anything
+     left blank just tells Gemini to use its best judgment.
+  3. Submitting asks for the actual plan (phase: 'plan'), passing the
+     questions and answers back so Gemini can ground its estimate in
+     them, and shows the result for the person to accept or revise.
 */
 function GoalPlanChat({ goalTitle, onApply, onClose }) {
-  const [messages, setMessages] = useState([]);
-  const [draft, setDraft] = useState('');
+  const [questions, setQuestions] = useState([]);
+  const [answers, setAnswers] = useState([]);
   const [isSending, setIsSending] = useState(false);
   const [error, setError] = useState('');
   const [plan, setPlan] = useState(null);
 
-  async function callFunction(nextMessages, finalize) {
+  async function callFunction(payload) {
     const { data, error: invokeError } = await supabase.functions.invoke('plan-goal-chat', {
-      body: { goalTitle, messages: nextMessages, finalize },
+      body: { goalTitle, ...payload },
     });
     if (invokeError) {
       throw new Error(invokeError.message || 'Something went wrong.');
@@ -43,19 +49,14 @@ function GoalPlanChat({ goalTitle, onApply, onClose }) {
     return data;
   }
 
-  async function handleSend() {
-    const text = draft.trim();
-    if (!text || isSending) {
-      return;
-    }
-    const nextMessages = [...messages, { role: 'user', content: text }];
-    setMessages(nextMessages);
-    setDraft('');
+  async function loadQuestions() {
     setError('');
     setIsSending(true);
     try {
-      const data = await callFunction(nextMessages, false);
-      setMessages([...nextMessages, { role: 'assistant', content: data.reply }]);
+      const data = await callFunction({ phase: 'questions' });
+      const nextQuestions = data.questions || [];
+      setQuestions(nextQuestions);
+      setAnswers(nextQuestions.map(() => ''));
     } catch (err) {
       setError(err.message);
     } finally {
@@ -63,14 +64,26 @@ function GoalPlanChat({ goalTitle, onApply, onClose }) {
     }
   }
 
-  async function handleFinalize() {
+  useEffect(() => {
+    loadQuestions();
+    // goalTitle is fixed for the life of this modal (AddGoalFlow mounts
+    // a fresh one per bucket), so this only ever needs to run once.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  function handleAnswerChange(index, value) {
+    setAnswers((prev) => prev.map((answer, i) => (i === index ? value : answer)));
+  }
+
+  async function handleGetPlan() {
     if (isSending) {
       return;
     }
     setError('');
     setIsSending(true);
     try {
-      const data = await callFunction(messages, true);
+      const qa = questions.map((question, index) => ({ question: question.question, answer: answers[index] }));
+      const data = await callFunction({ phase: 'plan', answers: qa });
       setPlan(data.plan);
     } catch (err) {
       setError(err.message);
@@ -82,6 +95,8 @@ function GoalPlanChat({ goalTitle, onApply, onClose }) {
   function handleApply() {
     onApply(plan);
   }
+
+  const hasQuestions = questions.length > 0;
 
   return (
     <Modal onClose={onClose} className="step-editor-modal goal-plan-chat-modal">
@@ -115,19 +130,27 @@ function GoalPlanChat({ goalTitle, onApply, onClose }) {
               </ul>
             )}
           </div>
-        ) : (
-          <div className="goal-plan-chat-thread">
-            {messages.length === 0 && (
-              <p className="goal-plan-chat-hint">
-                Tell the assistant a bit about this goal — timeline, budget flexibility, anything it should know.
-              </p>
-            )}
-            {messages.map((message, index) => (
-              <div key={index} className={`goal-plan-chat-bubble is-${message.role}`}>
-                {message.content}
+        ) : hasQuestions ? (
+          <div className="goal-plan-chat-questions">
+            <p className="goal-plan-chat-hint">Answer as many as you'd like — skip anything you're not sure about.</p>
+            {questions.map((question, index) => (
+              <div className="goal-plan-chat-question" key={question.question}>
+                <p className="goal-plan-chat-question-label">{question.question}</p>
+                <input
+                  type="text"
+                  className="goal-plan-chat-question-input"
+                  value={answers[index] || ''}
+                  onChange={(event) => handleAnswerChange(index, event.target.value)}
+                  placeholder={question.placeholder}
+                  disabled={isSending}
+                  autoFocus={index === 0}
+                />
               </div>
             ))}
-            {isSending && <div className="goal-plan-chat-bubble is-assistant is-thinking">…</div>}
+          </div>
+        ) : (
+          <div className="goal-plan-chat-thread">
+            <p className="goal-plan-chat-hint">{isSending ? 'Thinking of a few questions…' : 'Something went wrong.'}</p>
           </div>
         )}
 
@@ -137,42 +160,22 @@ function GoalPlanChat({ goalTitle, onApply, onClose }) {
           {plan ? (
             <>
               <motion.button type="button" className="secondary-button" onClick={() => setPlan(null)} {...tapProps}>
-                Keep talking
+                Answer differently
               </motion.button>
               <motion.button type="button" className="primary-button" onClick={handleApply} {...tapProps}>
                 Use this plan
               </motion.button>
             </>
+          ) : hasQuestions ? (
+            <motion.button type="button" className="primary-button" onClick={handleGetPlan} disabled={isSending} {...tapProps}>
+              {isSending ? 'Working on it…' : 'Get my plan'}
+            </motion.button>
           ) : (
-            <>
-              <input
-                type="text"
-                className="step-editor-field-input goal-plan-chat-input"
-                value={draft}
-                onChange={(event) => setDraft(event.target.value)}
-                onKeyDown={(event) => {
-                  if (event.key === 'Enter') {
-                    event.preventDefault();
-                    handleSend();
-                  }
-                }}
-                placeholder="Say something…"
-                disabled={isSending}
-                autoFocus
-              />
-              <motion.button type="button" className="secondary-button" onClick={handleSend} disabled={isSending || !draft.trim()} {...tapProps}>
-                Send
+            !isSending && (
+              <motion.button type="button" className="primary-button" onClick={loadQuestions} {...tapProps}>
+                Try again
               </motion.button>
-              <motion.button
-                type="button"
-                className="primary-button"
-                onClick={handleFinalize}
-                disabled={isSending || messages.length === 0}
-                {...tapProps}
-              >
-                Finalize plan
-              </motion.button>
-            </>
+            )
           )}
         </div>
       </div>
