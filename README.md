@@ -20,6 +20,10 @@ Start there for setup, environment variables, and Supabase configuration.
 - `index.html`, `style.css`, `script.js` -- an early static prototype,
   superseded by `react-app/` and not part of the deployed site. Kept for
   reference.
+- [`dm-sense/`](./dm-sense) -- a standalone static MVP, unrelated to the
+  life-archive app: "DM Sense", an AI copilot that reads an English DM's
+  vibe and suggests replies. Plain HTML/CSS/JS, no build step. See
+  [`dm-sense/README.md`](./dm-sense/README.md).
 
 ## Reel tooling quick start
 

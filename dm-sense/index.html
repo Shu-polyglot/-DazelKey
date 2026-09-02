@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>DM Sense</title>
+    <meta
+      name="description"
+      content="DM Sense is your AI copilot for English DMs. Paste a message, understand what they really mean, and get ready-to-send replies."
+    />
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="brand">
+        <span class="brand-mark">DS</span>
+        <span class="brand-name">DM Sense</span>
+      </div>
+      <p class="brand-tagline">Your AI copilot for English DMs</p>
+    </header>
+
+    <main class="page">
+      <section class="hero">
+        <h1>Understand what they <em>REALLY</em> mean.</h1>
+        <p class="subheadline">Read the vibe. Know what to say next.</p>
+      </section>
+
+      <div class="workspace">
+        <section class="panel chat-panel" aria-label="Simulated conversation">
+          <div class="chat-thread" id="chatThread">
+            <div class="bubble bubble-them" id="theirBubble" hidden>
+              <span class="bubble-label">Her</span>
+              <p id="theirMessageText"></p>
+            </div>
+            <div class="bubble bubble-you" id="yourBubble" hidden>
+              <span class="bubble-label">You</span>
+              <p id="yourReplyText" class="placeholder">
+                Pick a reply on the right to drop it in here
+              </p>
+            </div>
+          </div>
+
+          <form id="messageForm" class="message-form">
+            <label for="messageInput">Paste the message you received</label>
+            <textarea
+              id="messageInput"
+              rows="3"
+              placeholder="e.g. &quot;ppl always compare me to her not gonna lie&quot;"
+            ></textarea>
+            <button type="submit" id="analyzeBtn">Analyze</button>
+          </form>
+        </section>
+
+        <section class="panel assistant-panel" aria-label="DM Sense AI assistant">
+          <div class="assistant-empty" id="assistantEmpty">
+            <p>Paste a message on the left to see the meaning, vibe, and reply ideas.</p>
+          </div>
+
+          <div class="assistant-result" id="assistantResult" hidden>
+            <div class="result-block">
+              <h2>Meaning</h2>
+              <p id="meaningText"></p>
+            </div>
+
+            <div class="result-block">
+              <h2>Vibe</h2>
+              <ul class="pill-list" id="vibeList"></ul>
+            </div>
+
+            <div class="result-block" id="slangBlock" hidden>
+              <h2>Slang</h2>
+              <ul class="slang-list" id="slangList"></ul>
+            </div>
+
+            <div class="result-block">
+              <h2>Reply</h2>
+              <div class="reply-list" id="replyList"></div>
+            </div>
+          </div>
+        </section>
+      </div>
+    </main>
+
+    <script type="module" src="app.js"></script>
+  </body>
+</html>
