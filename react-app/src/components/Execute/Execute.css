@@ -1,0 +1,208 @@
+/* ExecutePlanFlow -- the "⚡ Execute" flow opened from ExpandedBucketCard.
+   Reuses step-editor-modal's shell (BucketStepEditor.css); everything
+   below is specific to this flow's own stages and plan result. */
+.execute-plan-modal {
+  height: min(85vh, 720px);
+}
+
+.execute-plan {
+  min-height: 0;
+}
+
+.execute-hint-stage {
+  flex: 1;
+  min-height: 200px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.execute-hint {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-body-sm);
+  text-align: center;
+}
+
+.execute-error {
+  color: var(--color-danger);
+  font-size: var(--font-size-body-sm);
+  text-align: center;
+}
+
+.execute-questions {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg);
+  padding: var(--space-sm) 0;
+}
+
+.execute-question {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+  text-align: left;
+}
+
+.execute-question-label {
+  font-size: var(--font-size-body-sm);
+  color: var(--color-text-secondary);
+}
+
+.execute-question-input {
+  width: 100%;
+  border: none;
+  border-bottom: 1px solid var(--color-border-strong);
+  background: transparent;
+  padding: var(--space-xs) 0;
+  font-family: inherit;
+  font-size: var(--font-size-body);
+  color: var(--color-text-primary);
+  transition: border-color 0.25s ease;
+}
+
+.execute-question-input::placeholder {
+  color: var(--color-text-muted);
+}
+
+.execute-question-input:focus {
+  outline: none;
+  border-bottom-color: var(--color-accent);
+}
+
+.execute-result {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg);
+  padding: var(--space-sm) 0;
+  text-align: left;
+}
+
+.execute-summary {
+  color: var(--color-text-secondary);
+  font-style: italic;
+  text-align: center;
+}
+
+.execute-recommendations {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+.execute-recommendation-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3xs);
+  padding: var(--space-sm) var(--space-md);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-border);
+  background: rgba(var(--color-mist-rgb), 0.04);
+}
+
+.execute-recommendation-name {
+  font-family: var(--font-family-display);
+  font-size: var(--font-size-h3);
+  color: var(--color-text-primary);
+}
+
+.execute-recommendation-meta {
+  font-size: var(--font-size-body-sm);
+  color: var(--color-text-secondary);
+}
+
+.execute-recommendation-reason {
+  font-size: var(--font-size-body-sm);
+  color: var(--color-text-muted);
+}
+
+.execute-recommendation-link {
+  align-self: flex-start;
+  margin-top: var(--space-2xs);
+  color: var(--color-accent-strong);
+  font-size: var(--font-size-body-sm);
+}
+
+.execute-plan-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+  padding: var(--space-lg);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--color-border);
+  background:
+    radial-gradient(circle at 50% -10%, rgba(var(--color-glow-rgb), 0.08), transparent 55%),
+    rgba(var(--color-void-2-rgb), 0.6);
+}
+
+.execute-plan-header {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: var(--space-xs);
+  font-family: var(--font-family-display);
+  font-size: var(--font-size-h3);
+  color: var(--color-text-primary);
+}
+
+.execute-plan-budget {
+  font-size: var(--font-size-body);
+  color: var(--color-text-secondary);
+}
+
+.execute-section-heading {
+  display: block;
+  font-size: var(--font-size-caption);
+  letter-spacing: var(--tracking-wide);
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+  margin-bottom: var(--space-xs);
+}
+
+.execute-schedule-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+}
+
+.execute-schedule-row {
+  display: flex;
+  gap: var(--space-sm);
+  font-size: var(--font-size-body-sm);
+}
+
+.execute-schedule-time {
+  flex: none;
+  width: 5.5em;
+  color: var(--color-accent-strong);
+}
+
+.execute-schedule-text {
+  color: var(--color-text-secondary);
+}
+
+.execute-bring-list,
+.execute-next-actions-list,
+.execute-sources-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2xs);
+  padding-left: var(--space-lg);
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-body-sm);
+}
+
+.execute-sources-list a {
+  color: var(--color-accent-strong);
+}
+
+@media (max-width: 640px) {
+  .execute-plan-header {
+    flex-direction: column;
+  }
+}

@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
-import { motion } from 'motion/react';
+import { motion, AnimatePresence } from 'motion/react';
 import BucketPlanEditor from '../Modals/BucketPlanEditor';
+import ExecutePlanFlow from '../Execute/ExecutePlanFlow';
 import CompletePrompt from '../shared/CompletePrompt';
 import CompletedPhotoHero from '../shared/CompletedPhotoHero';
 import { getStatusLabel, getWhenLabel, sortPlanItems, formatPlanTime } from '../../lib/buckets';
@@ -33,7 +34,7 @@ function getMeta(bucket) {
   return getWhenLabel(bucket.when);
 }
 
-function ExpandedCardView({ bucket, onEdit, onDelete, onClose, onComplete, readOnly }) {
+function ExpandedCardView({ bucket, onEdit, onExecute, onDelete, onClose, onComplete, readOnly }) {
   const hasPhotoHero = bucket.status === 'completed' && Boolean(bucket.image);
 
   function handleDelete() {
@@ -91,6 +92,11 @@ function ExpandedCardView({ bucket, onEdit, onDelete, onClose, onComplete, readO
 
       {!readOnly && (
         <div className="expanded-card-actions detail-actions">
+          {bucket.status !== 'completed' && (
+            <motion.button type="button" className="secondary-button" onClick={onExecute} {...tapProps}>
+              ⚡ Execute
+            </motion.button>
+          )}
           <motion.button type="button" className="secondary-button" onClick={onEdit} {...tapProps}>
             Plan
           </motion.button>
@@ -111,6 +117,28 @@ function ExpandedCardView({ bucket, onEdit, onDelete, onClose, onComplete, readO
  */
 function ExpandedBucketCard({ bucket, onClose, onUpdate, onDelete, onComplete, layoutId, readOnly = false }) {
   const [mode, setMode] = useState('view');
+  const [isExecuteOpen, setIsExecuteOpen] = useState(false);
+
+  // Applies an Execute-generated plan: the schedule becomes this
+  // Bucket's own Itinerary (same field/display ExpandedBucketCard's Plan
+  // button edits) so nothing new has to render it, `place` fills in only
+  // if this Bucket didn't already have one, and the full result is kept
+  // under executePlan so reopening Execute shows it again instead of
+  // starting over.
+  function handleApplyExecutePlan(result) {
+    const patch = { executePlan: result };
+    if (result.plan) {
+      patch.planItems = (result.plan.schedule || []).map((item, index) => ({
+        id: `plan-${Date.now()}-${index}-${Math.random().toString(36).slice(2, 6)}`,
+        time: item.time,
+        text: item.text,
+      }));
+      if (!bucket.place && result.plan.destination) {
+        patch.place = result.plan.destination;
+      }
+    }
+    onUpdate(bucket.id, patch);
+  }
 
   useEffect(() => {
     function handleKeyDown(event) {
@@ -156,6 +184,7 @@ function ExpandedBucketCard({ bucket, onClose, onUpdate, onDelete, onComplete, l
             <ExpandedCardView
               bucket={bucket}
               onEdit={() => setMode('edit')}
+              onExecute={() => setIsExecuteOpen(true)}
               onDelete={onDelete}
               onClose={onClose}
               onComplete={onComplete}
@@ -164,6 +193,17 @@ function ExpandedBucketCard({ bucket, onClose, onUpdate, onDelete, onComplete, l
           )}
         </motion.div>
       </motion.article>
+
+      <AnimatePresence>
+        {isExecuteOpen && (
+          <ExecutePlanFlow
+            key="execute-plan-flow"
+            bucket={bucket}
+            onApply={handleApplyExecutePlan}
+            onClose={() => setIsExecuteOpen(false)}
+          />
+        )}
+      </AnimatePresence>
     </motion.div>
   );
 }

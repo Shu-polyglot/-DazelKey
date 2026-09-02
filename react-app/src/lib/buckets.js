@@ -166,10 +166,20 @@ export function normalizeBucket(bucket, index) {
     sourceGoalId: bucket.sourceGoalId || null,
 
     // See normalizePlanItem's own comment above -- this Bucket's own
-    // itinerary, edited from ExpandedBucketCard's Plan button.
+    // itinerary, edited from ExpandedBucketCard's Plan button. Also
+    // where Execute (see components/Execute) writes its generated
+    // schedule once a person applies a plan, so the same Itinerary
+    // display picks it up with no separate UI.
     planItems: Array.isArray(bucket.planItems)
       ? sortPlanItems(bucket.planItems.map((item, itemIndex) => normalizePlanItem(item, itemIndex)))
       : [],
+
+    // The last plan Execute generated for this Bucket (see
+    // components/Execute/ExecutePlanFlow) -- kept in full (recommendations,
+    // budget, sources, next actions) so reopening Execute or the Bucket
+    // card shows what was already found instead of starting over. Only
+    // ever set by that flow; every other bucket keeps this null.
+    executePlan: bucket.executePlan && typeof bucket.executePlan === 'object' ? bucket.executePlan : null,
   };
 }
 
