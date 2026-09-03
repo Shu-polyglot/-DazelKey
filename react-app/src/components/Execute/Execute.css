@@ -1,6 +1,16 @@
 /* ExecutePlanFlow -- the "⚡ Execute" flow opened from ExpandedBucketCard.
    Reuses step-editor-modal's shell (BucketStepEditor.css); everything
    below is specific to this flow's own stages and plan result. */
+
+/* ExpandedBucketCard's own overlay (z-index 40, ExpandedBucketCard.css)
+   stays mounted underneath this flow (it's the thing that opened it),
+   which otherwise sits above Modal's default backdrop z-index of 30 --
+   scoped here rather than raising Modals.css' shared default so every
+   other modal's stacking is untouched. */
+.modal-backdrop:has(.execute-plan-modal) {
+  z-index: 50;
+}
+
 .execute-plan-modal {
   height: min(85vh, 720px);
 }
