@@ -6,7 +6,8 @@ import { spring } from '../../styles/motion';
 // Small inline list inside ProfilePanel showing incoming friend requests
 // (see useFriends' incomingRequests) with Accept/Decline actions. Each
 // request only has the requester's user_id, so this looks up their
-// public profile (name/handle) to display something recognizable.
+// public profile -- photo, name, handle, and role/bio if they set one
+// -- to show something a person can actually recognize, not just a name.
 function FriendRequestsPanel({ incomingRequests, onRespond }) {
   const [profilesById, setProfilesById] = useState({});
 
@@ -41,11 +42,20 @@ function FriendRequestsPanel({ incomingRequests, onRespond }) {
       <div className="profile-share-list">
         {incomingRequests.map((request) => {
           const requesterProfile = profilesById[request.requester_id];
-          const label = requesterProfile?.name || (requesterProfile?.handle ? `@${requesterProfile.handle}` : 'Someone');
+          const name = requesterProfile?.name || 'Someone';
+          const detail = requesterProfile?.role || requesterProfile?.bio;
           return (
-            <div className="profile-share-row" key={request.id}>
-              <span>{label}</span>
-              <div style={{ display: 'flex', gap: '8px' }}>
+            <div className="profile-share-row friend-row" key={request.id}>
+              <span
+                className="friend-row-avatar"
+                style={{ backgroundImage: requesterProfile?.photo ? `url(${requesterProfile.photo})` : 'none' }}
+              />
+              <div className="friend-row-meta">
+                <span className="friend-row-name">{name}</span>
+                {requesterProfile?.handle && <span className="friend-row-handle">@{requesterProfile.handle}</span>}
+                {detail && <span className="friend-row-detail">{detail}</span>}
+              </div>
+              <div className="friend-row-actions">
                 <motion.button
                   type="button"
                   className="secondary-button"

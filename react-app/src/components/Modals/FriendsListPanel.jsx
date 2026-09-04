@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { motion } from 'motion/react';
 import { lookupPublicProfileByUserId } from '../../hooks/usePublicProfile';
+import { formatMonth } from '../../lib/dates';
 import { spring } from '../../styles/motion';
 
 // Inline list inside ProfilePanel of accepted friends (with a Remove
@@ -8,7 +9,9 @@ import { spring } from '../../styles/motion';
 // approval (with a Cancel action) -- see FriendRequestsPanel for the
 // matching incoming-side list. A friendship row only has both users'
 // ids, so this looks up each "other side" profile the same way that
-// panel does, to show a name/handle instead of a bare id.
+// panel does, to show a photo/name/handle/role instead of a bare name,
+// plus how long the friendship has actually existed (or that a request
+// is still waiting) rather than an undifferentiated flat list.
 function FriendsListPanel({ friendships, outgoingRequests, currentUserId, onRemove }) {
   const [profilesById, setProfilesById] = useState({});
 
@@ -39,13 +42,23 @@ function FriendsListPanel({ friendships, outgoingRequests, currentUserId, onRemo
     return null;
   }
 
-  function renderRow(row, actionLabel) {
+  function renderRow(row, actionLabel, statusText) {
     const id = otherUserId(row);
     const profile = profilesById[id];
-    const label = profile?.name || (profile?.handle ? `@${profile.handle}` : 'Someone');
+    const name = profile?.name || 'Someone';
+    const detail = profile?.role || profile?.bio;
+    const handleAndStatus = [profile?.handle && `@${profile.handle}`, statusText].filter(Boolean).join(' · ');
     return (
-      <div className="profile-share-row" key={row.id}>
-        <span>{label}</span>
+      <div className="profile-share-row friend-row" key={row.id}>
+        <span
+          className="friend-row-avatar"
+          style={{ backgroundImage: profile?.photo ? `url(${profile.photo})` : 'none' }}
+        />
+        <div className="friend-row-meta">
+          <span className="friend-row-name">{name}</span>
+          {handleAndStatus && <span className="friend-row-handle">{handleAndStatus}</span>}
+          {detail && <span className="friend-row-detail">{detail}</span>}
+        </div>
         <motion.button
           type="button"
           className="secondary-button"
@@ -63,8 +76,8 @@ function FriendsListPanel({ friendships, outgoingRequests, currentUserId, onRemo
     <div className="profile-share-section detail-form-label">
       <span>Friends</span>
       <div className="profile-share-list">
-        {friendships.map((row) => renderRow(row, 'Remove'))}
-        {outgoingRequests.map((row) => renderRow(row, 'Cancel'))}
+        {friendships.map((row) => renderRow(row, 'Remove', `Friends since ${formatMonth(new Date(row.created_at))}`))}
+        {outgoingRequests.map((row) => renderRow(row, 'Cancel', 'Request sent — waiting for them to accept'))}
       </div>
     </div>
   );
