@@ -159,9 +159,15 @@
   gap: var(--space-3xs);
 }
 
+/* .detail-form-label span (Modals.css) uppercases every span inside a
+   form-label block for short chrome labels like "WHEN" -- fine there,
+   wrong for an actual name/handle/date, so every span below opts back
+   out. */
 .friend-row-name {
   font-weight: var(--font-weight-medium);
   color: var(--color-text-primary);
+  text-transform: none;
+  letter-spacing: normal;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -170,6 +176,9 @@
 .friend-row-handle,
 .friend-row-detail {
   font-size: var(--font-size-caption);
+  font-weight: var(--font-weight-regular);
+  text-transform: none;
+  letter-spacing: normal;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
