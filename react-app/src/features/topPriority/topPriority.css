@@ -195,7 +195,10 @@
   bottom: calc(100% + var(--space-xs));
   transform: translateX(-50%);
   pointer-events: none;
-  z-index: 1;
+  /* Comfortably above .year-progress-caption (position:relative, its own
+     positioned stacking level) -- confirmed live that a low z-index here
+     could still end up hidden behind it once dragged underneath. */
+  z-index: 10;
 }
 
 /* The ephemeral "peek" a press/drag on the bar or a tap on a tick
