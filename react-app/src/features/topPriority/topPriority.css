@@ -89,8 +89,9 @@
    and the goal list. Same card recipe as .priority-card (border/radius/
    glow-gradient/shadow) so it reads as one more card on this page, not
    a separate visual language -- concept-only reference to the source
-   idea (Pattrn's dot-year card), not its black-card look. Static, no
-   tap target. */
+   idea (Pattrn's dot-year card), not its black-card look. The caption
+   is the one tap target (see its own rule below) -- everything else
+   stays a plain read. */
 .year-progress-widget {
   margin-bottom: var(--space-md);
   padding: var(--space-lg);
@@ -116,11 +117,29 @@
   color: var(--color-text-primary);
 }
 
+/* Button reset -- this is the widget's one tap target (toggles "Day X
+   of Y" vs. "N days left", see YearProgressWidget), so it needs to look
+   like the same quiet caption text either state is showing rather than
+   like a button. `position: relative` gives the crossfading <span>
+   inside something to sit against so its own enter/exit y-offset never
+   shifts this row's layout. */
 .year-progress-caption {
+  position: relative;
   flex-shrink: 0;
+  appearance: none;
+  border: none;
+  background: none;
+  padding: 0;
+  font: inherit;
   font-size: var(--font-size-caption);
   color: var(--color-text-muted);
   font-variant-numeric: tabular-nums;
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.year-progress-caption:hover {
+  color: var(--color-text-secondary);
 }
 
 /* The whole widget, now: a filled pill tracking `percentage` directly,

@@ -47,7 +47,17 @@ export function getYearDayProgress(now = new Date()) {
 
   const percentage = totalDays ? Math.round((elapsedDays / totalDays) * 100) : 0;
 
-  return { year, totalDays, elapsedDays, percentage };
+  // How far through *today itself* `now` is, layered under elapsedDays'
+  // whole-day count -- lets the widget's bar fill creep forward within
+  // a single day instead of only ever jumping once at midnight, which
+  // is what actually makes it read as time passing rather than a fixed
+  // snapshot. Never rounded or shown as a number -- only percentage/
+  // elapsedDays above are what any visible text reads.
+  const msIntoToday = now - startOfToday;
+  const preciseElapsedDays = Math.min(totalDays, elapsedDays - 1 + msIntoToday / MS_PER_DAY);
+  const precisePercentage = totalDays ? (preciseElapsedDays / totalDays) * 100 : 0;
+
+  return { year, totalDays, elapsedDays, percentage, precisePercentage };
 }
 
 // Bar-position percentages for the start of each month after January
