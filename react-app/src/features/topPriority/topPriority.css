@@ -188,16 +188,21 @@
   outline-offset: 2px;
 }
 
-/* The ephemeral "peek" a press/drag on the bar or a tap on a tick
-   reveals (see YearProgressWidget's pinDay state) -- pointer-events:none
-   so it never itself intercepts the drag happening on the track right
-   underneath it. */
-.year-progress-pin {
+/* Static positioning for the ephemeral "peek" (see .year-progress-pin
+   below) -- always present (empty when no pin is showing) so
+   AnimatePresence's direct child can be exactly the motion.div it
+   animates in/out, with positioning kept entirely separate from that. */
+.year-progress-pin-anchor {
   position: absolute;
   bottom: calc(100% + var(--space-xs));
-  /* No transform here -- Motion owns it entirely (see the x/y/scale it
-     animates in YearProgressWidget), including the constant -50% x
-     offset that centers this over its `left` position. */
+  transform: translateX(-50%);
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* The ephemeral "peek" a press/drag on the bar or a tap on a tick
+   reveals (see YearProgressWidget's pinDay state). */
+.year-progress-pin {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -207,9 +212,7 @@
   background: var(--color-bg-elevated);
   border: 1px solid var(--color-border-strong);
   box-shadow: var(--shadow-subtle);
-  pointer-events: none;
   white-space: nowrap;
-  z-index: 1;
 }
 
 .year-progress-pin-date {

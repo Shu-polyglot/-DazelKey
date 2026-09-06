@@ -148,25 +148,28 @@ function YearProgressWidget() {
         </motion.button>
       </div>
       <div className="year-progress-bar-wrap">
-        <AnimatePresence>
-          {pinDay != null && (
-            <motion.div
-              key="pin"
-              className="year-progress-pin"
-              // x stays a constant -50% (CSS could do this instead, but
-              // Motion fully owns `transform` once it's animating y/scale
-              // at all -- setting it here too keeps it from clobbering a
-              // separate CSS transform on this element).
-              initial={{ opacity: 0, y: 4, scale: 0.92, x: '-50%', left: `${pinPercent}%` }}
-              animate={{ opacity: 1, y: 0, scale: 1, x: '-50%', left: `${pinPercent}%` }}
-              exit={{ opacity: 0, y: 4, scale: 0.92, x: '-50%' }}
-              transition={transitions.micro}
-            >
-              <span className="year-progress-pin-date">{formatShortDate(dateFromDayOfYear(year, pinDay))}</span>
-              <span className="year-progress-pin-relative">{relativeDayLabel(pinDay, elapsedDays)}</span>
-            </motion.div>
-          )}
-        </AnimatePresence>
+        {/* Positioning lives on this plain, always-present anchor (a
+            static -50% translateX in CSS) -- AnimatePresence needs its
+            *direct* child to be the motion component it's tracking for
+            exit, so the thing it actually wraps below is exactly the
+            motion.div and nothing else. */}
+        <div className="year-progress-pin-anchor" style={{ left: `${pinPercent ?? 0}%` }}>
+          <AnimatePresence>
+            {pinDay != null && (
+              <motion.div
+                key="pin"
+                className="year-progress-pin"
+                initial={{ opacity: 0, y: 4, scale: 0.92 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                exit={{ opacity: 0, y: 4, scale: 0.92 }}
+                transition={transitions.micro}
+              >
+                <span className="year-progress-pin-date">{formatShortDate(dateFromDayOfYear(year, pinDay))}</span>
+                <span className="year-progress-pin-relative">{relativeDayLabel(pinDay, elapsedDays)}</span>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
 
         <div
           className="year-progress-bar-track"
