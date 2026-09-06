@@ -25,12 +25,6 @@ const captionVariants = {
   exit: { opacity: 0, y: 4, transition: transitions.exit },
 };
 
-const pinVariants = {
-  enter: { opacity: 0, y: 4, scale: 0.92 },
-  center: { opacity: 1, y: 0, scale: 1, transition: transitions.micro },
-  exit: { opacity: 0, y: 4, scale: 0.92, transition: transitions.micro },
-};
-
 function relativeDayLabel(dayOfYear, elapsedDays) {
   const diff = dayOfYear - elapsedDays;
   if (diff === 0) {
@@ -157,12 +151,16 @@ function YearProgressWidget() {
         <AnimatePresence>
           {pinDay != null && (
             <motion.div
+              key="pin"
               className="year-progress-pin"
-              style={{ left: `${pinPercent}%` }}
-              variants={pinVariants}
-              initial="enter"
-              animate="center"
-              exit="exit"
+              // x stays a constant -50% (CSS could do this instead, but
+              // Motion fully owns `transform` once it's animating y/scale
+              // at all -- setting it here too keeps it from clobbering a
+              // separate CSS transform on this element).
+              initial={{ opacity: 0, y: 4, scale: 0.92, x: '-50%', left: `${pinPercent}%` }}
+              animate={{ opacity: 1, y: 0, scale: 1, x: '-50%', left: `${pinPercent}%` }}
+              exit={{ opacity: 0, y: 4, scale: 0.92, x: '-50%' }}
+              transition={transitions.micro}
             >
               <span className="year-progress-pin-date">{formatShortDate(dateFromDayOfYear(year, pinDay))}</span>
               <span className="year-progress-pin-relative">{relativeDayLabel(pinDay, elapsedDays)}</span>

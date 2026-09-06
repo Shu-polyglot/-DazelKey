@@ -195,7 +195,9 @@
 .year-progress-pin {
   position: absolute;
   bottom: calc(100% + var(--space-xs));
-  transform: translateX(-50%);
+  /* No transform here -- Motion owns it entirely (see the x/y/scale it
+     animates in YearProgressWidget), including the constant -50% x
+     offset that centers this over its `left` position. */
   display: flex;
   flex-direction: column;
   align-items: center;
