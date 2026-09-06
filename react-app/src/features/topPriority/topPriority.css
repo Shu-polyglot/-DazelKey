@@ -142,9 +142,19 @@
   color: var(--color-text-secondary);
 }
 
+/* Wraps the track so the pinned-date popup (see .year-progress-pin) has
+   somewhere to sit *above* the track without being clipped by the
+   track's own overflow:hidden (needed to keep the fill/ticks inside its
+   pill shape). */
+.year-progress-bar-wrap {
+  position: relative;
+}
+
 /* The whole widget, now: a filled pill tracking `percentage` directly,
    with a week-boundary tick underneath (see .year-progress-bar-ticks)
-   standing in for the old day-by-day dot grid. */
+   standing in for the old day-by-day dot grid. touch-action:none stops
+   a press-drag here from also scrolling the page vertically, so
+   scrubbing (see YearProgressWidget) feels immediate on touch. */
 .year-progress-bar-track {
   position: relative;
   height: 8px;
@@ -152,6 +162,63 @@
   border: 1px solid var(--color-border);
   background: rgba(var(--color-void-1-rgb), 0.4);
   overflow: hidden;
+  touch-action: none;
+  cursor: pointer;
+}
+
+/* Invisible hit target laid over each visual tick (see
+   .year-progress-bar-tick below) -- wider than that 1px line so it's
+   actually tappable, especially on touch. Stays within the track's own
+   height rather than extending past it, since the track clips overflow. */
+.year-progress-tick-target {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 20px;
+  transform: translateX(-50%);
+  appearance: none;
+  border: none;
+  background: transparent;
+  padding: 0;
+  cursor: pointer;
+}
+
+.year-progress-tick-target:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+/* The ephemeral "peek" a press/drag on the bar or a tap on a tick
+   reveals (see YearProgressWidget's pinDay state) -- pointer-events:none
+   so it never itself intercepts the drag happening on the track right
+   underneath it. */
+.year-progress-pin {
+  position: absolute;
+  bottom: calc(100% + var(--space-xs));
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-3xs);
+  padding: var(--space-2xs) var(--space-sm);
+  border-radius: var(--radius-md);
+  background: var(--color-bg-elevated);
+  border: 1px solid var(--color-border-strong);
+  box-shadow: var(--shadow-subtle);
+  pointer-events: none;
+  white-space: nowrap;
+  z-index: 1;
+}
+
+.year-progress-pin-date {
+  font-family: var(--font-family-display);
+  font-size: var(--font-size-body-sm);
+  color: var(--color-text-primary);
+}
+
+.year-progress-pin-relative {
+  font-size: var(--font-size-caption);
+  color: var(--color-text-muted);
 }
 
 .year-progress-bar-fill {

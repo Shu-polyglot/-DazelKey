@@ -60,17 +60,35 @@ export function getYearDayProgress(now = new Date()) {
   return { year, totalDays, elapsedDays, percentage, precisePercentage };
 }
 
-// Bar-position percentages for the start of each month after January
-// (Feb 1 through Dec 1) -- the year progress bar's month-boundary
-// ticks. January's own start is the bar's left edge, so it isn't
-// included as a tick.
+// Bar-position ticks for the start of each month after January (Feb 1
+// through Dec 1) -- the year progress bar's month-boundary marks.
+// January's own start is the bar's left edge, so it isn't included.
+// Each entry carries its own day-of-year alongside its bar percent so a
+// tap on a tick (see YearProgressWidget) can resolve straight back to
+// an exact date instead of re-deriving one from a rounded percent.
 export function getMonthBoundaryPercentages(year, totalDays) {
   const startOfYear = new Date(year, 0, 1);
-  const percentages = [];
+  const boundaries = [];
   for (let month = 1; month < 12; month += 1) {
     const monthStart = new Date(year, month, 1);
     const dayOfYear = Math.round((monthStart - startOfYear) / MS_PER_DAY) + 1;
-    percentages.push(((dayOfYear - 1) / totalDays) * 100);
+    boundaries.push({ month, dayOfYear, percent: ((dayOfYear - 1) / totalDays) * 100 });
   }
-  return percentages;
+  return boundaries;
+}
+
+// Inverse of the day-of-year math above -- turns a 1-based day-of-year
+// back into an actual calendar date, for the year progress bar's
+// scrubber (see YearProgressWidget) turning a tapped/dragged position
+// back into a real day to show.
+export function dateFromDayOfYear(year, dayOfYear) {
+  const date = new Date(year, 0, 1);
+  date.setDate(date.getDate() + (dayOfYear - 1));
+  return date;
+}
+
+// "Mar 15" -- no year, for contexts (like the year progress bar's
+// scrubber) where the year is already obvious from the surrounding UI.
+export function formatShortDate(date) {
+  return new Intl.DateTimeFormat('en-US', { month: 'short', day: 'numeric' }).format(date);
 }
