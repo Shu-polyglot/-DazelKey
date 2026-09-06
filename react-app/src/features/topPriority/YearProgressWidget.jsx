@@ -43,7 +43,21 @@ function YearProgressWidget() {
 
   useEffect(() => {
     const timer = setInterval(() => setProgress(getYearDayProgress()), REFRESH_INTERVAL_MS);
-    return () => clearInterval(timer);
+    // Backgrounded tabs throttle setInterval (browsers cap or pause timers
+    // once document.hidden is true), so the fill can sit stale for however
+    // long this tab was in the background -- catch it up the instant
+    // someone actually looks at it again instead of waiting on whatever's
+    // left of the throttled interval.
+    function handleVisibilityChange() {
+      if (!document.hidden) {
+        setProgress(getYearDayProgress());
+      }
+    }
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    return () => {
+      clearInterval(timer);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
   }, []);
 
   const { year, totalDays, elapsedDays, percentage, precisePercentage } = progress;
