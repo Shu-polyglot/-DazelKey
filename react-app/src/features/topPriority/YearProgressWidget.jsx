@@ -58,7 +58,19 @@ function relativeDayLabel(dayOfYear, elapsedDays) {
 function YearProgressWidget() {
   const [progress, setProgress] = useState(() => getYearDayProgress());
   const [showDaysLeft, setShowDaysLeft] = useState(false);
+  // pinDay, once first set, is never cleared back to null -- it's the
+  // last date shown, kept around so content stays put while isPinVisible
+  // fades it out (see showPin). Not Motion/AnimatePresence-driven: this
+  // one element never actually animated under Motion (a plain
+  // motion.div, initial/animate, no exit-triggering surprises) reliably
+  // in testing -- opacity got stuck at its `initial` value with zero
+  // WAAPI animations ever registered on it, for reasons that didn't
+  // trace back to anything in this file. A plain CSS transition on
+  // .is-visible sidesteps whatever that was; duration/easing below are
+  // still read from styles/motion's own tokens, just applied as CSS
+  // instead of a Motion prop.
   const [pinDay, setPinDay] = useState(null);
+  const [isPinVisible, setIsPinVisible] = useState(false);
 
   const trackRef = useRef(null);
   const dismissTimerRef = useRef(null);
@@ -96,7 +108,8 @@ function YearProgressWidget() {
   function showPin(dayOfYear) {
     clearTimeout(dismissTimerRef.current);
     setPinDay(dayOfYear);
-    dismissTimerRef.current = setTimeout(() => setPinDay(null), PIN_DISMISS_MS);
+    setIsPinVisible(true);
+    dismissTimerRef.current = setTimeout(() => setIsPinVisible(false), PIN_DISMISS_MS);
   }
 
   function dayFromClientX(clientX) {
@@ -119,7 +132,12 @@ function YearProgressWidget() {
     showPin(dayFromClientX(event.clientX));
   }
 
-  const pinPercent = pinDay != null ? ((pinDay - 1) / totalDays) * 100 : null;
+  // Defaults so this renders (invisible, opacity 0 by default in CSS)
+  // from the very first paint, before pinDay is ever set -- a CSS
+  // transition only plays on a class change to an *already-mounted*
+  // node, so the pin has to already exist the first time showPin flips
+  // isPinVisible true, not be freshly created in that same render.
+  const pinPercent = pinDay != null ? ((pinDay - 1) / totalDays) * 100 : 0;
 
   return (
     <div className="year-progress-widget">
@@ -148,27 +166,21 @@ function YearProgressWidget() {
         </motion.button>
       </div>
       <div className="year-progress-bar-wrap">
-        {/* Positioning lives on this plain, always-present anchor (a
-            static -50% translateX in CSS) -- AnimatePresence needs its
-            *direct* child to be the motion component it's tracking for
-            exit, so the thing it actually wraps below is exactly the
-            motion.div and nothing else. */}
-        <div className="year-progress-pin-anchor" style={{ left: `${pinPercent ?? 0}%` }}>
-          <AnimatePresence>
+        <div className="year-progress-pin-anchor" style={{ left: `${pinPercent}%` }}>
+          <div
+            className={`year-progress-pin${isPinVisible ? ' is-visible' : ''}`}
+            style={{
+              transitionDuration: `${transitions.micro.duration}s`,
+              transitionTimingFunction: `cubic-bezier(${transitions.micro.ease.join(',')})`,
+            }}
+          >
             {pinDay != null && (
-              <motion.div
-                key="pin"
-                className="year-progress-pin"
-                initial={{ opacity: 0, y: 4, scale: 0.92 }}
-                animate={{ opacity: 1, y: 0, scale: 1 }}
-                exit={{ opacity: 0, y: 4, scale: 0.92 }}
-                transition={transitions.micro}
-              >
+              <>
                 <span className="year-progress-pin-date">{formatShortDate(dateFromDayOfYear(year, pinDay))}</span>
                 <span className="year-progress-pin-relative">{relativeDayLabel(pinDay, elapsedDays)}</span>
-              </motion.div>
+              </>
             )}
-          </AnimatePresence>
+          </div>
         </div>
 
         <div
