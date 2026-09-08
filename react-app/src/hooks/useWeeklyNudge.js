@@ -28,6 +28,14 @@ export function useWeeklyNudge(buckets) {
   // fallen out of `candidates` (completed/deleted since). Returning the
   // same `prev` reference when neither is true lets React bail out of
   // re-rendering instead of looping.
+  //
+  // Depends on `state.bucketId`/`state.weekKey`, not just `candidates` --
+  // useLocalStorage's own async Supabase hydrate (a separate effect) can
+  // overwrite local state with a stale remote value *after* this effect
+  // already ran once on mount, which a candidates-only dependency list
+  // would never notice (candidates hadn't changed, so the effect
+  // wouldn't re-fire to re-validate the clobbered pick). Re-running
+  // whenever state itself changes -- for any reason -- closes that gap.
   useEffect(() => {
     setState((prev) => {
       const currentWeekKey = getIsoWeekKey();
@@ -43,7 +51,7 @@ export function useWeeklyNudge(buckets) {
 
       return { weekKey: currentWeekKey, bucketId, dismissedIds, suggestedIds };
     });
-  }, [candidates, setState]);
+  }, [candidates, state.bucketId, state.weekKey, setState]);
 
   function dismissNudge() {
     setState((prev) => {

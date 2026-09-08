@@ -37,10 +37,13 @@ jobs:
       - name: Build
         working-directory: react-app
         env:
-          # Both values are designed to be publicly available in a browser.
+          # All values here are designed to be publicly available in a
+          # browser (the Google client ID is a public OAuth client-side
+          # token flow, no client secret involved -- see .env.example).
           # Do not put a service_role or secret key in this workflow.
           VITE_SUPABASE_URL: https://yrovrilfgaaewaashipy.supabase.co
           VITE_SUPABASE_PUBLISHABLE_KEY: sb_publishable_cMTCTCrW-4VFuF1EyRZfuw_0xE53Clc
+          VITE_GOOGLE_CALENDAR_CLIENT_ID: 193453650584-se38eos764gj5tn2dve1bo1t86v2nsle.apps.googleusercontent.com
         run: npm run build
 
       - name: Upload Pages artifact

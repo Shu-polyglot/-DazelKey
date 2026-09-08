@@ -3,6 +3,7 @@ import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'motion/react';
 import ExecutePlanFlow from '../Execute/ExecutePlanFlow';
 import { getWhenLabel } from '../../lib/buckets';
+import { describeFreeEvening } from '../../lib/weeklyNudge';
 import { entranceTransition, spring } from '../../styles/motion';
 import '../Modals/Modals.css';
 import './WeeklyNudgeCard.css';
@@ -19,13 +20,22 @@ const tapProps = {
   question, not an instruction: #9 Human Agency means this offers,
   it never tells someone what they should do, and "Not this week" has to
   be exactly as easy to tap as "Execute".
+
+  `freeEvening` (from useGoogleCalendar, optional) swaps the generic
+  question for a specific offered slot ("Today 18:00–21:00 looks free —
+  want to go?") once a real Google Calendar connection can back it up --
+  the exact Human Agency "Good" example from the Life OS note, degrading
+  to the generic ask whenever Calendar isn't connected or nothing's
+  free.
 */
-function WeeklyNudgeCard({ bucket, onUpdate, onDismiss }) {
+function WeeklyNudgeCard({ bucket, freeEvening, onUpdate, onDismiss }) {
   const [isExecuteOpen, setIsExecuteOpen] = useState(false);
 
   if (!bucket) {
     return null;
   }
+
+  const freeSlotLabel = describeFreeEvening(freeEvening);
 
   // Same apply logic as ExpandedBucketCard's handleApplyExecutePlan --
   // the schedule becomes this Bucket's own Itinerary and `place` fills
@@ -53,7 +63,9 @@ function WeeklyNudgeCard({ bucket, onUpdate, onDismiss }) {
       transition={entranceTransition(0)}
     >
       <span className="weekly-nudge-eyebrow">This week</span>
-      <p className="weekly-nudge-question">Could you make time for this?</p>
+      <p className="weekly-nudge-question">
+        {freeSlotLabel ? `${freeSlotLabel} looks free — want to go?` : 'Could you make time for this?'}
+      </p>
       <p className="weekly-nudge-title">{bucket.title}</p>
       <p className="weekly-nudge-meta">
         {bucket.place ? `${bucket.place} · ` : ''}

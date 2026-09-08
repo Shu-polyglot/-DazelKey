@@ -36,3 +36,22 @@ export function pickNudgeCandidate(candidates, { suggestedIds = [], excludeIds =
   const pick = finalPool[Math.floor(Math.random() * finalPool.length)];
   return pick.id;
 }
+
+const TIME_LABEL_FORMAT = new Intl.DateTimeFormat('en-US', { hour: 'numeric', minute: '2-digit' });
+const WEEKDAY_LABEL_FORMAT = new Intl.DateTimeFormat('en-US', { weekday: 'long' });
+
+// Turns the soonest entry from getFreeEveningsThisWeek (lib/googleCalendar)
+// into the one-line "today 18:00–21:00" WeeklyNudgeCard shows instead of
+// its generic "this week" copy once a real free evening is known --
+// see that note's own Human Agency example ("今日18:00〜21:00なら近場で
+// 行けそう") for why this stays a specific, offered slot rather than a
+// vaguer nudge. Returns null when there's nothing to describe (no
+// Google Calendar connection, or no free evening this week).
+export function describeFreeEvening(freeEvening) {
+  if (!freeEvening) {
+    return null;
+  }
+  const dayLabel =
+    freeEvening.dayIndex === 0 ? 'Today' : freeEvening.dayIndex === 1 ? 'Tomorrow' : WEEKDAY_LABEL_FORMAT.format(freeEvening.date);
+  return `${dayLabel} ${TIME_LABEL_FORMAT.format(freeEvening.windowStart)}–${TIME_LABEL_FORMAT.format(freeEvening.windowEnd)}`;
+}

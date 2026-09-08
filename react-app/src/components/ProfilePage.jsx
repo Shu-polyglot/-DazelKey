@@ -6,6 +6,7 @@ import AchievementGallery from './Achievements/AchievementGallery';
 import AboutManifesto from './shared/AboutManifesto';
 import PreviewProfile from './shared/PreviewProfile';
 import FriendsScreen from './Friends/FriendsScreen';
+import GoogleCalendarConnect from './shared/GoogleCalendarConnect';
 import { useFriends } from '../hooks/useFriends';
 import { getInitials, getSocialPlatformLabel } from '../lib/profile';
 import { entranceTransition, spring } from '../styles/motion';
@@ -90,6 +91,7 @@ function ProfilePage({
   onAddBucket,
   onEditProfile,
   onReplayTutorial,
+  googleCalendar,
 }) {
   const hasPhoto = Boolean(profile?.photo);
   const [activeTab, setActiveTab] = useState('buckets');
@@ -221,6 +223,8 @@ function ProfilePage({
         <button type="button" className="profile-page-about-link" onClick={() => setIsAboutOpen(true)}>
           About DazelKey
         </button>
+
+        <GoogleCalendarConnect googleCalendar={googleCalendar} />
       </div>
 
       <div className="profile-tabs" role="tablist" aria-label="Profile sections">

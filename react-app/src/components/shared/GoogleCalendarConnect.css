@@ -1,0 +1,41 @@
+/* Mirrors .profile-page-about-link's quiet caption-link tone
+   (ProfilePage.css) -- a secondary data-connection control, not a
+   primary header action. */
+.google-calendar-connect {
+  margin-top: var(--space-xs);
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+  flex-wrap: wrap;
+}
+
+.google-calendar-connect-link {
+  appearance: none;
+  background: none;
+  border: none;
+  padding: 0;
+  font-size: var(--font-size-caption);
+  letter-spacing: var(--tracking-wide);
+  color: var(--color-text-muted);
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.google-calendar-connect-link:hover:not(:disabled) {
+  color: var(--color-text-secondary);
+}
+
+.google-calendar-connect-link:disabled {
+  cursor: default;
+  opacity: 0.6;
+}
+
+.google-calendar-connect-status {
+  font-size: var(--font-size-caption);
+  color: var(--color-accent);
+}
+
+.google-calendar-connect-error {
+  font-size: var(--font-size-caption);
+  color: var(--color-danger);
+}

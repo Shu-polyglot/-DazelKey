@@ -28,6 +28,7 @@ import { usePublicProfile } from './hooks/usePublicProfile';
 import { useOnboardingTutorial } from './hooks/useOnboardingTutorial';
 import { useVotes } from './hooks/useVotes';
 import { useContributions } from './hooks/useContributions';
+import { useGoogleCalendar } from './hooks/useGoogleCalendar';
 import { useRoute, readAddFriendHandleFromHash, readAddFriendHandleFromQuery } from './hooks/useRoute';
 import { todayIso } from './lib/dates';
 import { getTotalProgress } from './lib/doing';
@@ -71,6 +72,12 @@ function App() {
   }, []);
 
   const { buckets, addBucket, updateBucket, deleteBucket, completeBucket, addAchievement } = useBuckets();
+  // Called once here (not inside StrategyPage/ProfilePage individually)
+  // since every tab page stays mounted simultaneously (see the
+  // tab-page divs below) -- two independent instances would each fire
+  // their own silent-reconnect + freeBusy fetch at the same moment,
+  // which raced unreliably against each other in testing.
+  const googleCalendar = useGoogleCalendar();
   const { profile, updateProfile, completeProfile } = useProfile();
   const { publicProfile, saveHandleAndProfile } = usePublicProfile();
   useAchievementSync(buckets, publicProfile);
@@ -396,6 +403,7 @@ function App() {
                 onAddBucket={() => setIsAddModalOpen(true)}
                 activeView={momentumView}
                 onViewChange={setMomentumView}
+                googleCalendar={googleCalendar}
               />
             </div>
 
@@ -424,6 +432,7 @@ function App() {
                 onAddBucket={addBucket}
                 onEditProfile={() => setIsProfileOpen(true)}
                 onReplayTutorial={() => setIsReplayTutorialOpen(true)}
+                googleCalendar={googleCalendar}
               />
             </div>
           </main>

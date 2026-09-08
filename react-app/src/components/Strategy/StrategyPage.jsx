@@ -66,6 +66,7 @@ function StrategyPage({
   onAddBucket,
   activeView,
   onViewChange,
+  googleCalendar,
 }) {
   // Drops out once doingCompletedAt is set (100% reached, see App.jsx's
   // checkDoingCompletion) -- the goal itself lives on in `buckets` for
@@ -79,6 +80,12 @@ function StrategyPage({
   const atDoingCap = doingGoals.length >= MAX_DOING_GOALS;
 
   const { nudgeBucket, dismissNudge } = useWeeklyNudge(buckets);
+  // The soonest free evening this week, when Google Calendar is
+  // connected (see App.jsx's single useGoogleCalendar() call, passed
+  // down as `googleCalendar` -- see GoogleCalendarConnect's own comment
+  // on why this isn't called locally here too) -- entries come back
+  // sorted by dayIndex, so [0] is always the nearest one.
+  const nudgeFreeEvening = googleCalendar.freeEvenings[0] || null;
 
   const [isAddGoalOpen, setIsAddGoalOpen] = useState(false);
   const [isLogMoneyOpen, setIsLogMoneyOpen] = useState(false);
@@ -139,7 +146,12 @@ function StrategyPage({
       <AnimatePresence mode="wait">
         {activeView === 'bucket-lists' ? (
           <motion.div key="bucket-lists" variants={viewVariants} initial="enter" animate="center" exit="exit">
-            <WeeklyNudgeCard bucket={nudgeBucket} onUpdate={onUpdateBucket} onDismiss={dismissNudge} />
+            <WeeklyNudgeCard
+              bucket={nudgeBucket}
+              freeEvening={nudgeFreeEvening}
+              onUpdate={onUpdateBucket}
+              onDismiss={dismissNudge}
+            />
             <BucketListPanel
               buckets={buckets}
               onUpdate={onUpdateBucket}
