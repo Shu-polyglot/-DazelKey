@@ -15,6 +15,7 @@ import './BucketList.css';
 // (see StrategyPage) after the Core/Bucket Lists swap.
 function BucketListPanel({
   buckets,
+  googleCalendar,
   onUpdate,
   onDelete,
   onComplete,
@@ -120,6 +121,8 @@ function BucketListPanel({
             <ExpandedBucketCard
               key={expandedBucket.id}
               bucket={expandedBucket}
+              buckets={buckets}
+              googleCalendar={googleCalendar}
               layoutId={`${layoutIdPrefix}${expandedBucket.id}`}
               onClose={() => setExpandedId(null)}
               onUpdate={onUpdate}

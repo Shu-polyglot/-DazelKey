@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'motion/react';
-import ExecutePlanFlow from '../Execute/ExecutePlanFlow';
+import RecommendPlanFlow from '../Execute/RecommendPlanFlow';
 import { getWhenLabel } from '../../lib/buckets';
 import { describeFreeEvening } from '../../lib/weeklyNudge';
 import { entranceTransition, spring } from '../../styles/motion';
@@ -19,7 +19,7 @@ const tapProps = {
   Obsidian design notes (see CLAUDE.md). Deliberately a single soft
   question, not an instruction: #9 Human Agency means this offers,
   it never tells someone what they should do, and "Not this week" has to
-  be exactly as easy to tap as "Execute".
+  be exactly as easy to tap as "Recommend".
 
   `freeEvening` (from useGoogleCalendar, optional) swaps the generic
   question for a specific offered slot ("Today 18:00–21:00 looks free —
@@ -28,19 +28,24 @@ const tapProps = {
   to the generic ask whenever Calendar isn't connected or nothing's
   free.
 */
-function WeeklyNudgeCard({ bucket, freeEvening, onUpdate, onDismiss }) {
-  const [isExecuteOpen, setIsExecuteOpen] = useState(false);
+function WeeklyNudgeCard({ bucket, buckets, googleCalendar, freeEvening, onUpdate, onDismiss }) {
+  const [isRecommendOpen, setIsRecommendOpen] = useState(false);
 
   if (!bucket) {
     return null;
   }
 
   const freeSlotLabel = describeFreeEvening(freeEvening);
+  // Same "become" exclusion as ExpandedBucketCard's own Recommend
+  // gating (see that component's comment) -- an ongoing pursuit like
+  // "Score 900 on the TOEIC" doesn't get a dated-itinerary
+  // recommendation.
+  const showRecommend = bucket.difficulty?.goalShape !== 'become';
 
-  // Same apply logic as ExpandedBucketCard's handleApplyExecutePlan --
+  // Same apply logic as ExpandedBucketCard's handleApplyRecommendPlan --
   // the schedule becomes this Bucket's own Itinerary and `place` fills
   // in only if it wasn't already set.
-  function handleApplyExecutePlan(result) {
+  function handleApplyRecommendPlan(result) {
     const patch = { executePlan: result };
     if (result.plan) {
       patch.planItems = (result.plan.schedule || []).map((item, index) => ({
@@ -73,9 +78,11 @@ function WeeklyNudgeCard({ bucket, freeEvening, onUpdate, onDismiss }) {
       </p>
 
       <div className="weekly-nudge-actions">
-        <motion.button type="button" className="secondary-button" onClick={() => setIsExecuteOpen(true)} {...tapProps}>
-          ⚡ Execute
-        </motion.button>
+        {showRecommend && (
+          <motion.button type="button" className="secondary-button" onClick={() => setIsRecommendOpen(true)} {...tapProps}>
+            ✨ Recommend
+          </motion.button>
+        )}
         <motion.button type="button" className="weekly-nudge-dismiss" onClick={onDismiss} {...tapProps}>
           Not this week
         </motion.button>
@@ -83,12 +90,14 @@ function WeeklyNudgeCard({ bucket, freeEvening, onUpdate, onDismiss }) {
 
       {createPortal(
         <AnimatePresence>
-          {isExecuteOpen && (
-            <ExecutePlanFlow
-              key="execute-plan-flow"
+          {isRecommendOpen && (
+            <RecommendPlanFlow
+              key="recommend-plan-flow"
               bucket={bucket}
-              onApply={handleApplyExecutePlan}
-              onClose={() => setIsExecuteOpen(false)}
+              buckets={buckets}
+              googleCalendar={googleCalendar}
+              onApply={handleApplyRecommendPlan}
+              onClose={() => setIsRecommendOpen(false)}
             />
           )}
         </AnimatePresence>,

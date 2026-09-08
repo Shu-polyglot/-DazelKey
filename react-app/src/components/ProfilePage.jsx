@@ -252,6 +252,7 @@ function ProfilePage({
       {activeTab === 'buckets' ? (
         <BucketListPanel
           buckets={buckets}
+          googleCalendar={googleCalendar}
           onUpdate={onUpdateBucket}
           onDelete={onDeleteBucket}
           onComplete={onCompleteBucket}

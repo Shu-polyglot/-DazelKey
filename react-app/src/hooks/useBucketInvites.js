@@ -43,7 +43,13 @@ export function useBucketInvites() {
   // see bucket_invites.sql's unique_bucket_invite -- so re-inviting the
   // same friend to the same Bucket after a decline flips the same row
   // back to 'pending' instead of erroring.
-  async function sendInvite(toUserId, bucket) {
+  //
+  // `plan` (optional, see bucket_invites_plan.sql) is a
+  // RecommendPlanFlow result -- when given, the invitee's Accept
+  // creates their own Bucket with that same schedule/budget already
+  // attached (see FriendsScreen's handleAcceptInvite), so they land
+  // somewhere ready to act on immediately instead of an empty title.
+  async function sendInvite(toUserId, bucket, plan = null) {
     if (!currentUserId) {
       return { error: { message: 'Not signed in.' } };
     }
@@ -56,6 +62,7 @@ export function useBucketInvites() {
         place: bucket.place || '',
         bucket_when: bucket.when,
         message: bucket.message || '',
+        plan,
         status: 'pending',
       },
       { onConflict: 'from_user_id,to_user_id,source_bucket_id' },

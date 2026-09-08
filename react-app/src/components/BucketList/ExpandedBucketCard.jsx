@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import BucketPlanEditor from '../Modals/BucketPlanEditor';
-import ExecutePlanFlow from '../Execute/ExecutePlanFlow';
+import RecommendPlanFlow from '../Execute/RecommendPlanFlow';
 import BucketInviteModal from './BucketInviteModal';
 import CompletePrompt from '../shared/CompletePrompt';
 import CompletedPhotoHero from '../shared/CompletedPhotoHero';
@@ -35,8 +34,16 @@ function getMeta(bucket) {
   return getWhenLabel(bucket.when);
 }
 
-function ExpandedCardView({ bucket, onEdit, onExecute, onInvite, onDelete, onClose, onComplete, readOnly }) {
+function ExpandedCardView({ bucket, onRecommend, onInvite, onDelete, onClose, onComplete, readOnly }) {
   const hasPhotoHero = bucket.status === 'completed' && Boolean(bucket.image);
+  // "become" Buckets (see classify-bucket-difficulty's goalShape --
+  // an ongoing pursuit like "Score 900 on the TOEIC") don't get
+  // Recommend at all: a single dated itinerary doesn't fit something no
+  // one sitting finishes. Unclassified Buckets (difficulty still
+  // pending -- see useBucketDifficulty) default to showing it, since
+  // most Buckets are "do"-shaped and classification catching up
+  // shouldn't hide the feature in the meantime.
+  const showRecommend = bucket.status !== 'completed' && bucket.difficulty?.goalShape !== 'become';
 
   function handleDelete() {
     if (confirm('Delete this experience?\n\nThis action cannot be undone.')) {
@@ -93,9 +100,9 @@ function ExpandedCardView({ bucket, onEdit, onExecute, onInvite, onDelete, onClo
 
       {!readOnly && (
         <div className="expanded-card-actions detail-actions">
-          {bucket.status !== 'completed' && (
-            <motion.button type="button" className="secondary-button" onClick={onExecute} {...tapProps}>
-              ⚡ Execute
+          {showRecommend && (
+            <motion.button type="button" className="secondary-button" onClick={onRecommend} {...tapProps}>
+              ✨ Recommend
             </motion.button>
           )}
           {bucket.status !== 'completed' && (
@@ -103,9 +110,6 @@ function ExpandedCardView({ bucket, onEdit, onExecute, onInvite, onDelete, onClo
               Invite
             </motion.button>
           )}
-          <motion.button type="button" className="secondary-button" onClick={onEdit} {...tapProps}>
-            Plan
-          </motion.button>
           <motion.button type="button" className="secondary-button" onClick={handleDelete} {...tapProps}>
             Delete
           </motion.button>
@@ -121,18 +125,16 @@ function ExpandedCardView({ bucket, onEdit, onExecute, onInvite, onDelete, onClo
  * the card's on-screen rect into the centered, expanded position (and
  * back again on close) instead of presenting a separate modal.
  */
-function ExpandedBucketCard({ bucket, onClose, onUpdate, onDelete, onComplete, layoutId, readOnly = false }) {
-  const [mode, setMode] = useState('view');
-  const [isExecuteOpen, setIsExecuteOpen] = useState(false);
+function ExpandedBucketCard({ bucket, buckets, googleCalendar, onClose, onUpdate, onDelete, onComplete, layoutId, readOnly = false }) {
+  const [isRecommendOpen, setIsRecommendOpen] = useState(false);
   const [isInviteOpen, setIsInviteOpen] = useState(false);
 
-  // Applies an Execute-generated plan: the schedule becomes this
-  // Bucket's own Itinerary (same field/display ExpandedBucketCard's Plan
-  // button edits) so nothing new has to render it, `place` fills in only
-  // if this Bucket didn't already have one, and the full result is kept
-  // under executePlan so reopening Execute shows it again instead of
-  // starting over.
-  function handleApplyExecutePlan(result) {
+  // Applies a Recommend result: the schedule becomes this Bucket's own
+  // Itinerary (same field ExpandedBucketCard's itinerary list reads),
+  // `place` fills in only if this Bucket didn't already have one, and
+  // the full result is kept under executePlan so reopening Recommend
+  // shows the same plan again instead of regenerating.
+  function handleApplyRecommendPlan(result) {
     const patch = { executePlan: result };
     if (result.plan) {
       patch.planItems = (result.plan.schedule || []).map((item, index) => ({
@@ -173,42 +175,32 @@ function ExpandedBucketCard({ bucket, onClose, onUpdate, onDelete, onComplete, l
     >
       <motion.article
         layoutId={layoutId || `bucket-card-${bucket.id}`}
-        className={`expanded-card${mode === 'edit' ? ' is-editing' : ''}`}
+        className="expanded-card"
         data-status={getStatusLabel(bucket)}
         transition={{ layout: { duration: 0.6, ease: easing.emphasized } }}
       >
         <motion.div variants={contentVariants} initial="hidden" animate="visible" exit="exit">
-          {mode === 'edit' ? (
-            <BucketPlanEditor
-              bucket={bucket}
-              onCancel={() => setMode('view')}
-              onSave={(patch) => {
-                onUpdate(bucket.id, patch);
-                setMode('view');
-              }}
-            />
-          ) : (
-            <ExpandedCardView
-              bucket={bucket}
-              onEdit={() => setMode('edit')}
-              onExecute={() => setIsExecuteOpen(true)}
-              onInvite={() => setIsInviteOpen(true)}
-              onDelete={onDelete}
-              onClose={onClose}
-              onComplete={onComplete}
-              readOnly={readOnly}
-            />
-          )}
+          <ExpandedCardView
+            bucket={bucket}
+            onRecommend={() => setIsRecommendOpen(true)}
+            onInvite={() => setIsInviteOpen(true)}
+            onDelete={onDelete}
+            onClose={onClose}
+            onComplete={onComplete}
+            readOnly={readOnly}
+          />
         </motion.div>
       </motion.article>
 
       <AnimatePresence>
-        {isExecuteOpen && (
-          <ExecutePlanFlow
-            key="execute-plan-flow"
+        {isRecommendOpen && (
+          <RecommendPlanFlow
+            key="recommend-plan-flow"
             bucket={bucket}
-            onApply={handleApplyExecutePlan}
-            onClose={() => setIsExecuteOpen(false)}
+            buckets={buckets}
+            googleCalendar={googleCalendar}
+            onApply={handleApplyRecommendPlan}
+            onClose={() => setIsRecommendOpen(false)}
           />
         )}
       </AnimatePresence>

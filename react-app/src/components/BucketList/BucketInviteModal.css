@@ -1,10 +1,11 @@
-/* Opened from inside ExpandedBucketCard, same as ExecutePlanFlow --
-   needs the identical z-index bump over that card's own overlay
-   (z-index 40, ExpandedBucketCard.css). See Execute.css's matching rule
-   for why this is scoped here instead of raising Modals.css' shared
-   default. */
+/* Opened either from inside ExpandedBucketCard (z-index 40) or from
+   RecommendPlanFlow's full-screen takeover (z-index 400,
+   RecommendPlanFlow.css) -- 410 clears both callers, not just
+   whichever one this was first written for. See Execute.css's matching
+   rule for why this is scoped here instead of raising Modals.css'
+   shared default. */
 .modal-backdrop:has(.invite-modal) {
-  z-index: 50;
+  z-index: 410;
 }
 
 /* Same quiet, centered hint tone as Execute's own .execute-hint
@@ -14,4 +15,19 @@
   color: var(--color-text-muted);
   font-size: var(--font-size-body-sm);
   text-align: center;
+}
+
+/* Small marker next to the eyebrow when this invite carries a
+   Recommend-generated plan (see RecommendPlanFlow) -- lets the sender
+   see at a glance that this isn't a bare "want to join?" ask. */
+.invite-modal-plan-badge {
+  display: inline-block;
+  margin-left: var(--space-xs);
+  padding: 1px var(--space-xs);
+  border-radius: var(--radius-pill);
+  background: var(--color-accent-subtle);
+  color: var(--color-accent-strong);
+  font-size: var(--font-size-caption);
+  letter-spacing: normal;
+  text-transform: none;
 }

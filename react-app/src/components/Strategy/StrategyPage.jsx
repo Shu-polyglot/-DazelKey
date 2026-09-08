@@ -148,12 +148,15 @@ function StrategyPage({
           <motion.div key="bucket-lists" variants={viewVariants} initial="enter" animate="center" exit="exit">
             <WeeklyNudgeCard
               bucket={nudgeBucket}
+              buckets={buckets}
+              googleCalendar={googleCalendar}
               freeEvening={nudgeFreeEvening}
               onUpdate={onUpdateBucket}
               onDismiss={dismissNudge}
             />
             <BucketListPanel
               buckets={buckets}
+              googleCalendar={googleCalendar}
               onUpdate={onUpdateBucket}
               onDelete={onDeleteBucket}
               onComplete={onCompleteBucket}

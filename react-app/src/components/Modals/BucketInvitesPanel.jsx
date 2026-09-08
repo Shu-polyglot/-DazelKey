@@ -2,7 +2,9 @@ import { useEffect, useState } from 'react';
 import { motion } from 'motion/react';
 import { lookupPublicProfileByUserId } from '../../hooks/usePublicProfile';
 import { getWhenLabel } from '../../lib/buckets';
+import { formatDate } from '../../lib/dates';
 import { spring } from '../../styles/motion';
+import '../BucketList/BucketInviteModal.css';
 
 // Mirrors FriendRequestsPanel exactly (same row/action shape), but for
 // incoming Bucket invites (see useBucketInvites/bucket_invites.sql) --
@@ -42,7 +44,17 @@ function BucketInvitesPanel({ incomingInvites, onAccept, onDecline }) {
         {incomingInvites.map((invite) => {
           const senderProfile = profilesById[invite.from_user_id];
           const senderName = senderProfile?.name || 'Someone';
-          const detail = [invite.place, getWhenLabel(invite.bucket_when)].filter(Boolean).join(' · ');
+          // A Recommend-generated plan (see RecommendPlanFlow) makes a
+          // much more concrete first impression than the bare place/
+          // when this row otherwise falls back to -- a real date and
+          // destination reads as "here's an actual plan", not just a
+          // request.
+          const planDestination = invite.plan?.plan?.destination;
+          const planDate = invite.plan?.plan?.date;
+          const hasPlan = Boolean(planDestination || planDate);
+          const detail = hasPlan
+            ? [planDestination, planDate && formatDate(planDate)].filter(Boolean).join(' · ')
+            : [invite.place, getWhenLabel(invite.bucket_when)].filter(Boolean).join(' · ');
           return (
             <div className="profile-share-row friend-row" key={invite.id}>
               <span
@@ -50,7 +62,10 @@ function BucketInvitesPanel({ incomingInvites, onAccept, onDecline }) {
                 style={{ backgroundImage: senderProfile?.photo ? `url(${senderProfile.photo})` : 'none' }}
               />
               <div className="friend-row-meta">
-                <span className="friend-row-name">{invite.title}</span>
+                <span className="friend-row-name">
+                  {invite.title}
+                  {hasPlan && <span className="invite-modal-plan-badge">✨ Plan</span>}
+                </span>
                 <span className="friend-row-handle">{senderName} invited you</span>
                 {detail && <span className="friend-row-detail">{detail}</span>}
               </div>

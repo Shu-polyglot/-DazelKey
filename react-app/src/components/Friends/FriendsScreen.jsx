@@ -47,15 +47,27 @@ function FriendsScreen({ onClose, onAddBucket }) {
 
   async function handleAcceptInvite(invite) {
     const { error } = await respondToInvite(invite.id, true);
-    if (!error) {
-      onAddBucket({
-        title: invite.title,
-        place: invite.place,
-        when: invite.bucket_when,
-        message: invite.message,
-        mode: 'together',
-      });
+    if (error) {
+      return;
     }
+    // A Recommend-generated plan (see RecommendPlanFlow) rides along on
+    // the invite -- carrying it straight into planItems/executePlan
+    // means the new Bucket arrives already schedule-ready (same
+    // shortcuts, same itinerary), not just a bare title the invitee
+    // would have to plan all over again themselves.
+    const patch = { title: invite.title, place: invite.place, when: invite.bucket_when, message: invite.message, mode: 'together' };
+    if (invite.plan?.plan) {
+      patch.executePlan = invite.plan;
+      patch.planItems = (invite.plan.plan.schedule || []).map((item, index) => ({
+        id: `plan-${Date.now()}-${index}-${Math.random().toString(36).slice(2, 6)}`,
+        time: item.time,
+        text: item.text,
+      }));
+      if (!patch.place && invite.plan.plan.destination) {
+        patch.place = invite.plan.plan.destination;
+      }
+    }
+    onAddBucket(patch);
   }
 
   return (

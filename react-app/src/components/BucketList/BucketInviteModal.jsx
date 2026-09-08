@@ -22,7 +22,7 @@ const tapProps = {
 // invite object, not a DM). Every friend row shows the invite's current
 // state for THIS Bucket specifically -- a friend can be mid-invite on
 // one Bucket and untouched on another.
-function BucketInviteModal({ bucket, onClose }) {
+function BucketInviteModal({ bucket, plan = null, onClose }) {
   const { friendships, currentUserId } = useFriends();
   const { outgoingForBucket, sendInvite } = useBucketInvites();
   const [profilesById, setProfilesById] = useState({});
@@ -55,7 +55,7 @@ function BucketInviteModal({ bucket, onClose }) {
 
   async function handleInvite(friendId) {
     setSendingId(friendId);
-    await sendInvite(friendId, bucket);
+    await sendInvite(friendId, bucket, plan);
     setSendingId(null);
   }
 
@@ -63,7 +63,10 @@ function BucketInviteModal({ bucket, onClose }) {
     <Modal onClose={onClose} className="step-editor-modal invite-modal">
       <div className="step-editor">
         <div className="step-editor-topbar">
-          <p className="step-editor-eyebrow">Invite to &ldquo;{bucket.title}&rdquo;</p>
+          <p className="step-editor-eyebrow">
+            Invite to &ldquo;{bucket.title}&rdquo;
+            {plan?.plan && <span className="invite-modal-plan-badge">Plan attached</span>}
+          </p>
           <motion.button
             type="button"
             className="icon-button"
@@ -97,7 +100,7 @@ function BucketInviteModal({ bucket, onClose }) {
                   </div>
                   <div className="friend-row-actions">
                     {status === 'accepted' ? (
-                      <span className="friend-row-detail">Joined</span>
+                      <span className="friend-row-detail">🎉 Joined</span>
                     ) : (
                       <motion.button
                         type="button"

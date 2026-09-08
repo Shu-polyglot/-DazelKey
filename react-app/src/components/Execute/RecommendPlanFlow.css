@@ -1,0 +1,122 @@
+/* Full-screen takeover, same tier as CompleteScreen (z-index 400, sits
+   above BottomNav) -- Recommend is meant to land as a moment, not
+   another form-shaped modal. Unlike CompleteScreen's fixed 3:4 card,
+   this scrolls: a plan carries far more content (schedule, shortcuts,
+   sources) than a single achievement beat. */
+.recommend-flow {
+  position: fixed;
+  inset: 0;
+  z-index: 400;
+  overflow-y: auto;
+  touch-action: manipulation;
+  background: radial-gradient(ellipse at 50% 0%, var(--color-bg-elevated) 0%, var(--color-bg) 72%);
+}
+
+.recommend-flow-close {
+  position: sticky;
+  top: var(--space-lg);
+  left: calc(100% - 56px);
+  z-index: 1;
+}
+
+.recommend-flow-stage {
+  min-height: 100vh;
+  flex-direction: column;
+  gap: var(--space-lg);
+}
+
+.recommend-flow-content {
+  max-width: 560px;
+  margin: 0 auto;
+  padding: 0 var(--space-lg) var(--space-2xl);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xl);
+}
+
+.recommend-flow-hero {
+  text-align: center;
+  padding-top: var(--space-sm);
+}
+
+.recommend-flow-eyebrow {
+  display: block;
+  font-size: var(--font-size-label);
+  letter-spacing: var(--tracking-wider);
+  text-transform: uppercase;
+  color: var(--color-accent-strong);
+  margin-bottom: var(--space-xs);
+}
+
+.recommend-flow-destination {
+  margin: 0 0 var(--space-sm);
+  font-family: var(--font-family-display);
+  font-weight: var(--font-weight-regular);
+  font-size: clamp(1.75rem, 6vw, 2.5rem);
+  line-height: var(--leading-tight);
+  color: var(--color-text-primary);
+  text-shadow: 0 4px 32px rgba(var(--color-void-1-rgb), 0.5);
+}
+
+.recommend-flow-meta {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.8em;
+  font-size: var(--font-size-body-sm);
+  color: var(--color-text-secondary);
+}
+
+.recommend-flow-summary {
+  margin-top: var(--space-md);
+}
+
+.recommend-flow-schedule {
+  border-top: none;
+  padding-top: 0;
+}
+
+.recommend-flow-section {
+  text-align: left;
+}
+
+.recommend-flow-shortcuts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-sm);
+}
+
+.recommend-flow-shortcut {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2xs);
+  padding: var(--space-xs) var(--space-md);
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--color-border);
+  background: rgba(var(--color-mist-rgb), 0.04);
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-body-sm);
+  text-decoration: none;
+  transition: border-color 0.2s ease, color 0.2s ease, background 0.2s ease;
+}
+
+.recommend-flow-shortcut:hover {
+  border-color: rgba(var(--color-glow-rgb), 0.4);
+  color: var(--color-text-primary);
+  background: rgba(var(--color-glow-rgb), 0.08);
+}
+
+.recommend-flow-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-sm);
+  justify-content: center;
+  padding-top: var(--space-md);
+  border-top: 1px solid var(--color-border);
+}
+
+@media (max-width: 640px) {
+  .recommend-flow-content {
+    padding: 0 var(--space-md) var(--space-xl);
+  }
+}
