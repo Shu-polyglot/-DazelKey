@@ -7,8 +7,10 @@ import LogMoneyFlow from './LogMoneyFlow';
 import DoingHistoryModal from './DoingHistoryModal';
 import AddGoalFlow from './AddGoalFlow';
 import BucketListPanel from '../BucketList/BucketListPanel';
+import WeeklyNudgeCard from '../BucketList/WeeklyNudgeCard';
 import { MAX_DOING_GOALS } from '../../lib/buckets';
 import { getTotalProgress } from '../../lib/doing';
+import { useWeeklyNudge } from '../../hooks/useWeeklyNudge';
 import { entranceTransition, spring, transitions } from '../../styles/motion';
 import '../Modals/Modals.css';
 import './Strategy.css';
@@ -76,6 +78,8 @@ function StrategyPage({
   const eligibleBuckets = buckets.filter((bucket) => bucket.status !== 'completed' && !bucket.doingEnabled);
   const atDoingCap = doingGoals.length >= MAX_DOING_GOALS;
 
+  const { nudgeBucket, dismissNudge } = useWeeklyNudge(buckets);
+
   const [isAddGoalOpen, setIsAddGoalOpen] = useState(false);
   const [isLogMoneyOpen, setIsLogMoneyOpen] = useState(false);
   const [expandedDoingGoalId, setExpandedDoingGoalId] = useState(null);
@@ -135,6 +139,7 @@ function StrategyPage({
       <AnimatePresence mode="wait">
         {activeView === 'bucket-lists' ? (
           <motion.div key="bucket-lists" variants={viewVariants} initial="enter" animate="center" exit="exit">
+            <WeeklyNudgeCard bucket={nudgeBucket} onUpdate={onUpdateBucket} onDismiss={dismissNudge} />
             <BucketListPanel
               buckets={buckets}
               onUpdate={onUpdateBucket}

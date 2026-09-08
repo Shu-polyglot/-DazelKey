@@ -92,3 +92,24 @@ export function dateFromDayOfYear(year, dayOfYear) {
 export function formatShortDate(date) {
   return new Intl.DateTimeFormat('en-US', { month: 'short', day: 'numeric' }).format(date);
 }
+
+// ISO 8601 week number as "2026-W37" -- a plain string (not a Date) so
+// the Weekly Nudge (useWeeklyNudge) can tell "still this week" from "a
+// new week started" with a single string comparison against its saved
+// state, instead of re-deriving week boundaries on every check. Matches
+// the rest of this file's UTC-independent style (local calendar fields
+// only, no timezone math).
+export function getIsoWeekKey(date = new Date()) {
+  // ISO weeks start Monday and belong to the year holding their Thursday,
+  // so first nudge the date to that Thursday before reading the year.
+  const target = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+  const isoDayOfWeek = (target.getDay() + 6) % 7; // Monday = 0 ... Sunday = 6
+  target.setDate(target.getDate() - isoDayOfWeek + 3);
+
+  const isoYear = target.getFullYear();
+  const firstThursday = new Date(isoYear, 0, 1);
+  firstThursday.setDate(firstThursday.getDate() + ((3 - ((firstThursday.getDay() + 6) % 7) + 7) % 7));
+
+  const weekNumber = 1 + Math.round((target - firstThursday) / MS_PER_DAY / 7);
+  return `${isoYear}-W${String(weekNumber).padStart(2, '0')}`;
+}

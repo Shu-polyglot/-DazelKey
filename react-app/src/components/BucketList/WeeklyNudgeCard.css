@@ -1,0 +1,65 @@
+/* Strategy's own proactive suggestion, sitting just above The Bucket
+   List (see StrategyPage) -- same card recipe as .strategy-goal-card
+   (Strategy.css) so it reads as belonging to this screen rather than a
+   one-off banner. */
+.weekly-nudge-card {
+  margin-bottom: var(--space-lg);
+  padding: var(--space-lg);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--color-border);
+  background: radial-gradient(circle at 50% 0%, rgba(var(--color-glow-rgb), 0.07), transparent 60%), var(--color-bg-elevated);
+  box-shadow: var(--shadow-medium);
+}
+
+.weekly-nudge-eyebrow {
+  display: block;
+  font-size: var(--font-size-label);
+  letter-spacing: var(--tracking-wider);
+  text-transform: uppercase;
+  color: var(--color-accent);
+}
+
+.weekly-nudge-question {
+  margin-top: var(--space-2xs);
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-body-sm);
+}
+
+.weekly-nudge-title {
+  margin-top: var(--space-xs);
+  font-family: var(--font-family-display);
+  font-size: var(--font-size-h3);
+  color: var(--color-text-primary);
+}
+
+.weekly-nudge-meta {
+  margin-top: var(--space-3xs);
+  color: var(--color-text-muted);
+  font-size: var(--font-size-caption);
+}
+
+.weekly-nudge-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  margin-top: var(--space-md);
+}
+
+/* Deliberately as easy a tap target as Execute itself -- this is a
+   proposal, not a task to push through (#9 Human Agency, see this
+   component's own header comment), so declining it can't read as the
+   harder or lesser option. */
+.weekly-nudge-dismiss {
+  appearance: none;
+  background: none;
+  border: none;
+  padding: var(--space-xs) var(--space-sm);
+  color: var(--color-text-muted);
+  font-size: var(--font-size-body-sm);
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.weekly-nudge-dismiss:hover {
+  color: var(--color-text-secondary);
+}
