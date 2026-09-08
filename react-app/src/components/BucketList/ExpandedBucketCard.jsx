@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import BucketPlanEditor from '../Modals/BucketPlanEditor';
 import ExecutePlanFlow from '../Execute/ExecutePlanFlow';
+import BucketInviteModal from './BucketInviteModal';
 import CompletePrompt from '../shared/CompletePrompt';
 import CompletedPhotoHero from '../shared/CompletedPhotoHero';
 import { getStatusLabel, getWhenLabel, sortPlanItems, formatPlanTime } from '../../lib/buckets';
@@ -34,7 +35,7 @@ function getMeta(bucket) {
   return getWhenLabel(bucket.when);
 }
 
-function ExpandedCardView({ bucket, onEdit, onExecute, onDelete, onClose, onComplete, readOnly }) {
+function ExpandedCardView({ bucket, onEdit, onExecute, onInvite, onDelete, onClose, onComplete, readOnly }) {
   const hasPhotoHero = bucket.status === 'completed' && Boolean(bucket.image);
 
   function handleDelete() {
@@ -97,6 +98,11 @@ function ExpandedCardView({ bucket, onEdit, onExecute, onDelete, onClose, onComp
               ⚡ Execute
             </motion.button>
           )}
+          {bucket.status !== 'completed' && (
+            <motion.button type="button" className="secondary-button" onClick={onInvite} {...tapProps}>
+              Invite
+            </motion.button>
+          )}
           <motion.button type="button" className="secondary-button" onClick={onEdit} {...tapProps}>
             Plan
           </motion.button>
@@ -118,6 +124,7 @@ function ExpandedCardView({ bucket, onEdit, onExecute, onDelete, onClose, onComp
 function ExpandedBucketCard({ bucket, onClose, onUpdate, onDelete, onComplete, layoutId, readOnly = false }) {
   const [mode, setMode] = useState('view');
   const [isExecuteOpen, setIsExecuteOpen] = useState(false);
+  const [isInviteOpen, setIsInviteOpen] = useState(false);
 
   // Applies an Execute-generated plan: the schedule becomes this
   // Bucket's own Itinerary (same field/display ExpandedBucketCard's Plan
@@ -185,6 +192,7 @@ function ExpandedBucketCard({ bucket, onClose, onUpdate, onDelete, onComplete, l
               bucket={bucket}
               onEdit={() => setMode('edit')}
               onExecute={() => setIsExecuteOpen(true)}
+              onInvite={() => setIsInviteOpen(true)}
               onDelete={onDelete}
               onClose={onClose}
               onComplete={onComplete}
@@ -204,6 +212,8 @@ function ExpandedBucketCard({ bucket, onClose, onUpdate, onDelete, onComplete, l
           />
         )}
       </AnimatePresence>
+
+      {isInviteOpen && <BucketInviteModal bucket={bucket} onClose={() => setIsInviteOpen(false)} />}
     </motion.div>
   );
 }

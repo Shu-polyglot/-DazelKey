@@ -1,0 +1,17 @@
+/* Opened from inside ExpandedBucketCard, same as ExecutePlanFlow --
+   needs the identical z-index bump over that card's own overlay
+   (z-index 40, ExpandedBucketCard.css). See Execute.css's matching rule
+   for why this is scoped here instead of raising Modals.css' shared
+   default. */
+.modal-backdrop:has(.invite-modal) {
+  z-index: 50;
+}
+
+/* Same quiet, centered hint tone as Execute's own .execute-hint
+   (Execute.css) -- not imported directly since that file also carries
+   a lot of Execute-specific layout this modal doesn't need. */
+.invite-modal-empty {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-body-sm);
+  text-align: center;
+}

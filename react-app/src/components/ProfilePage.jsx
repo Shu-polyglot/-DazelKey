@@ -87,6 +87,7 @@ function ProfilePage({
   onUpdateBucket,
   onDeleteBucket,
   onCompleteBucket,
+  onAddBucket,
   onEditProfile,
   onReplayTutorial,
 }) {
@@ -281,7 +282,9 @@ function ProfilePage({
 
       {createPortal(
         <AnimatePresence>
-          {isFriendsOpen && <FriendsScreen key="friends-screen" onClose={() => setIsFriendsOpen(false)} />}
+          {isFriendsOpen && (
+            <FriendsScreen key="friends-screen" onClose={() => setIsFriendsOpen(false)} onAddBucket={onAddBucket} />
+          )}
         </AnimatePresence>,
         document.body,
       )}

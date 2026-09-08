@@ -421,6 +421,7 @@ function App() {
                 onUpdateBucket={updateBucket}
                 onDeleteBucket={deleteBucket}
                 onCompleteBucket={handleCompleteBucket}
+                onAddBucket={addBucket}
                 onEditProfile={() => setIsProfileOpen(true)}
                 onReplayTutorial={() => setIsReplayTutorialOpen(true)}
               />
