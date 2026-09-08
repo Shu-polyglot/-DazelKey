@@ -180,6 +180,14 @@ export function normalizeBucket(bucket, index) {
     // card shows what was already found instead of starting over. Only
     // ever set by that flow; every other bucket keeps this null.
     executePlan: bucket.executePlan && typeof bucket.executePlan === 'object' ? bucket.executePlan : null,
+
+    // Coarse feasibility tags (timeCommitment/costTier/seasonality/
+    // travelRequired) -- see supabase/functions/classify-bucket-difficulty
+    // and useBucketDifficulty, which fills this in the background via
+    // Gemini, never asked of the user directly. Null until classified;
+    // every reader (lib/digitalOpportunityLoss.js) treats null as
+    // "unknown", never as a default tier.
+    difficulty: bucket.difficulty && typeof bucket.difficulty === 'object' ? bucket.difficulty : null,
   };
 }
 

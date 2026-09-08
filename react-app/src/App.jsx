@@ -19,6 +19,7 @@ import WhatsAheadExperience from './components/Archive/WhatsAheadExperience';
 import TransitionRitual from './components/TransitionRitual';
 import MilestoneRitual from './components/shared/MilestoneRitual';
 import CompleteScreen from './components/shared/CompleteScreen';
+import DigitalOpportunityLossRitual from './components/shared/DigitalOpportunityLossRitual';
 import AchievementPhotoPrompt from './components/Achievements/AchievementPhotoPrompt';
 import BottomNav from './components/BottomNav';
 import { useBuckets } from './hooks/useBuckets';
@@ -29,6 +30,8 @@ import { useOnboardingTutorial } from './hooks/useOnboardingTutorial';
 import { useVotes } from './hooks/useVotes';
 import { useContributions } from './hooks/useContributions';
 import { useGoogleCalendar } from './hooks/useGoogleCalendar';
+import { useBucketDifficulty } from './hooks/useBucketDifficulty';
+import { useDigitalOpportunityLoss } from './hooks/useDigitalOpportunityLoss';
 import { useRoute, readAddFriendHandleFromHash, readAddFriendHandleFromQuery } from './hooks/useRoute';
 import { todayIso } from './lib/dates';
 import { getTotalProgress } from './lib/doing';
@@ -78,6 +81,11 @@ function App() {
   // their own silent-reconnect + freeBusy fetch at the same moment,
   // which raced unreliably against each other in testing.
   const googleCalendar = useGoogleCalendar();
+  // Background-classifies open Buckets (see that hook's own comment) --
+  // feeds both the Weekly Opportunity ritual below and, later, any other
+  // feature that wants to reason about a Bucket's rough time/cost/season.
+  useBucketDifficulty(buckets, updateBucket);
+  const { shouldShow: showOpportunityLoss, markSeen: dismissOpportunityLoss } = useDigitalOpportunityLoss(buckets);
   const { profile, updateProfile, completeProfile } = useProfile();
   const { publicProfile, saveHandleAndProfile } = usePublicProfile();
   useAchievementSync(buckets, publicProfile);
@@ -368,6 +376,15 @@ function App() {
       <AnimatePresence>
         {isReplayTutorialOpen && (
           <OnboardingTutorial key="replay-tutorial" onClose={() => setIsReplayTutorialOpen(false)} />
+        )}
+      </AnimatePresence>
+
+      {/* Gated on hasEntered (not shown mid-onboarding) -- this is a
+          recurring weekly beat, not a first-run one, so it has to wait
+          until someone's actually reached the dashboard. */}
+      <AnimatePresence>
+        {hasEntered && showOpportunityLoss && (
+          <DigitalOpportunityLossRitual key="opportunity-loss" buckets={buckets} onClose={dismissOpportunityLoss} />
         )}
       </AnimatePresence>
 

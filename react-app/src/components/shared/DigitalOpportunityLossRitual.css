@@ -1,0 +1,41 @@
+/* Extends OnboardingTutorial.css's shell (imported alongside this file)
+   with the two things unique to this ritual: the final slide's example
+   list and the citation line under a stat-bearing slide. */
+
+.dol-example-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  width: 100%;
+  max-width: 320px;
+}
+
+.dol-example-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-md);
+  padding: var(--space-sm) var(--space-md);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-border);
+  background: rgba(var(--color-mist-rgb), 0.04);
+}
+
+.dol-example-title {
+  font-family: var(--font-family-display);
+  font-size: var(--font-size-body);
+  color: var(--color-text-primary);
+}
+
+.dol-example-count {
+  flex: 0 0 auto;
+  font-size: var(--font-size-body-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-accent-strong);
+}
+
+.dol-footnote {
+  margin-top: var(--space-xs);
+  font-size: var(--font-size-caption);
+  color: var(--color-text-muted);
+}
