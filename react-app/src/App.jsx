@@ -408,7 +408,7 @@ function App() {
             </div>
 
             <div className={`tab-page${route === 'explore' ? ' is-active' : ''}`} aria-hidden={route !== 'explore'}>
-              <ExploreFeed />
+              <ExploreFeed onAddBucket={addBucket} />
             </div>
 
             <div className={`tab-page${route === 'achievement' ? ' is-active' : ''}`} aria-hidden={route !== 'achievement'}>

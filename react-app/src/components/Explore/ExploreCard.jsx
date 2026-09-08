@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { motion } from 'motion/react';
 import { formatDate } from '../../lib/dates';
 import { modeLabels } from '../../lib/buckets';
@@ -20,6 +21,15 @@ function InspiredIcon({ active }) {
   );
 }
 
+// A plain "+", same construction as InspiredIcon above.
+function AddIcon() {
+  return (
+    <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true">
+      <path d="M12 5 V19 M5 12 H19" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
+    </svg>
+  );
+}
+
 // friendStatus: 'none' | 'requested' (outgoing, pending) | 'incoming'
 // (they requested us -- shown same as 'none' here since accepting an
 // incoming request happens from a dedicated requests list, not this
@@ -31,9 +41,19 @@ const FRIEND_BUTTON_LABEL = {
   friends: 'Friend',
 };
 
-function ExploreCard({ post, index = 0, onToggleInspired, friendStatus, onToggleFriend }) {
+function ExploreCard({ post, index = 0, onToggleInspired, friendStatus, onToggleFriend, onAddToBucketList }) {
   const meta = post.place;
   const isActive = friendStatus === 'friends' || friendStatus === 'requested';
+  // Local-only, resets on reload -- there's no stored link back to which
+  // Bucket (if any) a given Achievement was turned into, so this is just
+  // enough to stop a double-tap making two copies in the same sitting,
+  // not a durable "already added" record.
+  const [wasAdded, setWasAdded] = useState(false);
+
+  function handleAddToBucketList() {
+    onAddToBucketList(post);
+    setWasAdded(true);
+  }
 
   return (
     <motion.article
@@ -89,6 +109,22 @@ function ExploreCard({ post, index = 0, onToggleInspired, friendStatus, onToggle
         >
           <InspiredIcon active={post.isInspired} />
           Inspired · {post.inspiredCount}
+        </motion.button>
+
+        {/* Inspired alone dead-ends at a reaction -- this is the one tap
+            that actually carries a friend's completed Experience back
+            into the viewer's own Bucket List, instead of just being
+            seen. */}
+        <motion.button
+          type="button"
+          className={`explore-action-button${wasAdded ? ' is-active' : ''}`}
+          onClick={handleAddToBucketList}
+          disabled={wasAdded}
+          whileHover={{ y: -1, transition: spring.hover }}
+          whileTap={{ y: 1, scale: 0.96, transition: spring.press }}
+        >
+          <AddIcon />
+          {wasAdded ? 'Added' : 'Add to my Bucket List'}
         </motion.button>
       </div>
     </motion.article>

@@ -11,7 +11,7 @@ import './Explore.css';
 // to people the user has an accepted friendship with (see useFriends'
 // statusWith). Matches on post.user.id (a real auth user id), not a
 // display handle -- see useFriends.js for why.
-function ExploreFeed() {
+function ExploreFeed({ onAddBucket }) {
   const { feed, toggleInspired } = useExploreFeed();
   const { statusWith, sendRequest, removeFriendship, friendships } = useFriends();
 
@@ -32,6 +32,15 @@ function ExploreFeed() {
     if (row) {
       removeFriendship(row.id);
     }
+  }
+
+  // A friend's completed Achievement becomes a new, still-unlived
+  // intention for the viewer -- `when` is left for normalizeBucket's own
+  // default (there's no year attached to someone else's memory), and
+  // `message`/photo stay behind since those belong to the friend's own
+  // account of it, not a fresh Bucket.
+  function handleAddToBucketList(post) {
+    onAddBucket({ title: post.title, place: post.place, mode: post.mode });
   }
 
   return (
@@ -57,6 +66,7 @@ function ExploreFeed() {
               onToggleInspired={toggleInspired}
               friendStatus={statusWith(post.user.id)}
               onToggleFriend={() => handleToggleFriend(post.user.id)}
+              onAddToBucketList={handleAddToBucketList}
             />
           ))}
         </div>

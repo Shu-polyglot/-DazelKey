@@ -214,3 +214,7 @@
   border-color: rgba(var(--color-glow-rgb), 0.4);
   color: var(--color-accent-strong);
 }
+
+.explore-action-button:disabled {
+  cursor: default;
+}
