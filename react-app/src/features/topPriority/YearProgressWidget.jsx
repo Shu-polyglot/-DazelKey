@@ -48,10 +48,12 @@ function relativeDayLabel(dayOfYear, elapsedDays) {
      (every app launch, since this widget only exists while hasEntered
      -- see App.jsx), so the year's progress reads as growing into
      place rather than appearing already-filled.
-   - tapping the caption flips it between "Day X of Y" (looking back at
-     how far you've come) and "N days left in <year>" (looking forward
-     at what's left) -- the same fact, either direction, a crossfade
-     away.
+   - the headline is "Day X of Y" -- a plain day count reads as time
+     actually elapsing more directly than a percentage does ("2026 is
+     0% done" at the start of the year says nothing). The percentage is
+     still here, just demoted to the tappable caption below, which
+     flips between "<year> is Y% done." and "N days left in <year>" --
+     the same fact, either direction, a crossfade away.
    - pressing/dragging anywhere along the bar, or tapping a month tick,
      pins a small floating date (see pinDay state below) showing exactly
      what day that point in the year is and how far it sits from today
@@ -147,13 +149,13 @@ function YearProgressWidget() {
     <div className="year-progress-widget">
       <div className="year-progress-header">
         <p className="year-progress-heading">
-          {year} is {percentage}% done.
+          Day {elapsedDays} of {totalDays}
         </p>
         <motion.button
           type="button"
           className="year-progress-caption"
           onClick={() => setShowDaysLeft((prev) => !prev)}
-          aria-label={showDaysLeft ? 'Show day count instead' : 'Show days remaining this year instead'}
+          aria-label={showDaysLeft ? 'Show percent done instead' : 'Show days remaining this year instead'}
           {...tapProps}
         >
           <AnimatePresence mode="wait" initial={false}>
@@ -162,8 +164,8 @@ function YearProgressWidget() {
                 {daysLeft} day{daysLeft === 1 ? '' : 's'} left in {year}
               </motion.span>
             ) : (
-              <motion.span key="count" variants={captionVariants} initial="enter" animate="center" exit="exit">
-                Day {elapsedDays} of {totalDays}
+              <motion.span key="percent" variants={captionVariants} initial="enter" animate="center" exit="exit">
+                {year} is {percentage}% done.
               </motion.span>
             )}
           </AnimatePresence>

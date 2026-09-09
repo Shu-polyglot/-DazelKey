@@ -84,7 +84,7 @@
   letter-spacing: var(--tracking-wide);
 }
 
-/* "20XX is Y% done." -- one dot per week of the year (see
+/* "Day X of Y" -- one dot per week of the year (see
    YearProgressWidget/getYearWeekProgress), sitting between the tagline
    and the goal list. Same card recipe as .priority-card (border/radius/
    glow-gradient/shadow) so it reads as one more card on this page, not
@@ -117,8 +117,8 @@
   color: var(--color-text-primary);
 }
 
-/* Button reset -- this is the widget's one tap target (toggles "Day X
-   of Y" vs. "N days left", see YearProgressWidget), so it needs to look
+/* Button reset -- this is the widget's one tap target (toggles "Y%
+   done" vs. "N days left", see YearProgressWidget), so it needs to look
    like the same quiet caption text either state is showing rather than
    like a button. `position: relative` gives the crossfading <span>
    inside something to sit against so its own enter/exit y-offset never
