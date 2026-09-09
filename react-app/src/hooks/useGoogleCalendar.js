@@ -3,6 +3,7 @@ import {
   requestCalendarAccessToken,
   fetchPrimaryBusyIntervals,
   getFreeEveningsThisWeek,
+  countCommitmentsThisWeek,
 } from '../lib/googleCalendar';
 
 const CLIENT_ID = import.meta.env.VITE_GOOGLE_CALENDAR_CLIENT_ID;
@@ -45,6 +46,10 @@ function writeConnectedHint(value) {
 export function useGoogleCalendar() {
   const [status, setStatus] = useState('idle'); // idle | connecting | connected | error
   const [freeEvenings, setFreeEvenings] = useState([]);
+  // Commitment検出 (see lib/googleCalendar's own comment) -- how much of
+  // the week is already decided, the other half of "Uncommitted Life"
+  // alongside `freeEvenings` above.
+  const [commitmentCount, setCommitmentCount] = useState(0);
   const [error, setError] = useState('');
 
   const isAvailable = Boolean(CLIENT_ID);
@@ -52,6 +57,7 @@ export function useGoogleCalendar() {
   const refreshFreeEvenings = useCallback(async (accessToken) => {
     const busyIntervals = await fetchPrimaryBusyIntervals(accessToken);
     setFreeEvenings(getFreeEveningsThisWeek(busyIntervals));
+    setCommitmentCount(countCommitmentsThisWeek(busyIntervals));
   }, []);
 
   const connect = useCallback(
@@ -84,6 +90,7 @@ export function useGoogleCalendar() {
     writeConnectedHint(false);
     setStatus('idle');
     setFreeEvenings([]);
+    setCommitmentCount(0);
     setError('');
   }
 
@@ -97,5 +104,5 @@ export function useGoogleCalendar() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  return { isAvailable, status, freeEvenings, error, connect, disconnect };
+  return { isAvailable, status, freeEvenings, commitmentCount, error, connect, disconnect };
 }

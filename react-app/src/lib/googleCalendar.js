@@ -137,3 +137,14 @@ export function getFreeEveningsThisWeek(busyIntervals, { now = new Date(), days 
 
   return freeEvenings;
 }
+
+// "Commitment検出" -- the Life OS note's own term for the other half of
+// Free Time detection: Calendar isn't just useful for finding gaps, it
+// also names how much of the week is *already decided* (§4-6,
+// "Commitment vs Life" / "Uncommitted Life"). A plain count of the raw
+// busy blocks freeBusy returned -- deliberately not deduplicated or
+// merged, since each block is one real thing already on the calendar,
+// however small.
+export function countCommitmentsThisWeek(busyIntervals) {
+  return busyIntervals.length;
+}

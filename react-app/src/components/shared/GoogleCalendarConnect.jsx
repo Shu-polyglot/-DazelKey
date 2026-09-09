@@ -14,7 +14,11 @@ const tapProps = {
   need to touch it after the first connect. Once connected, its own
   free-evening count is just a confirmation that something real was
   read -- the actual use of that data is Weekly Nudge (WeeklyNudgeCard)
-  picking a specific evening instead of a bare "this week".
+  picking a specific evening instead of a bare "this week". The
+  commitment count alongside it is Commitment検出 (see
+  lib/googleCalendar's countCommitmentsThisWeek) -- the Life OS note's
+  other half of "Uncommitted Life", named here rather than left
+  invisible even though nothing else in the app reads it yet.
 
   Receives its Google Calendar state as props from App.jsx's single
   useGoogleCalendar() call (same cross-cutting-hook pattern as
@@ -31,7 +35,7 @@ const tapProps = {
   should never show a button that can only ever fail.
 */
 function GoogleCalendarConnect({ googleCalendar }) {
-  const { isAvailable, status, freeEvenings, error, connect, disconnect } = googleCalendar;
+  const { isAvailable, status, freeEvenings, commitmentCount, error, connect, disconnect } = googleCalendar;
 
   if (!isAvailable) {
     return null;
@@ -41,7 +45,8 @@ function GoogleCalendarConnect({ googleCalendar }) {
     return (
       <div className="google-calendar-connect">
         <span className="google-calendar-connect-status">
-          Google Calendar connected — {freeEvenings.length} free evening{freeEvenings.length === 1 ? '' : 's'} this week
+          Google Calendar connected — {commitmentCount} commitment{commitmentCount === 1 ? '' : 's'}, {freeEvenings.length} free evening
+          {freeEvenings.length === 1 ? '' : 's'} this week
         </span>
         <motion.button type="button" className="google-calendar-connect-link" onClick={disconnect} {...tapProps}>
           Disconnect
