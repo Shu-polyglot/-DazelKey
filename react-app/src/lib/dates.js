@@ -93,6 +93,18 @@ export function formatShortDate(date) {
   return new Intl.DateTimeFormat('en-US', { month: 'short', day: 'numeric' }).format(date);
 }
 
+// Forward direction of dateFromDayOfYear above -- a calendar date's own
+// 1-based day-of-year plus which year it actually fell in, for the year
+// progress bar's Achievement markers (see YearProgressWidget): a Bucket
+// completed last year has no place on this year's bar, so callers need
+// the year back to filter by, not just an index into it.
+export function getDayOfYearFromDate(date) {
+  const year = date.getFullYear();
+  const startOfYear = new Date(year, 0, 1);
+  const startOfDay = new Date(year, date.getMonth(), date.getDate());
+  return { year, dayOfYear: Math.round((startOfDay - startOfYear) / MS_PER_DAY) + 1 };
+}
+
 // ISO 8601 week number as "2026-W37" -- a plain string (not a Date) so
 // the Weekly Nudge (useWeeklyNudge) can tell "still this week" from "a
 // new week started" with a single string comparison against its saved

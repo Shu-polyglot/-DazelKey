@@ -35,6 +35,10 @@ import './topPriority.css';
 // swap, PreviewProfile's shared-profile stack today). 'page' wraps that
 // same content in the app-section/eyebrow/h2 heading every other
 // top-level tab supplies for itself, for Core's own standalone route.
+// `buckets`: only read by YearProgressWidget below (variant === 'page'),
+// for its own completed-this-year Achievement markers -- unrelated to
+// this file's own `priorities` store, so it's passed straight through
+// rather than merged into anything here.
 
 // ---- priority機能一時非表示 (temporary hide) --------------------------
 // Core page has been scaled back down to just the tagline + Year
@@ -46,7 +50,7 @@ import './topPriority.css';
 // suppressed. Flip back to `true` to restore the old Core page.
 const SHOW_PRIORITY_FEATURES = false;
 
-function TopPrioritySection({ readOnly = false, variant = 'embedded' }) {
+function TopPrioritySection({ readOnly = false, variant = 'embedded', buckets = [] }) {
   const { priorities, addPriority, updatePriority, deletePriority } = useTopPriorities();
   const { habits } = useHabits();
   const { logs } = useHabitLogs();
@@ -135,7 +139,7 @@ function TopPrioritySection({ readOnly = false, variant = 'embedded' }) {
     <Wrapper {...wrapperProps}>
       {heading}
 
-      {variant === 'page' && <YearProgressWidget />}
+      {variant === 'page' && <YearProgressWidget buckets={buckets} />}
 
       {/* priority機能一時非表示: goal list/cards, long-press edit menu,
           Action recording, and Records Timeline all live behind

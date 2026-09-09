@@ -406,7 +406,7 @@ function App() {
               {/* Core (tagline + Year Progress widget) used to be its own
                   leftmost tab -- now it sits at the top of Momentum instead,
                   see useRoute's #/core -> 'strategy' remap. */}
-              <TopPrioritySection variant="page" />
+              <TopPrioritySection variant="page" buckets={buckets} />
               <StrategyPage
                 buckets={buckets}
                 votes={votes}

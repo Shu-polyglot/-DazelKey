@@ -1,6 +1,12 @@
 import { useEffect, useRef, useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { getYearDayProgress, getMonthBoundaryPercentages, dateFromDayOfYear, formatShortDate } from '../../lib/dates';
+import {
+  getYearDayProgress,
+  getMonthBoundaryPercentages,
+  dateFromDayOfYear,
+  getDayOfYearFromDate,
+  formatShortDate,
+} from '../../lib/dates';
 import { transitions, spring } from '../../styles/motion';
 
 // How often the widget re-reads the clock while mounted -- frequent
@@ -60,8 +66,16 @@ function relativeDayLabel(dayOfYear, elapsedDays) {
      -- an ephemeral "peek", not a persistent selection, so it fades on
      its own (PIN_DISMISS_MS) rather than needing a second tap to
      dismiss.
+   - completed Buckets from this same year get their own small marker
+     on the track (achievementMarks below) -- a day a real memory was
+     made, not just one that elapsed. Life OS's Social Need note draws
+     this exact contrast: a bare date is meaningless on its own ("Sep 8,
+     2026" says nothing), it only means something once a lived moment
+     is attached to it. Tapping a marker reuses the same pin as a tick
+     tap, just naming what happened that day instead of a relative day
+     count.
 */
-function YearProgressWidget() {
+function YearProgressWidget({ buckets = [] }) {
   const [progress, setProgress] = useState(() => getYearDayProgress());
   const [showDaysLeft, setShowDaysLeft] = useState(false);
   // pinDay, once first set, is never cleared back to null -- it's the
@@ -105,6 +119,26 @@ function YearProgressWidget() {
   const { year, totalDays, elapsedDays, percentage, precisePercentage } = progress;
   const daysLeft = totalDays - elapsedDays;
   const monthBoundaries = getMonthBoundaryPercentages(year, totalDays);
+
+  // Only Buckets actually completed *within the year this bar is
+  // showing* -- one from a prior year has no honest place on this
+  // year's track. Keyed by day-of-year (not id) so the pin lookup below
+  // is a single map read; a same-day pair just keeps whichever was
+  // completed last, since the pin only ever names one.
+  const achievementByDay = new Map();
+  buckets
+    .filter((bucket) => bucket.status === 'completed' && bucket.completedDate)
+    .forEach((bucket) => {
+      const { year: completedYear, dayOfYear } = getDayOfYearFromDate(new Date(`${bucket.completedDate}T12:00:00`));
+      if (completedYear === year) {
+        achievementByDay.set(dayOfYear, bucket);
+      }
+    });
+  const achievementMarks = Array.from(achievementByDay.entries()).map(([dayOfYear, bucket]) => ({
+    dayOfYear,
+    title: bucket.title,
+    percent: ((dayOfYear - 1) / totalDays) * 100,
+  }));
 
   // Shared by both interactions below -- a tap on a tick knows its exact
   // day-of-year already; a press/drag on the bar has to derive one from
@@ -183,6 +217,9 @@ function YearProgressWidget() {
             {pinDay != null && (
               <>
                 <span className="year-progress-pin-date">{formatShortDate(dateFromDayOfYear(year, pinDay))}</span>
+                {achievementByDay.has(pinDay) && (
+                  <span className="year-progress-pin-achievement">✦ {achievementByDay.get(pinDay).title}</span>
+                )}
                 <span className="year-progress-pin-relative">{relativeDayLabel(pinDay, elapsedDays)}</span>
               </>
             )}
@@ -219,6 +256,24 @@ function YearProgressWidget() {
               // approximate one derived from the same pixel position.
               onPointerDown={(event) => event.stopPropagation()}
               onClick={() => showPin(boundary.dayOfYear)}
+            />
+          ))}
+          {achievementMarks.length > 0 && (
+            <div className="year-progress-bar-achievements" aria-hidden="true">
+              {achievementMarks.map((mark) => (
+                <span key={mark.dayOfYear} className="year-progress-bar-achievement" style={{ left: `${mark.percent}%` }} />
+              ))}
+            </div>
+          )}
+          {achievementMarks.map((mark) => (
+            <button
+              key={mark.dayOfYear}
+              type="button"
+              className="year-progress-achievement-target"
+              style={{ left: `${mark.percent}%` }}
+              aria-label={`${mark.title} -- ${formatShortDate(dateFromDayOfYear(year, mark.dayOfYear))}`}
+              onPointerDown={(event) => event.stopPropagation()}
+              onClick={() => showPin(mark.dayOfYear)}
             />
           ))}
         </div>

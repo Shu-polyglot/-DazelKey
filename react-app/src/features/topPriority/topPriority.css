@@ -188,6 +188,50 @@
   outline-offset: 2px;
 }
 
+/* Achievement markers -- a day a real memory was made (see
+   YearProgressWidget's achievementMarks), not just an elapsed one. A
+   filled dot rather than a thin blend-mode line (like
+   .year-progress-bar-tick above) so it still reads as a *mark left
+   behind* against either the dark track or the lit fill, not a
+   measurement notch. */
+.year-progress-bar-achievements {
+  position: absolute;
+  inset: 0;
+}
+
+.year-progress-bar-achievement {
+  position: absolute;
+  top: 50%;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  background: var(--color-accent-strong);
+  border: 1px solid rgba(var(--color-mist-rgb), 0.9);
+  box-shadow: 0 0 6px rgba(var(--color-glow-bright-rgb), 0.8);
+}
+
+/* Same invisible-hit-target recipe as .year-progress-tick-target
+   above, just anchored to an achievement's day instead of a month
+   boundary. */
+.year-progress-achievement-target {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 20px;
+  transform: translateX(-50%);
+  appearance: none;
+  border: none;
+  background: transparent;
+  padding: 0;
+  cursor: pointer;
+}
+
+.year-progress-achievement-target:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
 /* Static positioning for the ephemeral "peek" (see .year-progress-pin
    below). */
 .year-progress-pin-anchor {
@@ -237,6 +281,15 @@
 .year-progress-pin-relative {
   font-size: var(--font-size-caption);
   color: var(--color-text-muted);
+}
+
+/* What actually happened that day, when it's an Achievement's date --
+   accent-colored (not muted, unlike .year-progress-pin-relative above)
+   since this is the pin's one line meant to stand out: a lived moment,
+   not just a measurement of the date. */
+.year-progress-pin-achievement {
+  font-size: var(--font-size-caption);
+  color: var(--color-accent-strong);
 }
 
 .year-progress-bar-fill {
