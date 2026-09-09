@@ -43,7 +43,11 @@ function relativeDayLabel(dayOfYear, elapsedDays) {
      lib/dates) and re-reads the clock every REFRESH_INTERVAL_MS, so it
      visibly creeps forward the longer this page stays open. Motion
      tweens each step (transitions.emphasis) instead of snapping, so a
-     refresh reads as a nudge forward, not a jump cut.
+     refresh reads as a nudge forward, not a jump cut. The same tween
+     also plays from `initial={{ width: 0 }}` on every fresh mount
+     (every app launch, since this widget only exists while hasEntered
+     -- see App.jsx), so the year's progress reads as growing into
+     place rather than appearing already-filled.
    - tapping the caption flips it between "Day X of Y" (looking back at
      how far you've come) and "N days left in <year>" (looking forward
      at what's left) -- the same fact, either direction, a crossfade
@@ -191,6 +195,7 @@ function YearProgressWidget() {
         >
           <motion.div
             className="year-progress-bar-fill"
+            initial={{ width: 0 }}
             animate={{ width: `${precisePercentage}%` }}
             transition={transitions.emphasis}
           />
